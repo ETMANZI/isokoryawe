@@ -132,3 +132,16 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+# import os
+
+if os.environ.get("CREATE_SUPERUSER") == "1":
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+
+    if not User.objects.filter(email="eugenetuyizere@gmail.com").exists():
+        User.objects.create_superuser(
+            username="tmanzi",
+            email="eugenetuyizere@gmail.com",
+            password="manzi@15"
+        )

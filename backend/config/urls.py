@@ -10,11 +10,13 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 def health_check(request):
     return JsonResponse({"ok": True})
-
+def accounts_test(request):
+    return JsonResponse({"accounts": "ok"})
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/health/", health_check),
+    path("api/accounts/test/", accounts_test),
     path("api/accounts/", include("apps.accounts.urls")),
 
     # path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

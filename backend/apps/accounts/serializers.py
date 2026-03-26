@@ -55,21 +55,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             "role",
         ]
 
-    # ✅ Email validation
-    def validate_email(self, value):
-        value = value.strip().lower()
-        if User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("An account with this email already exists.")
-        return value
-
-    # ✅ Username validation
-    def validate_username(self, value):
-        value = value.strip()
-        if User.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError("This username is already taken.")
-        return value
-
-    # ✅ Role validation (case-safe)
     def validate_role(self, value):
         value = (value or "").strip().lower()
         allowed_roles = [User.Role.BUYER, User.Role.SELLER]
@@ -77,37 +62,27 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid account type.")
         return value
 
-    # ✅ Password match + Django validation
     def validate(self, attrs):
         if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError(
                 {"confirm_password": "Passwords do not match."}
             )
-
         password_validation.validate_password(attrs["password"])
         return attrs
 
-    # ✅ Create user safely
     def create(self, validated_data):
-        try:
-            validated_data.pop("confirm_password", None)
-            password = validated_data.pop("password")
+        validated_data.pop("confirm_password", None)
+        password = validated_data.pop("password")
 
-            validated_data["email"] = validated_data["email"].strip().lower()
-            validated_data["role"] = validated_data.get("role", User.Role.BUYER)
+        validated_data["email"] = validated_data["email"].strip().lower()
+        validated_data["role"] = validated_data.get("role", User.Role.BUYER)
 
-            user = User(**validated_data)
-            user.set_password(password)
-            user.save()
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
 
-            # 🔥 Safe profile creation (prevents crash)
-            Profile.objects.get_or_create(user=user)
-
-            return user
-
-        except Exception as e:
-            # 🔥 This will show REAL error on frontend
-            raise serializers.ValidationError(str(e))
+        Profile.objects.get_or_create(user=user)
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):

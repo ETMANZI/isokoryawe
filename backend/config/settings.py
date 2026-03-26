@@ -75,10 +75,15 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 DATABASES = {
     "default": dj_database_url.parse(
         DATABASE_URL if DATABASE_URL else f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
+        conn_max_age=0,
         ssl_require=False,
     )
 }
+
+DATABASES["default"]["OPTIONS"] = {
+    "connect_timeout": 10,
+}
+
 
 AUTH_USER_MODEL = "accounts.User"
 

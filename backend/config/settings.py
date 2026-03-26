@@ -154,24 +154,3 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
-if os.environ.get("CREATE_SUPERUSER") == "1":
-    try:
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-
-        admin_username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
-        admin_email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@example.com")
-        admin_password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "Admin123!")
-
-        if not User.objects.filter(email=admin_email).exists():
-            User.objects.create_superuser(
-                email=admin_email,
-                username=admin_username,
-                password=admin_password,
-            )
-            print(f"Superuser created: {admin_email}")
-        else:
-            print(f"Superuser already exists: {admin_email}")
-    except Exception as e:
-        print(f"Superuser creation skipped: {e}")

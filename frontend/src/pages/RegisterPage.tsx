@@ -96,7 +96,14 @@ export default function RegisterPage() {
       } else if (backend?.detail) {
         setError(backend.detail);
       } else {
-        setError("Registration failed. Please try again.");
+  // 🔥 Show full backend error for debugging
+        if (typeof backend === "string") {
+          setError(backend);
+        } else if (backend) {
+          setError(JSON.stringify(backend));
+        } else {
+          setError("Registration failed. Please try again.");
+        }
       }
     }
   };

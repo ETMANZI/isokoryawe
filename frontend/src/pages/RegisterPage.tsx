@@ -73,6 +73,10 @@ export default function RegisterPage() {
       setSuccess("Account created successfully. You can now sign in.");
       setTimeout(() => navigate("/login"), 1200);
     } catch (err: any) {
+      console.log("REGISTER ERROR:", err);
+      console.log("REGISTER RESPONSE:", err?.response);
+      console.log("REGISTER RESPONSE DATA:", err?.response?.data);
+
       const backend = err?.response?.data;
 
       if (backend?.email?.[0]) {
@@ -95,15 +99,16 @@ export default function RegisterPage() {
         setError(backend.non_field_errors[0]);
       } else if (backend?.detail) {
         setError(backend.detail);
+      } else if (typeof backend === "string") {
+        setError(backend);
+      } else if (Array.isArray(backend)) {
+        setError(backend.join(", "));
+      } else if (backend && typeof backend === "object") {
+        setError(JSON.stringify(backend));
+      } else if (err?.message) {
+        setError(err.message);
       } else {
-  // 🔥 Show full backend error for debugging
-        if (typeof backend === "string") {
-          setError(backend);
-        } else if (backend) {
-          setError(JSON.stringify(backend));
-        } else {
-          setError("Registration failed. Please try again.");
-        }
+        setError("Registration failed. Please try again.");
       }
     }
   };
@@ -328,8 +333,17 @@ export default function RegisterPage() {
                   </p>
                 )}
 
-                {error && <p className="text-sm text-red-600">{error}</p>}
-                {success && <p className="text-sm text-green-600">{success}</p>}
+                {error && (
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 break-words whitespace-pre-wrap">
+                    {error}
+                  </div>
+                )}
+
+                {success && (
+                  <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                    {success}
+                  </div>
+                )}
 
                 <Button type="submit" className="mt-2 w-full py-3 text-base">
                   Create account

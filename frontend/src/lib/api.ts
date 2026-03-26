@@ -19,9 +19,6 @@ api.interceptors.request.use((config) => {
 
 
 
-
-
-
 // import axios from "axios";
 
 // const API_BASE_URL =

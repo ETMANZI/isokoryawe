@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: `${window.location.origin}/api`,
+  baseURL: "/api",  // 🔥 IMPORTANT: relative URL
 });
 
 api.interceptors.request.use((config) => {

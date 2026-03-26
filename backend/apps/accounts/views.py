@@ -16,15 +16,14 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.http import JsonResponse
+
 User = get_user_model()
 token_generator = PasswordResetTokenGenerator()
 
 
 
 
-def health_check(request):
-    return JsonResponse({"ok": True})
+
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

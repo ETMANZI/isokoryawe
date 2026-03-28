@@ -1,25 +1,19 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import path from "path";
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  base: "/static/frontend/",
-  build: {
-    outDir: path.resolve(__dirname, "../backend/static/frontend"),
-    emptyOutDir: true,
+  plugins: [react()],
+  server: {
+    port: 3000,
+    host: true
   },
-});
-
-
-
-
-// import { defineConfig } from "vite";
-// import react from "@vitejs/plugin-react";
-// import tailwindcss from "@tailwindcss/vite";
-
-// export default defineConfig({
-//   plugins: [react(), tailwindcss()],
-//   base: "/static/frontend/",
-// });
+  preview: {
+    port: 3000,
+    host: true
+  },
+  build: {
+    outDir: '../backend/static/frontend',  // This might be causing issues
+    emptyOutDir: true
+  }
+})

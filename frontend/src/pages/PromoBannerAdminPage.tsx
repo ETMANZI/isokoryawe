@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   Video,
   Upload,
@@ -26,6 +27,7 @@ type PromoBanner = {
 };
 
 export default function PromoBannerAdminPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
@@ -47,90 +49,43 @@ export default function PromoBannerAdminPage() {
     },
   });
 
+  const uploadMutation = useMutation({
+    mutationFn: async () => {
+      if (!file) {
+        throw new Error(t("promo_banner.no_file_error"));
+      }
 
-const uploadMutation = useMutation({
-  mutationFn: async () => {
-    if (!file) {
-      throw new Error("Please select a video file.");
-    }
+      const formData = new FormData();
+      formData.append("title", title.trim());
+      formData.append("media_type", "video");
+      formData.append("target_url", targetUrl.trim());
+      formData.append("is_active", String(isActive));
+      formData.append("file", file);
 
-    const formData = new FormData();
-    formData.append("title", title.trim());
-    formData.append("media_type", "video");
-    formData.append("target_url", targetUrl.trim());
-    formData.append("is_active", String(isActive));
-    formData.append("file", file);
-
-    // Let the browser set the correct Content-Type with boundary
-    await api.post("/promo-banners/", formData);
-  },
-  onSuccess: async () => {
-    setTitle("");
-    setTargetUrl("");
-    setIsActive(true);
-    setFile(null);
-    setFormError("");
-    await queryClient.invalidateQueries({ queryKey: ["admin-promo-banners"] });
-    await queryClient.invalidateQueries({ queryKey: ["promo-banners"] });
-  },
-  onError: (error: any) => {
-    const data = error?.response?.data;
-    if (data?.file?.[0]) {
-      setFormError(data.file[0]);
-    } else if (data?.target_url?.[0]) {
-      setFormError(data.target_url[0]);
-    } else if (data?.title?.[0]) {
-      setFormError(data.title[0]);
-    } else {
-      setFormError(error?.message || "Failed to upload banner video.");
-    }
-  },
-});
-
-
-
-
-  // const uploadMutation = useMutation({
-  //   mutationFn: async () => {
-  //     if (!file) {
-  //       throw new Error("Please select a video file.");
-  //     }
-
-  //     const formData = new FormData();
-  //     formData.append("title", title.trim());
-  //     formData.append("media_type", "video");
-  //     formData.append("target_url", targetUrl.trim());
-  //     formData.append("is_active", String(isActive));
-  //     formData.append("file", file);
-
-  //     await api.post("/promo-banners/", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
-  //   },
-  //   onSuccess: async () => {
-  //     setTitle("");
-  //     setTargetUrl("");
-  //     setIsActive(true);
-  //     setFile(null);
-  //     setFormError("");
-  //     await queryClient.invalidateQueries({ queryKey: ["admin-promo-banners"] });
-  //     await queryClient.invalidateQueries({ queryKey: ["promo-banners"] });
-  //   },
-  //   onError: (error: any) => {
-  //     const data = error?.response?.data;
-  //     if (data?.file?.[0]) {
-  //       setFormError(data.file[0]);
-  //     } else if (data?.target_url?.[0]) {
-  //       setFormError(data.target_url[0]);
-  //     } else if (data?.title?.[0]) {
-  //       setFormError(data.title[0]);
-  //     } else {
-  //       setFormError(error?.message || "Failed to upload banner video.");
-  //     }
-  //   },
-  // });
+      await api.post("/promo-banners/", formData);
+    },
+    onSuccess: async () => {
+      setTitle("");
+      setTargetUrl("");
+      setIsActive(true);
+      setFile(null);
+      setFormError("");
+      await queryClient.invalidateQueries({ queryKey: ["admin-promo-banners"] });
+      await queryClient.invalidateQueries({ queryKey: ["promo-banners"] });
+    },
+    onError: (error: any) => {
+      const data = error?.response?.data;
+      if (data?.file?.[0]) {
+        setFormError(data.file[0]);
+      } else if (data?.target_url?.[0]) {
+        setFormError(data.target_url[0]);
+      } else if (data?.title?.[0]) {
+        setFormError(data.title[0]);
+      } else {
+        setFormError(error?.message || t("promo_banner.upload_error"));
+      }
+    },
+  });
 
   const toggleMutation = useMutation({
     mutationFn: async (banner: PromoBanner) => {
@@ -165,11 +120,10 @@ const uploadMutation = useMutation({
               </div>
 
               <h1 className="text-4xl font-bold tracking-tight text-slate-900">
-                Banner Video Manager
+                {t("promo_banner.title")}
               </h1>
               <p className="mt-4 max-w-2xl text-slate-600">
-                Upload promotional videos for the listings page banner. Active videos
-                display automatically. Inactive ones stay saved but hidden from users.
+                {t("promo_banner.description")}
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -177,9 +131,9 @@ const uploadMutation = useMutation({
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm">
                     <Upload size={18} />
                   </div>
-                  <h3 className="font-semibold text-slate-900">Upload</h3>
+                  <h3 className="font-semibold text-slate-900">{t("promo_banner.upload")}</h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    Add new banner videos from the admin interface.
+                    {t("promo_banner.upload_description")}
                   </p>
                 </div>
 
@@ -187,9 +141,9 @@ const uploadMutation = useMutation({
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm">
                     <Power size={18} />
                   </div>
-                  <h3 className="font-semibold text-slate-900">Control status</h3>
+                  <h3 className="font-semibold text-slate-900">{t("promo_banner.control_status")}</h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    Activate or deactivate a banner any time.
+                    {t("promo_banner.control_status_description")}
                   </p>
                 </div>
 
@@ -197,9 +151,9 @@ const uploadMutation = useMutation({
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm">
                     <LinkIcon size={18} />
                   </div>
-                  <h3 className="font-semibold text-slate-900">Attach link</h3>
+                  <h3 className="font-semibold text-slate-900">{t("promo_banner.attach_link")}</h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    Send users directly to the advertiser website.
+                    {t("promo_banner.attach_link_description")}
                   </p>
                 </div>
               </div>
@@ -211,9 +165,9 @@ const uploadMutation = useMutation({
                   <PlusCircle size={20} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Create Banner Video</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">{t("promo_banner.create_banner")}</h2>
                   <p className="text-sm text-slate-500">
-                    Upload a new video banner for the listings page.
+                    {t("promo_banner.create_banner_description")}
                   </p>
                 </div>
               </div>
@@ -221,10 +175,10 @@ const uploadMutation = useMutation({
               <div className="grid gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Banner Title
+                    {t("promo_banner.banner_title")}
                   </label>
                   <Input
-                    placeholder="Example: Visit Ecobank Today"
+                    placeholder={t("promo_banner.banner_title_placeholder")}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
@@ -232,10 +186,10 @@ const uploadMutation = useMutation({
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Target Link
+                    {t("promo_banner.target_link")}
                   </label>
                   <Input
-                    placeholder="https://company-website.com"
+                    placeholder={t("promo_banner.target_link_placeholder")}
                     value={targetUrl}
                     onChange={(e) => setTargetUrl(e.target.value)}
                   />
@@ -243,7 +197,7 @@ const uploadMutation = useMutation({
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Video File
+                    {t("promo_banner.video_file")}
                   </label>
                   <input
                     type="file"
@@ -255,7 +209,7 @@ const uploadMutation = useMutation({
                     className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700"
                   />
                   <p className="mt-2 text-xs text-slate-500">
-                    Recommended: MP4, muted, short loop, landscape format.
+                    {t("promo_banner.video_recommendation")}
                   </p>
                 </div>
 
@@ -267,7 +221,7 @@ const uploadMutation = useMutation({
                     className="h-4 w-4"
                   />
                   <span className="text-sm text-slate-700">
-                    Make this banner active immediately
+                    {t("promo_banner.active_immediately")}
                   </span>
                 </label>
 
@@ -289,7 +243,7 @@ const uploadMutation = useMutation({
                   disabled={!file || uploadMutation.isPending}
                   className="w-full"
                 >
-                  {uploadMutation.isPending ? "Uploading..." : "Upload Banner Video"}
+                  {uploadMutation.isPending ? t("promo_banner.uploading") : t("promo_banner.upload_banner")}
                 </Button>
               </div>
             </Card>
@@ -297,8 +251,8 @@ const uploadMutation = useMutation({
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-slate-900">Existing Banners</h2>
-              <p className="text-sm text-slate-500">{banners.length} item(s)</p>
+              <h2 className="text-2xl font-bold text-slate-900">{t("promo_banner.existing_banners")}</h2>
+              <p className="text-sm text-slate-500">{banners.length} {t("promo_banner.items")}</p>
             </div>
 
             {isLoading ? (
@@ -311,7 +265,7 @@ const uploadMutation = useMutation({
               </div>
             ) : banners.length === 0 ? (
               <Card className="p-8">
-                <p className="text-slate-600">No promo banners uploaded yet.</p>
+                <p className="text-slate-600">{t("promo_banner.no_banners")}</p>
               </Card>
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
@@ -330,10 +284,10 @@ const uploadMutation = useMutation({
                       <div className="mb-3 flex items-start justify-between gap-3">
                         <div>
                           <h3 className="text-lg font-semibold text-slate-900">
-                            {banner.title || "Untitled Banner"}
+                            {banner.title || t("promo_banner.untitled_banner")}
                           </h3>
                           <p className="mt-1 text-sm text-slate-500">
-                            Type: {banner.media_type}
+                            {t("promo_banner.type")}: {banner.media_type}
                           </p>
                         </div>
 
@@ -344,7 +298,7 @@ const uploadMutation = useMutation({
                               : "bg-red-50 text-red-700"
                           }`}
                         >
-                          {banner.is_active ? "Active" : "Inactive"}
+                          {banner.is_active ? t("promo_banner.active") : t("promo_banner.inactive")}
                         </span>
                       </div>
 
@@ -356,7 +310,7 @@ const uploadMutation = useMutation({
                           className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:underline"
                         >
                           <Eye size={14} />
-                          Open target link
+                          {t("promo_banner.open_target_link")}
                         </a>
                       )}
 
@@ -366,7 +320,7 @@ const uploadMutation = useMutation({
                           onClick={() => toggleMutation.mutate(banner)}
                           disabled={toggleMutation.isPending}
                         >
-                          {banner.is_active ? "Deactivate" : "Activate"}
+                          {banner.is_active ? t("promo_banner.deactivate") : t("promo_banner.activate")}
                         </Button>
 
                         <Button
@@ -375,7 +329,7 @@ const uploadMutation = useMutation({
                           className="inline-flex items-center gap-2"
                         >
                           <Trash2 size={14} />
-                          Delete
+                          {t("promo_banner.delete")}
                         </Button>
                       </div>
                     </div>

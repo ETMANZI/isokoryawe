@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   PlusCircle,
   LayoutDashboard,
@@ -25,6 +26,7 @@ type Partner = {
 };
 
 export default function RightSidebar() {
+  const { t } = useTranslation();
   const loggedIn = isAuthenticated();
 
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -49,8 +51,9 @@ export default function RightSidebar() {
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-28">
+      {/* Quick Actions Card */}
       <Card>
-        <h3 className="text-base font-semibold text-slate-900">Quick Actions</h3>
+        <h3 className="text-base font-semibold text-slate-900">{t("sidebar.quick_actions")}</h3>
 
         <div className="mt-4 space-y-3">
           {loggedIn ? (
@@ -60,7 +63,7 @@ export default function RightSidebar() {
                 className="flex items-center gap-2 rounded-2xl bg-slate-400 px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
                 <PlusCircle size={16} />
-                Post Listing
+                {t("sidebar.post_listing")}
               </Link>
 
               <Link
@@ -68,7 +71,7 @@ export default function RightSidebar() {
                 className="flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 <LayoutDashboard size={16} />
-                Dashboard
+                {t("sidebar.dashboard")}
               </Link>
             </>
           ) : (
@@ -78,7 +81,7 @@ export default function RightSidebar() {
                 className="flex items-center gap-2 rounded-2xl bg-slate-400 px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
                 <PlusCircle size={16} />
-                Create Account
+                {t("sidebar.create_account")}
               </Link>
 
               <Link
@@ -86,13 +89,14 @@ export default function RightSidebar() {
                 className="flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 <LayoutDashboard size={16} />
-                Sign In
+                {t("sidebar.sign_in")}
               </Link>
             </>
           )}
         </div>
       </Card>
 
+      {/* Promote Your Listing Card */}
       <Card>
         <div className="flex items-start gap-3">
           <div className="rounded-2xl bg-blue-50 p-3 text-blue-700">
@@ -101,16 +105,16 @@ export default function RightSidebar() {
 
           <div>
             <h3 className="text-base font-semibold text-slate-900">
-              Promote Your Listing
+              {t("sidebar.promote_listing")}
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Reach more buyers and renters by publishing clear photos, strong
-              titles, and complete contact details.
+              {t("sidebar.promote_text")}
             </p>
           </div>
         </div>
       </Card>
 
+      {/* Our Partners Card */}
       <Card>
         <div className="flex items-start gap-3">
           <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-700">
@@ -118,17 +122,16 @@ export default function RightSidebar() {
           </div>
 
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-slate-900">Our Partners</h3>
+            <h3 className="text-base font-semibold text-slate-900">{t("sidebar.our_partners")}</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              We work with trusted partners across real estate, vehicles,
-              decoration, and business promotion.
+              {t("sidebar.partners_text")}
             </p>
 
             <div className="mt-4 space-y-3">
               {loadingPartners ? (
-                <p className="text-sm text-slate-500">Loading partners...</p>
+                <p className="text-sm text-slate-500">{t("sidebar.loading_partners")}</p>
               ) : partners.length === 0 ? (
-                <p className="text-sm text-slate-500">No partners available.</p>
+                <p className="text-sm text-slate-500">{t("sidebar.no_partners")}</p>
               ) : (
                 partners.map((partner) => {
                   const isClickable = Boolean(partner.website && partner.website.trim());
@@ -191,35 +194,37 @@ export default function RightSidebar() {
               to="/partners"
               className="mt-4 inline-flex items-center text-sm font-medium text-emerald-700 transition hover:text-emerald-800"
             >
-              View all partners
+              {t("sidebar.view_all_partners")}
             </Link>
           </div>
         </div>
       </Card>
 
+      {/* Safety Tips Card */}
       <Card>
-        <h3 className="text-base font-semibold text-slate-900">Safety Tips</h3>
+        <h3 className="text-base font-semibold text-slate-900">{t("sidebar.safety_tips")}</h3>
 
         <div className="mt-4 space-y-3 text-sm text-slate-600">
           <div className="flex items-start gap-2">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
-            <p>Verify location, price, and ownership details before payment.</p>
+            <p>{t("sidebar.safety_tip_1")}</p>
           </div>
 
           <div className="flex items-start gap-2">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
-            <p>Meet in a safe place when inspecting property or vehicles.</p>
+            <p>{t("sidebar.safety_tip_2")}</p>
           </div>
 
           <div className="flex items-start gap-2">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
-            <p>Avoid sending money before confirming the listing is genuine.</p>
+            <p>{t("sidebar.safety_tip_3")}</p>
           </div>
         </div>
       </Card>
 
+      {/* Need Help Card */}
       <Card>
-        <h3 className="text-base font-semibold text-slate-900">Need Help?</h3>
+        <h3 className="text-base font-semibold text-slate-900">{t("sidebar.need_help")}</h3>
 
         <div className="mt-4 space-y-3 text-sm text-slate-600">
           <div className="flex items-center gap-2">
@@ -229,7 +234,7 @@ export default function RightSidebar() {
 
           <div className="flex items-center gap-2">
             <BadgeHelp size={15} className="text-slate-500" />
-            <span>Support available for posting and account setup</span>
+            <span>{t("sidebar.support_text")}</span>
           </div>
         </div>
       </Card>

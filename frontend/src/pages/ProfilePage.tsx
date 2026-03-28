@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   ShieldCheck,
@@ -25,6 +26,7 @@ type CurrentUser = {
 };
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<CurrentUser>({
@@ -74,7 +76,7 @@ export default function ProfilePage() {
       });
     },
     onSuccess: async () => {
-      setProfileMessage("Profile updated successfully.");
+      setProfileMessage(t("profile.profile_success"));
       await queryClient.invalidateQueries({ queryKey: ["profile-me"] });
       await queryClient.invalidateQueries({ queryKey: ["navbar-current-user"] });
     },
@@ -89,7 +91,7 @@ export default function ProfilePage() {
       } else if (errors?.phone_number?.[0]) {
         setProfileError(errors.phone_number[0]);
       } else {
-        setProfileError("Failed to update profile.");
+        setProfileError(t("profile.profile_error"));
       }
     },
   });
@@ -101,7 +103,7 @@ export default function ProfilePage() {
       return await api.post("/accounts/change-password/", passwordForm);
     },
     onSuccess: () => {
-      setPasswordMessage("Password changed successfully.");
+      setPasswordMessage(t("profile.password_success"));
       setPasswordForm({
         old_password: "",
         new_password: "",
@@ -119,7 +121,7 @@ export default function ProfilePage() {
       } else if (errors?.non_field_errors?.[0]) {
         setPasswordError(errors.non_field_errors[0]);
       } else {
-        setPasswordError("Failed to change password.");
+        setPasswordError(t("profile.password_error"));
       }
     },
   });
@@ -127,13 +129,13 @@ export default function ProfilePage() {
   const displayName =
     [data?.first_name, data?.last_name].filter(Boolean).join(" ").trim() ||
     data?.username ||
-    "My Profile";
+    t("profile.my_profile");
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
         <PageContainer>
-          <div className="py-16 text-center text-slate-500">Loading...</div>
+          <div className="py-16 text-center text-slate-500">{t("profile.loading")}</div>
         </PageContainer>
       </div>
     );
@@ -150,12 +152,11 @@ export default function ProfilePage() {
               </div>
 
               <h1 className="max-w-xl text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-                Manage your account
+                {t("profile.manage_account")}
               </h1>
 
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 md:text-lg">
-                Keep your profile details up to date and secure your account with
-                a strong password.
+                {t("profile.manage_account_description")}
               </p>
 
               <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
@@ -164,7 +165,7 @@ export default function ProfilePage() {
                     <Mail size={20} />
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500">Signed in as</p>
+                    <p className="text-sm text-slate-500">{t("profile.signed_in_as")}</p>
                     <h2 className="mt-1 text-xl font-semibold text-slate-900">
                       {displayName}
                     </h2>
@@ -178,7 +179,7 @@ export default function ProfilePage() {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/dashboard">
                   <Button className="flex w-full items-center justify-center gap-2 sm:w-auto">
-                    Dashboard
+                    {t("profile.dashboard")}
                     <ArrowRight size={16} />
                   </Button>
                 </Link>
@@ -188,7 +189,7 @@ export default function ProfilePage() {
                     variant="outline"
                     className="flex w-full items-center justify-center gap-2 sm:w-auto"
                   >
-                    Browse Listings
+                    {t("profile.browse_listings")}
                   </Button>
                 </Link>
               </div>
@@ -199,10 +200,10 @@ export default function ProfilePage() {
                     <UserRound size={20} />
                   </div>
                   <h3 className="text-sm font-semibold text-slate-900">
-                    Update details
+                    {t("profile.update_details")}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Edit your username, first name, last name, and phone number.
+                    {t("profile.update_details_description")}
                   </p>
                 </div>
 
@@ -211,10 +212,10 @@ export default function ProfilePage() {
                     <KeyRound size={20} />
                   </div>
                   <h3 className="text-sm font-semibold text-slate-900">
-                    Change password
+                    {t("profile.change_password")}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Protect your account by setting a stronger password anytime.
+                    {t("profile.change_password_description")}
                   </p>
                 </div>
 
@@ -223,10 +224,10 @@ export default function ProfilePage() {
                     <ShieldCheck size={20} />
                   </div>
                   <h3 className="text-sm font-semibold text-slate-900">
-                    Stay secure
+                    {t("profile.stay_secure")}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Your email stays protected and cannot be changed from here.
+                    {t("profile.stay_secure_description")}
                   </p>
                 </div>
               </div>
@@ -240,9 +241,9 @@ export default function ProfilePage() {
                   <LayoutDashboard size={20} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Profile Details</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">{t("profile.profile_details")}</h2>
                   <p className="text-sm text-slate-500">
-                    Update your personal information below.
+                    {t("profile.profile_details_description")}
                   </p>
                 </div>
               </div>
@@ -250,7 +251,7 @@ export default function ProfilePage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Email
+                    {t("profile.email")}
                   </label>
                   <Input
                     value={data?.email || ""}
@@ -261,51 +262,51 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Username
+                    {t("profile.username")}
                   </label>
                   <Input
                     value={form.username}
                     onChange={(e) => setForm({ ...form, username: e.target.value })}
-                    placeholder="Username"
+                    placeholder={t("profile.username_placeholder")}
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Phone Number
+                    {t("profile.phone_number")}
                   </label>
                   <Input
                     value={form.phone_number}
                     onChange={(e) =>
                       setForm({ ...form, phone_number: e.target.value })
                     }
-                    placeholder="Phone number (optional)"
+                    placeholder={t("profile.phone_placeholder")}
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    First Name
+                    {t("profile.first_name")}
                   </label>
                   <Input
                     value={form.first_name}
                     onChange={(e) =>
                       setForm({ ...form, first_name: e.target.value })
                     }
-                    placeholder="First name"
+                    placeholder={t("profile.first_name_placeholder")}
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Last Name
+                    {t("profile.last_name")}
                   </label>
                   <Input
                     value={form.last_name}
                     onChange={(e) =>
                       setForm({ ...form, last_name: e.target.value })
                     }
-                    placeholder="Last name"
+                    placeholder={t("profile.last_name_placeholder")}
                   />
                 </div>
               </div>
@@ -322,7 +323,7 @@ export default function ProfilePage() {
                 disabled={updateProfileMutation.isPending}
                 className="mt-6 w-full md:w-auto"
               >
-                {updateProfileMutation.isPending ? "Saving..." : "Update Profile"}
+                {updateProfileMutation.isPending ? t("profile.saving") : t("profile.update_profile")}
               </Button>
             </Card>
 
@@ -332,9 +333,9 @@ export default function ProfilePage() {
                   <KeyRound size={20} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Change Password</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">{t("profile.change_password")}</h2>
                   <p className="text-sm text-slate-500">
-                    Use your current password to set a new one.
+                    {t("profile.change_password_description")}
                   </p>
                 </div>
               </div>
@@ -342,7 +343,7 @@ export default function ProfilePage() {
               <div className="grid gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Old Password
+                    {t("profile.old_password")}
                   </label>
                   <Input
                     type="password"
@@ -353,13 +354,13 @@ export default function ProfilePage() {
                         old_password: e.target.value,
                       })
                     }
-                    placeholder="Old password"
+                    placeholder={t("profile.old_password_placeholder")}
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    New Password
+                    {t("profile.new_password")}
                   </label>
                   <Input
                     type="password"
@@ -370,13 +371,13 @@ export default function ProfilePage() {
                         new_password: e.target.value,
                       })
                     }
-                    placeholder="New password"
+                    placeholder={t("profile.new_password_placeholder")}
                   />
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Confirm New Password
+                    {t("profile.confirm_password")}
                   </label>
                   <Input
                     type="password"
@@ -387,7 +388,7 @@ export default function ProfilePage() {
                         confirm_password: e.target.value,
                       })
                     }
-                    placeholder="Confirm new password"
+                    placeholder={t("profile.confirm_password_placeholder")}
                   />
                 </div>
               </div>
@@ -404,7 +405,7 @@ export default function ProfilePage() {
                 disabled={changePasswordMutation.isPending}
                 className="mt-6 w-full md:w-auto"
               >
-                {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+                {changePasswordMutation.isPending ? t("profile.changing") : t("profile.change_password_button")}
               </Button>
             </Card>
           </div>

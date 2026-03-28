@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
@@ -7,6 +8,7 @@ import Button from "../components/ui/Button";
 import { api } from "../lib/api";
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation();
   const { uid, token } = useParams();
   const navigate = useNavigate();
 
@@ -40,7 +42,7 @@ export default function ResetPasswordPage() {
         data?.error ||
           data?.confirm_password?.[0] ||
           data?.new_password?.[0] ||
-          "Failed to reset password."
+          t("reset_password.error_message")
       );
     } finally {
       setLoading(false);
@@ -53,23 +55,23 @@ export default function ResetPasswordPage() {
         <div className="mx-auto max-w-md">
           <Card className="p-6 shadow-lg">
             <h1 className="mb-2 text-2xl font-semibold text-slate-800">
-              Reset Password
+              {t("reset_password.title")}
             </h1>
             <p className="mb-6 text-sm text-slate-500">
-              Enter your new password below.
+              {t("reset_password.description")}
             </p>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <Input
                 type="password"
-                placeholder="New password"
+                placeholder={t("reset_password.new_password_placeholder")}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
 
               <Input
                 type="password"
-                placeholder="Confirm new password"
+                placeholder={t("reset_password.confirm_password_placeholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
@@ -78,7 +80,7 @@ export default function ResetPasswordPage() {
               {message && <p className="text-sm text-green-600">{message}</p>}
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Resetting..." : "Reset Password"}
+                {loading ? t("reset_password.resetting") : t("reset_password.reset_button")}
               </Button>
             </form>
 
@@ -87,7 +89,7 @@ export default function ResetPasswordPage() {
                 to="/login"
                 className="font-medium text-indigo-600 hover:underline"
               >
-                Back to login
+                {t("reset_password.back_to_login")}
               </Link>
             </div>
           </Card>

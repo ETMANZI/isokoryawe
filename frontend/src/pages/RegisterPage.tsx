@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   BadgePlus,
@@ -27,6 +28,7 @@ type RegisterForm = {
 };
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -71,7 +73,7 @@ export default function RegisterPage() {
 
       await api.post("/accounts/register/", payload);
 
-      setSuccess("Account created successfully. You can now sign in.");
+      setSuccess(t("register.success_message"));
       setTimeout(() => navigate("/login"), 1200);
     } catch (err: any) {
       console.log("REGISTER ERROR:", err);
@@ -106,13 +108,11 @@ export default function RegisterPage() {
       } else if (Array.isArray(backend)) {
         setError(backend.join(", "));
       } else if (backend && typeof backend === "object") {
-        // setError(JSON.stringify(backend));
         setError(`BACKEND: ${JSON.stringify(backend)}`);
       } else if (err?.message) {
-        // setError(err.message);
         setError(`ERRMSG: ${err.message}`);
       } else {
-        setError("Registration failed again 1111. Please try again.");
+        setError(t("register.general_error"));
       }
     }
   };
@@ -128,18 +128,17 @@ export default function RegisterPage() {
               </div>
 
               <h1 className="max-w-xl text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-                Create your account
+                {t("register.create_account_title")}
               </h1>
 
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 md:text-lg">
-                Join the platform to post listings, manage your properties or
-                ads, and connect with buyers, renters, and businesses.
+                {t("register.create_account_description")}
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/listings">
                   <Button className="flex w-full items-center justify-center gap-2 sm:w-auto">
-                    Browse Listings
+                    {t("register.browse_listings")}
                     <ArrowRight size={16} />
                   </Button>
                 </Link>
@@ -149,7 +148,7 @@ export default function RegisterPage() {
                     variant="outline"
                     className="flex w-full items-center justify-center gap-2 sm:w-auto"
                   >
-                    Already have an account?
+                    {t("register.already_have_account")}
                   </Button>
                 </Link>
               </div>
@@ -159,9 +158,9 @@ export default function RegisterPage() {
                   <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                     <Megaphone size={20} />
                   </div>
-                  <h3 className="text-sm font-semibold text-slate-900">Post easily</h3>
+                  <h3 className="text-sm font-semibold text-slate-900">{t("register.post_easily")}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Add your property, car, or business details in minutes.
+                    {t("register.post_description")}
                   </p>
                 </div>
 
@@ -169,9 +168,9 @@ export default function RegisterPage() {
                   <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                     <ShieldCheck size={20} />
                   </div>
-                  <h3 className="text-sm font-semibold text-slate-900">Reach users</h3>
+                  <h3 className="text-sm font-semibold text-slate-900">{t("register.reach_users")}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Get visibility for your listings and promotions.
+                    {t("register.reach_description")}
                   </p>
                 </div>
 
@@ -179,9 +178,9 @@ export default function RegisterPage() {
                   <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                     <LayoutDashboard size={20} />
                   </div>
-                  <h3 className="text-sm font-semibold text-slate-900">Manage faster</h3>
+                  <h3 className="text-sm font-semibold text-slate-900">{t("register.manage_faster")}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Track and update your listings from one place.
+                    {t("register.manage_description")}
                   </p>
                 </div>
               </div>
@@ -190,18 +189,18 @@ export default function RegisterPage() {
 
           <div className="order-1 lg:order-2">
             <Card className="rounded-[2rem] border border-slate-200 p-6 shadow-xl md:p-8">
-              <h2 className="text-3xl font-bold text-slate-900">Sign up</h2>
+              <h2 className="text-3xl font-bold text-slate-900">{t("register.sign_up")}</h2>
               <p className="mt-2 text-sm text-slate-500">
-                Fill in your details to get started.
+                {t("register.fill_details")}
               </p>
 
               <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <Input
-                      placeholder="First name"
+                      placeholder={t("register.first_name")}
                       {...register("first_name", {
-                        required: "First name is required",
+                        required: t("register.first_name_required"),
                       })}
                     />
                     {errors.first_name && (
@@ -213,9 +212,9 @@ export default function RegisterPage() {
 
                   <div>
                     <Input
-                      placeholder="Last name"
+                      placeholder={t("register.last_name")}
                       {...register("last_name", {
-                        required: "Last name is required",
+                        required: t("register.last_name_required"),
                       })}
                     />
                     {errors.last_name && (
@@ -228,9 +227,9 @@ export default function RegisterPage() {
 
                 <Input
                   type="email"
-                  placeholder="Email address"
+                  placeholder={t("register.email")}
                   {...register("email", {
-                    required: "Email is required",
+                    required: t("register.email_required"),
                   })}
                 />
                 {errors.email && (
@@ -238,9 +237,9 @@ export default function RegisterPage() {
                 )}
 
                 <Input
-                  placeholder="Username"
+                  placeholder={t("register.username")}
                   {...register("username", {
-                    required: "Username is required",
+                    required: t("register.username_required"),
                   })}
                 />
                 {errors.username && (
@@ -248,7 +247,7 @@ export default function RegisterPage() {
                 )}
 
                 <Input
-                  placeholder="Phone number (optional)"
+                  placeholder={t("register.phone_optional")}
                   {...register("phone_number")}
                 />
                 {errors.phone_number && (
@@ -259,16 +258,16 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Account type
+                    {t("register.account_type")}
                   </label>
                   <select
                     {...register("role", {
-                      required: "Account type is required",
+                      required: t("register.account_type_required"),
                     })}
                     className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500"
                   >
-                    <option value="buyer">Buyer</option>
-                    <option value="seller">Seller</option>
+                    <option value="buyer">{t("register.buyer")}</option>
+                    <option value="seller">{t("register.seller")}</option>
                   </select>
                   {errors.role && (
                     <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
@@ -277,12 +276,12 @@ export default function RegisterPage() {
 
                 <Input
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("register.password")}
                   {...register("password", {
-                    required: "Password is required",
+                    required: t("register.password_required"),
                     minLength: {
                       value: 8,
-                      message: "Password must be at least 8 characters",
+                      message: t("register.password_min_length"),
                     },
                   })}
                 />
@@ -292,11 +291,11 @@ export default function RegisterPage() {
 
                 <Input
                   type="password"
-                  placeholder="Confirm password"
+                  placeholder={t("register.confirm_password")}
                   {...register("confirm_password", {
-                    required: "Please confirm your password",
+                    required: t("register.confirm_password_required"),
                     validate: (value) =>
-                      value === watch("password") || "Passwords do not match",
+                      value === watch("password") || t("register.password_mismatch"),
                   })}
                 />
                 {errors.confirm_password && (
@@ -310,23 +309,23 @@ export default function RegisterPage() {
                     type="checkbox"
                     className="mt-1 h-4 w-4 rounded"
                     {...register("agree_terms", {
-                      required: "You must agree to the terms and privacy policy",
+                      required: t("register.terms_required"),
                     })}
                   />
                   <span className="text-sm leading-6 text-slate-700">
-                    I agree to the{" "}
+                    {t("register.agree_terms")}{" "}
                     <Link
                       to="/terms"
                       className="font-medium text-indigo-600 hover:underline"
                     >
-                      Terms of Service
+                      {t("register.terms_of_service")}
                     </Link>{" "}
-                    and{" "}
+                    {t("register.and")}{" "}
                     <Link
                       to="/privacy"
                       className="font-medium text-indigo-600 hover:underline"
                     >
-                      Privacy Policy
+                      {t("register.privacy_policy")}
                     </Link>
                     .
                   </span>
@@ -349,27 +348,21 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                {/* <Button type="submit" className="mt-2 w-full py-3 text-base">
-                  Create account
-                </Button> */}
-
-<button
-  type="submit"
-  className="mt-2 w-full rounded-2xl bg-slate-900 px-4 py-3 text-base font-medium text-white hover:bg-slate-800"
->
-  Create account
-</button>
-
-
+                <button
+                  type="submit"
+                  className="mt-2 w-full rounded-2xl bg-slate-900 px-4 py-3 text-base font-medium text-white hover:bg-slate-800"
+                >
+                  {t("register.create_account_button")}
+                </button>
               </form>
 
               <div className="mt-6 text-center text-sm text-slate-500">
-                Already have an account?{" "}
+                {t("register.already_have_account_text")}{" "}
                 <Link
                   to="/login"
                   className="font-medium text-indigo-600 hover:underline"
                 >
-                  Login
+                  {t("register.login_link")}
                 </Link>
               </div>
 
@@ -378,7 +371,7 @@ export default function RegisterPage() {
                   to="/listings"
                   className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
                 >
-                  Continue to listings
+                  {t("register.continue_to_listings")}
                   <ArrowRight size={16} />
                 </Link>
               </div>

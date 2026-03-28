@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   MapPin,
   House,
@@ -132,14 +133,14 @@ function getListingIcon(type: Listing["listing_type"]) {
   return <Building2 size={16} />;
 }
 
-function getListingLabel(type: Listing["listing_type"]) {
-  if (type === "house") return "House";
-  if (type === "parcel") return "Parcel";
-  if (type === "car") return "Car";
-  if (type === "clothes_product") return "Clothes Product";
-  if (type === "food_product") return "Food Product";
-  if (type === "home_kitchen_product") return "Home & Kitchen Product";
-  return "Business Ad";
+function getListingLabel(type: Listing["listing_type"], t: (key: string) => string) {
+  if (type === "house") return t("listing_detail.house");
+  if (type === "parcel") return t("listing_detail.parcel");
+  if (type === "car") return t("listing_detail.car");
+  if (type === "clothes_product") return t("listing_detail.clothes_product");
+  if (type === "food_product") return t("listing_detail.food_product");
+  if (type === "home_kitchen_product") return t("listing_detail.home_kitchen_product");
+  return t("listing_detail.business_ad");
 }
 
 function formatPrice(value?: string | number | null) {
@@ -148,8 +149,8 @@ function formatPrice(value?: string | number | null) {
   return new Intl.NumberFormat("en-RW").format(amount);
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return "N/A";
+function formatDate(value?: string | null, t?: (key: string) => string) {
+  if (!value) return t ? t("listing_detail.na") : "N/A";
   return new Date(value).toLocaleDateString("en-RW", {
     year: "numeric",
     month: "long",
@@ -229,6 +230,7 @@ function InfoTile({
 }
 
 export default function ListingDetailsPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState<string>("");
 
@@ -295,7 +297,7 @@ export default function ListingDetailsPage() {
               className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
             >
               <ArrowLeft size={16} />
-              Back to listings
+              {t("listing_detail.back_to_listings")}
             </Link>
           </div>
 
@@ -316,7 +318,7 @@ export default function ListingDetailsPage() {
             </div>
           ) : isError || !listing ? (
             <Card>
-              <p className="text-red-600">Unable to load listing details.</p>
+              <p className="text-red-600">{t("listing_detail.load_error")}</p>
             </Card>
           ) : (
             <>
@@ -332,7 +334,7 @@ export default function ListingDetailsPage() {
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-slate-500">
-                          No Image
+                          {t("listing_detail.no_image")}
                         </div>
                       )}
                     </div>
@@ -361,26 +363,26 @@ export default function ListingDetailsPage() {
                     <div className="mb-4 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                         {getListingIcon(listing.listing_type)}
-                        {getListingLabel(listing.listing_type)}
+                        {getListingLabel(listing.listing_type, t)}
                       </span>
 
                       {listing.sale_mode && (
                         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                           {listing.sale_mode === "sell"
-                            ? "For Sale"
+                            ? t("listing_detail.for_sale")
                             : listing.sale_mode === "rent"
-                            ? "For Rent"
-                            : "Advertisement"}
+                            ? t("listing_detail.for_rent")
+                            : t("listing_detail.advertisement")}
                         </span>
                       )}
 
                       {listing.negotiable ? (
                         <span className="rounded-full bg-yellow-50 px-3 py-1 text-xs font-medium text-yellow-700">
-                          Negotiable
+                          {t("listing_detail.negotiable")}
                         </span>
                       ) : (
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                          Fixed Price
+                          {t("listing_detail.fixed_price")}
                         </span>
                       )}
                     </div>
@@ -397,21 +399,21 @@ export default function ListingDetailsPage() {
                             [listing.district, listing.sector, listing.village]
                               .filter(Boolean)
                               .join(", ") ||
-                            "Location not specified"}
+                            t("listing_detail.location_not_specified")}
                         </span>
                       </div>
                     )}
 
                     {isCar && (
                       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <InfoTile icon={<Car size={16} />} label="Make" value={listing.car_make || "Not specified"} />
-                        <InfoTile icon={<Car size={16} />} label="Model" value={listing.car_model || "Not specified"} />
-                        <InfoTile icon={<CalendarDays size={16} />} label="Year" value={listing.car_year || "Not specified"} />
-                        <InfoTile icon={<Gauge size={16} />} label="Mileage" value={formatMileage(listing.car_mileage)} />
-                        <InfoTile icon={<Fuel size={16} />} label="Fuel Type" value={formatLabel(listing.car_fuel_type)} />
-                        <InfoTile icon={<Cog size={16} />} label="Transmission" value={formatLabel(listing.car_transmission)} />
-                        <InfoTile icon={<BadgeCheck size={16} />} label="Condition" value={formatLabel(listing.car_condition)} />
-                        <InfoTile icon={<Palette size={16} />} label="Color" value={listing.car_color || "Not specified"} />
+                        <InfoTile icon={<Car size={16} />} label={t("listing_detail.car_make")} value={listing.car_make || t("listing_detail.not_specified")} />
+                        <InfoTile icon={<Car size={16} />} label={t("listing_detail.car_model")} value={listing.car_model || t("listing_detail.not_specified")} />
+                        <InfoTile icon={<CalendarDays size={16} />} label={t("listing_detail.car_year")} value={listing.car_year || t("listing_detail.not_specified")} />
+                        <InfoTile icon={<Gauge size={16} />} label={t("listing_detail.car_mileage")} value={formatMileage(listing.car_mileage)} />
+                        <InfoTile icon={<Fuel size={16} />} label={t("listing_detail.car_fuel_type")} value={formatLabel(listing.car_fuel_type)} />
+                        <InfoTile icon={<Cog size={16} />} label={t("listing_detail.car_transmission")} value={formatLabel(listing.car_transmission)} />
+                        <InfoTile icon={<BadgeCheck size={16} />} label={t("listing_detail.car_condition")} value={formatLabel(listing.car_condition)} />
+                        <InfoTile icon={<Palette size={16} />} label={t("listing_detail.car_color")} value={listing.car_color || t("listing_detail.not_specified")} />
                       </div>
                     )}
 
@@ -419,28 +421,28 @@ export default function ListingDetailsPage() {
                       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {isHouse && (
                           <>
-                            <InfoTile icon={<BedDouble size={16} />} label="Bedrooms" value={listing.bedrooms ?? 0} />
-                            <InfoTile icon={<Bath size={16} />} label="Bathrooms" value={listing.bathrooms ?? 0} />
+                            <InfoTile icon={<BedDouble size={16} />} label={t("listing_detail.bedrooms")} value={listing.bedrooms ?? 0} />
+                            <InfoTile icon={<Bath size={16} />} label={t("listing_detail.bathrooms")} value={listing.bathrooms ?? 0} />
                           </>
                         )}
 
-                        <InfoTile icon={<Ruler size={16} />} label="Land Size" value={formatLandSize(listing.land_size)} />
+                        <InfoTile icon={<Ruler size={16} />} label={t("listing_detail.land_size")} value={formatLandSize(listing.land_size)} />
 
                         {listing.upi && (
-                          <InfoTile icon={<Map size={16} />} label="UPI" value={listing.upi} />
+                          <InfoTile icon={<Map size={16} />} label={t("listing_detail.upi")} value={listing.upi} />
                         )}
 
                         <InfoTile
                           icon={<Zap size={16} />}
-                          label="Electricity"
-                          value={listing.has_electricity ? "Available" : "Not Available"}
+                          label={t("listing_detail.electricity")}
+                          value={listing.has_electricity ? t("listing_detail.available") : t("listing_detail.not_available")}
                           valueClassName={listing.has_electricity ? "text-green-600" : "text-slate-900"}
                         />
 
                         <InfoTile
                           icon={<Droplets size={16} />}
-                          label="Water"
-                          value={listing.has_water ? "Available" : "Not Available"}
+                          label={t("listing_detail.water")}
+                          value={listing.has_water ? t("listing_detail.available") : t("listing_detail.not_available")}
                           valueClassName={listing.has_water ? "text-green-600" : "text-slate-900"}
                         />
                       </div>
@@ -449,42 +451,42 @@ export default function ListingDetailsPage() {
                     {isProduct && (
                       <div className="mt-6">
                         <h2 className="mb-4 text-lg font-semibold text-slate-900">
-                          Product Details
+                          {t("listing_detail.product_details")}
                         </h2>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                          <InfoTile icon={<Package size={16} />} label="Brand" value={listing.brand || "Not specified"} />
+                          <InfoTile icon={<Package size={16} />} label={t("listing_detail.brand")} value={listing.brand || t("listing_detail.not_specified")} />
                           <InfoTile
                             icon={<Archive size={16} />}
-                            label="Stock Quantity"
-                            value={listing.stock_quantity != null ? formatNumber(listing.stock_quantity) : "Not specified"}
+                            label={t("listing_detail.stock_quantity")}
+                            value={listing.stock_quantity != null ? formatNumber(listing.stock_quantity) : t("listing_detail.not_specified")}
                           />
-                          <InfoTile icon={<Hash size={16} />} label="SKU" value={listing.sku || "Not specified"} />
+                          <InfoTile icon={<Hash size={16} />} label={t("listing_detail.sku")} value={listing.sku || t("listing_detail.not_specified")} />
                           <InfoTile
                             icon={<BadgeCheck size={16} />}
-                            label="Condition"
+                            label={t("listing_detail.product_condition")}
                             value={formatLabel(listing.product_condition)}
                           />
                           <InfoTile
                             icon={<Truck size={16} />}
-                            label="Home Delivery"
-                            value={listing.has_home_delivery ? "Available" : "Not Available"}
+                            label={t("listing_detail.home_delivery")}
+                            value={listing.has_home_delivery ? t("listing_detail.available") : t("listing_detail.not_available")}
                             valueClassName={listing.has_home_delivery ? "text-green-600" : "text-slate-900"}
                           />
                           <InfoTile
                             icon={<Truck size={16} />}
-                            label="Delivery Fee"
+                            label={t("listing_detail.delivery_fee")}
                             value={
                               listing.has_home_delivery
                                 ? `RWF ${formatPrice(listing.delivery_fee)}`
-                                : "Not applicable"
+                                : t("listing_detail.not_applicable")
                             }
                           />
                         </div>
 
                         {listing.delivery_notes && (
                           <div className="mt-4 rounded-2xl bg-slate-100 p-4">
-                            <p className="text-sm font-medium text-slate-700">Delivery Notes</p>
+                            <p className="text-sm font-medium text-slate-700">{t("listing_detail.delivery_notes")}</p>
                             <p className="mt-2 text-slate-600">{listing.delivery_notes}</p>
                           </div>
                         )}
@@ -494,34 +496,34 @@ export default function ListingDetailsPage() {
                     {isClothes && (
                       <div className="mt-6">
                         <h2 className="mb-4 text-lg font-semibold text-slate-900">
-                          Clothes Details
+                          {t("listing_detail.clothes_details")}
                         </h2>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                           <InfoTile
                             icon={<Shirt size={16} />}
-                            label="Category"
-                            value={listing.clothes_category || "Not specified"}
+                            label={t("listing_detail.clothes_category")}
+                            value={listing.clothes_category || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<BadgeCheck size={16} />}
-                            label="Gender"
+                            label={t("listing_detail.clothes_gender")}
                             value={formatLabel(listing.clothes_gender)}
                           />
                           <InfoTile
                             icon={<Ruler size={16} />}
-                            label="Size"
-                            value={listing.clothes_size?.toUpperCase() || "Not specified"}
+                            label={t("listing_detail.clothes_size")}
+                            value={listing.clothes_size?.toUpperCase() || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Palette size={16} />}
-                            label="Color"
-                            value={listing.clothes_color || "Not specified"}
+                            label={t("listing_detail.clothes_color")}
+                            value={listing.clothes_color || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Package size={16} />}
-                            label="Material"
-                            value={listing.clothes_material || "Not specified"}
+                            label={t("listing_detail.clothes_material")}
+                            value={listing.clothes_material || t("listing_detail.not_specified")}
                           />
                         </div>
                       </div>
@@ -530,44 +532,44 @@ export default function ListingDetailsPage() {
                     {isFood && (
                       <div className="mt-6">
                         <h2 className="mb-4 text-lg font-semibold text-slate-900">
-                          Food Details
+                          {t("listing_detail.food_details")}
                         </h2>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                           <InfoTile
                             icon={<UtensilsCrossed size={16} />}
-                            label="Category"
-                            value={listing.food_category || "Not specified"}
+                            label={t("listing_detail.food_category")}
+                            value={listing.food_category || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Scale size={16} />}
-                            label="Unit"
+                            label={t("listing_detail.food_unit")}
                             value={formatLabel(listing.food_unit)}
                           />
                           <InfoTile
                             icon={<Package size={16} />}
-                            label="Weight / Volume"
-                            value={listing.food_weight_volume || "Not specified"}
+                            label={t("listing_detail.food_weight_volume")}
+                            value={listing.food_weight_volume || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<BadgeCheck size={16} />}
-                            label="Perishable"
-                            value={listing.is_perishable ? "Yes" : "No"}
+                            label={t("listing_detail.perishable")}
+                            value={listing.is_perishable ? t("listing_detail.yes") : t("listing_detail.no")}
                             valueClassName={listing.is_perishable ? "text-green-600" : "text-slate-900"}
                           />
                           <InfoTile
                             icon={<CalendarDays size={16} />}
-                            label="Expiry Date"
+                            label={t("listing_detail.expiry_date")}
                             value={
                               listing.is_perishable
-                                ? formatDate(listing.expiry_date || undefined)
-                                : "Not applicable"
+                                ? formatDate(listing.expiry_date || undefined, t)
+                                : t("listing_detail.not_applicable")
                             }
                           />
                           <InfoTile
                             icon={<UtensilsCrossed size={16} />}
-                            label="Prepared Food"
-                            value={listing.is_prepared_food ? "Yes" : "No"}
+                            label={t("listing_detail.prepared_food")}
+                            value={listing.is_prepared_food ? t("listing_detail.yes") : t("listing_detail.no")}
                             valueClassName={listing.is_prepared_food ? "text-green-600" : "text-slate-900"}
                           />
                         </div>
@@ -577,42 +579,42 @@ export default function ListingDetailsPage() {
                     {isHomeKitchen && (
                       <div className="mt-6">
                         <h2 className="mb-4 text-lg font-semibold text-slate-900">
-                          Home & Kitchen Details
+                          {t("listing_detail.home_kitchen_details")}
                         </h2>
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                           <InfoTile
                             icon={<Home size={16} />}
-                            label="Category"
-                            value={listing.home_product_category || "Not specified"}
+                            label={t("listing_detail.home_product_category")}
+                            value={listing.home_product_category || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Package size={16} />}
-                            label="Material"
-                            value={listing.material || "Not specified"}
+                            label={t("listing_detail.material")}
+                            value={listing.material || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Palette size={16} />}
-                            label="Color"
-                            value={listing.color || "Not specified"}
+                            label={t("listing_detail.product_color")}
+                            value={listing.color || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Ruler size={16} />}
-                            label="Dimensions"
-                            value={listing.dimensions || "Not specified"}
+                            label={t("listing_detail.dimensions")}
+                            value={listing.dimensions || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<Scale size={16} />}
-                            label="Weight"
-                            value={listing.weight || "Not specified"}
+                            label={t("listing_detail.weight")}
+                            value={listing.weight || t("listing_detail.not_specified")}
                           />
                           <InfoTile
                             icon={<BadgeCheck size={16} />}
-                            label="Warranty"
+                            label={t("listing_detail.warranty")}
                             value={
                               listing.warranty_months != null
-                                ? `${listing.warranty_months} month(s)`
-                                : "Not specified"
+                                ? `${listing.warranty_months} ${t("listing_detail.months")}`
+                                : t("listing_detail.not_specified")
                             }
                           />
                         </div>
@@ -620,9 +622,9 @@ export default function ListingDetailsPage() {
                     )}
 
                     <div className="mt-6">
-                      <h2 className="text-lg font-semibold text-slate-900">Description</h2>
+                      <h2 className="text-lg font-semibold text-slate-900">{t("listing_detail.description")}</h2>
                       <p className="mt-2 whitespace-pre-line leading-7 text-slate-600">
-                        {listing.description || "No description provided."}
+                        {listing.description || t("listing_detail.no_description")}
                       </p>
                     </div>
                   </Card>
@@ -630,7 +632,7 @@ export default function ListingDetailsPage() {
 
                 <div>
                   <Card>
-                    <p className="text-sm text-slate-500">Price</p>
+                    <p className="text-sm text-slate-500">{t("listing_detail.price")}</p>
 
                     <div className="mt-2">
                       {listing.discount_price && Number(listing.discount_price) > 0 ? (
@@ -652,11 +654,11 @@ export default function ListingDetailsPage() {
                     <div className="mt-2">
                       {listing.negotiable ? (
                         <span className="inline-block rounded-full bg-yellow-50 px-3 py-1 text-xs font-medium text-green-700">
-                          Negotiable
+                          {t("listing_detail.negotiable_badge")}
                         </span>
                       ) : (
                         <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-red-600">
-                          Fixed Price
+                          {t("listing_detail.fixed_price_badge")}
                         </span>
                       )}
                     </div>
@@ -666,11 +668,11 @@ export default function ListingDetailsPage() {
                         <div className="flex items-start gap-3">
                           <MapPin size={18} className="mt-0.5 shrink-0" />
                           <div>
-                            <p className="font-medium text-slate-900">Location</p>
+                            <p className="font-medium text-slate-900">{t("listing_detail.location")}</p>
                             <p>
                               {[listing.district, listing.sector, listing.village]
                                 .filter(Boolean)
-                                .join(", ") || "Not specified"}
+                                .join(", ") || t("listing_detail.not_specified")}
                             </p>
                           </div>
                         </div>
@@ -679,8 +681,8 @@ export default function ListingDetailsPage() {
                       <div className="flex items-start gap-3">
                         <CalendarDays size={18} className="mt-0.5 shrink-0" />
                         <div>
-                          <p className="font-medium text-slate-900">Posted on</p>
-                          <p>{formatDate(listing.created_at)}</p>
+                          <p className="font-medium text-slate-900">{t("listing_detail.posted_on")}</p>
+                          <p>{formatDate(listing.created_at, t)}</p>
                         </div>
                       </div>
 
@@ -688,7 +690,7 @@ export default function ListingDetailsPage() {
                         <div className="flex items-start gap-3">
                           <Package size={18} className="mt-0.5 shrink-0" />
                           <div>
-                            <p className="font-medium text-slate-900">Email</p>
+                            <p className="font-medium text-slate-900">{t("listing_detail.email")}</p>
                             <p>{listing.contact_email}</p>
                           </div>
                         </div>
@@ -699,14 +701,14 @@ export default function ListingDetailsPage() {
                           <div className="flex items-start gap-3">
                             <Map size={18} className="mt-0.5 shrink-0" />
                             <div>
-                              <p className="font-medium text-slate-900">Map Location</p>
+                              <p className="font-medium text-slate-900">{t("listing_detail.map_location")}</p>
                               <a
                                 href={`https://www.google.com/maps?q=${latNum},${lngNum}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:underline"
                               >
-                                View on Google Maps
+                                {t("listing_detail.view_on_google_maps")}
                               </a>
                               <p className="mt-1 text-xs text-slate-500">
                                 {latNum}, {lngNum}
@@ -735,7 +737,7 @@ export default function ListingDetailsPage() {
                         <div className="flex items-start gap-3">
                           <Phone size={18} className="mt-0.5 shrink-0" />
                           <div>
-                            <p className="font-medium text-slate-900">Contact</p>
+                            <p className="font-medium text-slate-900">{t("listing_detail.contact")}</p>
                             <p>{listing.contact_phone}</p>
                           </div>
                         </div>
@@ -750,7 +752,7 @@ export default function ListingDetailsPage() {
                             onClick={() => handleTrackContact("call")}
                             className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-300 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-600"
                           >
-                            Call Now
+                            {t("listing_detail.call_now")}
                           </a>
 
                           <a
@@ -760,7 +762,7 @@ export default function ListingDetailsPage() {
                             onClick={() => handleTrackContact("whatsapp")}
                             className="inline-flex w-full items-center justify-center rounded-2xl bg-green-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-green-700"
                           >
-                            WhatsApp
+                            {t("listing_detail.whatsapp")}
                           </a>
                         </>
                       ) : (
@@ -769,7 +771,7 @@ export default function ListingDetailsPage() {
                           className="w-full rounded-2xl bg-slate-300 px-4 py-3 text-white"
                           disabled
                         >
-                          No Contact Available
+                          {t("listing_detail.no_contact")}
                         </button>
                       )}
                     </div>
@@ -783,7 +785,7 @@ export default function ListingDetailsPage() {
                   className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
                 >
                   <ArrowLeft size={16} />
-                  Back to listings
+                  {t("listing_detail.back_to_listings")}
                 </Link>
               </div>
             </>

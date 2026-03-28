@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Search, MapPin, Phone, Eye, PhoneCall, MessageCircle, Shield } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
@@ -85,6 +86,7 @@ function getVisibilityBadgeClass(status?: string) {
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
 
@@ -166,12 +168,12 @@ export default function DashboardPage() {
         <div className="py-10">
           <div className="mb-6 flex items-center gap-3">
             <h1 className="text-3xl font-bold text-slate-900">
-              {isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
+              {isAdmin ? t("dashboard.admin_dashboard") : t("dashboard.seller_dashboard")}
             </h1>
             {isAdmin && (
               <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
                 <Shield size={14} />
-                Admin
+                {t("dashboard.admin_badge")}
               </span>
             )}
           </div>
@@ -180,28 +182,28 @@ export default function DashboardPage() {
             <>
               <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card>
-                  <p className="text-sm text-slate-500">Total Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.total_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingAdminOverview ? "..." : adminOverview?.total_listings ?? 0}
                   </p>
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Approved Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.approved_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-green-600">
                     {loadingAdminOverview ? "..." : adminOverview?.approved_listings ?? 0}
                   </p>
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Pending Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.pending_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-yellow-600">
                     {loadingAdminOverview ? "..." : adminOverview?.pending_listings ?? 0}
                   </p>
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Rejected Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.rejected_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-red-600">
                     {loadingAdminOverview ? "..." : adminOverview?.rejected_listings ?? 0}
                   </p>
@@ -212,7 +214,7 @@ export default function DashboardPage() {
                 <Card>
                   <div className="flex items-center gap-2 text-slate-500">
                     <Eye size={16} />
-                    <p className="text-sm">Total Views</p>
+                    <p className="text-sm">{t("dashboard.total_views")}</p>
                   </div>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingAdminOverview ? "..." : adminOverview?.total_views ?? 0}
@@ -222,7 +224,7 @@ export default function DashboardPage() {
                 <Card>
                   <div className="flex items-center gap-2 text-slate-500">
                     <PhoneCall size={16} />
-                    <p className="text-sm">Call Clicks</p>
+                    <p className="text-sm">{t("dashboard.call_clicks")}</p>
                   </div>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingAdminOverview ? "..." : adminOverview?.total_call_clicks ?? 0}
@@ -232,7 +234,7 @@ export default function DashboardPage() {
                 <Card>
                   <div className="flex items-center gap-2 text-slate-500">
                     <MessageCircle size={16} />
-                    <p className="text-sm">WhatsApp Clicks</p>
+                    <p className="text-sm">{t("dashboard.whatsapp_clicks")}</p>
                   </div>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingAdminOverview ? "..." : adminOverview?.total_whatsapp_clicks ?? 0}
@@ -240,7 +242,7 @@ export default function DashboardPage() {
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Inactive Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.inactive_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-slate-700">
                     {loadingAdminOverview ? "..." : adminOverview?.inactive_listings ?? 0}
                   </p>
@@ -249,17 +251,17 @@ export default function DashboardPage() {
 
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-xl font-semibold text-slate-900">Popular Categories</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">{t("dashboard.popular_categories")}</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Most viewed categories across the platform.
+                    {t("dashboard.popular_categories_description")}
                   </p>
                 </div>
 
                 {loadingPopularCategories ? (
-                  <p className="text-slate-600">Loading...</p>
+                  <p className="text-slate-600">{t("dashboard.loading")}</p>
                 ) : popularCategories.length === 0 ? (
                   <div className="py-8 text-center">
-                    <p className="text-sm text-slate-600">No category analytics available yet.</p>
+                    <p className="text-sm text-slate-600">{t("dashboard.no_category_analytics")}</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -268,13 +270,13 @@ export default function DashboardPage() {
                         <tr className="text-left">
                           <th className="px-4 py-3 text-sm font-semibold text-slate-700">#</th>
                           <th className="px-4 py-3 text-sm font-semibold text-slate-700">
-                            Category
+                            {t("dashboard.category")}
                           </th>
                           <th className="px-4 py-3 text-sm font-semibold text-slate-700">
-                            Listings
+                            {t("dashboard.listings_count")}
                           </th>
                           <th className="px-4 py-3 text-sm font-semibold text-slate-700">
-                            Views
+                            {t("dashboard.views_count")}
                           </th>
                         </tr>
                       </thead>
@@ -283,7 +285,7 @@ export default function DashboardPage() {
                           <tr key={`${item.category__id}-${index}`}>
                             <td className="px-4 py-3 text-sm text-slate-600">{index + 1}</td>
                             <td className="px-4 py-3 text-sm font-medium text-slate-900">
-                              {item.category__name || "Uncategorized"}
+                              {item.category__name || t("dashboard.uncategorized")}
                             </td>
                             <td className="px-4 py-3 text-sm text-slate-600">
                               {item.total_listings}
@@ -303,28 +305,28 @@ export default function DashboardPage() {
             <>
               <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card>
-                  <p className="text-sm text-slate-500">Total Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.total_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingSellerStats ? total : sellerStats?.total_listings ?? total}
                   </p>
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Pending Review</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.pending_review")}</p>
                   <p className="mt-2 text-3xl font-bold text-yellow-600">
                     {loadingSellerStats ? pending : sellerStats?.pending_listings ?? pending}
                   </p>
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Published</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.published")}</p>
                   <p className="mt-2 text-3xl font-bold text-green-600">
                     {loadingSellerStats ? published : sellerStats?.approved_listings ?? published}
                   </p>
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Rejected</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.rejected")}</p>
                   <p className="mt-2 text-3xl font-bold text-red-600">
                     {loadingSellerStats ? rejected : sellerStats?.rejected_listings ?? rejected}
                   </p>
@@ -335,7 +337,7 @@ export default function DashboardPage() {
                 <Card>
                   <div className="flex items-center gap-2 text-slate-500">
                     <Eye size={16} />
-                    <p className="text-sm">Total Views</p>
+                    <p className="text-sm">{t("dashboard.total_views")}</p>
                   </div>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingSellerStats ? "..." : sellerStats?.total_views ?? 0}
@@ -345,7 +347,7 @@ export default function DashboardPage() {
                 <Card>
                   <div className="flex items-center gap-2 text-slate-500">
                     <PhoneCall size={16} />
-                    <p className="text-sm">Call Clicks</p>
+                    <p className="text-sm">{t("dashboard.call_clicks")}</p>
                   </div>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingSellerStats ? "..." : sellerStats?.total_call_clicks ?? 0}
@@ -355,7 +357,7 @@ export default function DashboardPage() {
                 <Card>
                   <div className="flex items-center gap-2 text-slate-500">
                     <MessageCircle size={16} />
-                    <p className="text-sm">WhatsApp Clicks</p>
+                    <p className="text-sm">{t("dashboard.whatsapp_clicks")}</p>
                   </div>
                   <p className="mt-2 text-3xl font-bold text-slate-900">
                     {loadingSellerStats ? "..." : sellerStats?.total_whatsapp_clicks ?? 0}
@@ -363,7 +365,7 @@ export default function DashboardPage() {
                 </Card>
 
                 <Card>
-                  <p className="text-sm text-slate-500">Active Listings</p>
+                  <p className="text-sm text-slate-500">{t("dashboard.active_listings")}</p>
                   <p className="mt-2 text-3xl font-bold text-blue-700">
                     {loadingSellerStats ? "..." : sellerStats?.active_listings ?? 0}
                   </p>
@@ -374,9 +376,9 @@ export default function DashboardPage() {
                 <Card className="mb-6">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
-                      <h2 className="text-xl font-semibold text-slate-900">Top Performing Listing</h2>
+                      <h2 className="text-xl font-semibold text-slate-900">{t("dashboard.top_performing_listing")}</h2>
                       <p className="mt-1 text-sm text-slate-500">
-                        Your best listing by views.
+                        {t("dashboard.top_performing_description")}
                       </p>
                     </div>
 
@@ -385,9 +387,9 @@ export default function DashboardPage() {
                         {sellerStats.top_listing.title}
                       </p>
                       <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-600">
-                        <span>{sellerStats.top_listing.views_count} views</span>
-                        <span>{sellerStats.top_listing.call_clicks} calls</span>
-                        <span>{sellerStats.top_listing.whatsapp_clicks} WhatsApp</span>
+                        <span>{sellerStats.top_listing.views_count} {t("dashboard.views")}</span>
+                        <span>{sellerStats.top_listing.call_clicks} {t("dashboard.calls")}</span>
+                        <span>{sellerStats.top_listing.whatsapp_clicks} {t("dashboard.whatsapp")}</span>
                       </div>
                     </div>
                   </div>
@@ -397,10 +399,10 @@ export default function DashboardPage() {
               <Card>
                 <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-900">My Listings</h2>
+                    <h2 className="text-xl font-semibold text-slate-900">{t("dashboard.my_listings")}</h2>
                     {!isLoading && (
                       <p className="mt-1 text-sm text-slate-500">
-                        {filteredData.length} listing{filteredData.length !== 1 ? "s" : ""} found
+                        {t("dashboard.listings_found", { count: filteredData.length })}
                       </p>
                     )}
                   </div>
@@ -416,18 +418,18 @@ export default function DashboardPage() {
                         setSearch(e.target.value);
                         setCurrentPage(1);
                       }}
-                      placeholder="Search listings..."
+                      placeholder={t("dashboard.search_placeholder")}
                       className="w-full rounded-2xl border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm outline-none focus:border-slate-700"
                     />
                   </div>
                 </div>
 
                 {isLoading ? (
-                  <p className="text-slate-600">Loading...</p>
+                  <p className="text-slate-600">{t("dashboard.loading")}</p>
                 ) : filteredData.length === 0 ? (
                   <div className="py-10 text-center">
-                    <h3 className="text-lg font-semibold text-slate-900">No listings found</h3>
-                    <p className="mt-2 text-sm text-slate-600">Try another search term.</p>
+                    <h3 className="text-lg font-semibold text-slate-900">{t("dashboard.no_listings_found")}</h3>
+                    <p className="mt-2 text-sm text-slate-600">{t("dashboard.try_another_search")}</p>
                   </div>
                 ) : (
                   <>
@@ -449,7 +451,10 @@ export default function DashboardPage() {
                                     item.status
                                   )}`}
                                 >
-                                  {item.status || "unknown"}
+                                  {item.status === "approved" ? t("dashboard.approved") : 
+                                   item.status === "pending" ? t("dashboard.pending") : 
+                                   item.status === "rejected" ? t("dashboard.rejected") : 
+                                   t("dashboard.unknown")}
                                 </span>
 
                                 <span
@@ -457,7 +462,9 @@ export default function DashboardPage() {
                                     item.visibility_status
                                   )}`}
                                 >
-                                  {item.visibility_status || "unknown"}
+                                  {item.visibility_status === "active" ? t("dashboard.active") : 
+                                   item.visibility_status === "inactive" ? t("dashboard.inactive") : 
+                                   t("dashboard.unknown")}
                                 </span>
                               </div>
                             </div>
@@ -468,7 +475,7 @@ export default function DashboardPage() {
                                   <MapPin size={14} className="shrink-0" />
                                   <span>
                                     {[item.district, item.sector].filter(Boolean).join(" • ") ||
-                                      "No location"}
+                                      t("dashboard.no_location")}
                                   </span>
                                 </div>
 
@@ -485,15 +492,15 @@ export default function DashboardPage() {
                                 <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-600">
                                   <span className="inline-flex items-center gap-1">
                                     <Eye size={14} />
-                                    {item.views_count ?? 0} views
+                                    {item.views_count ?? 0} {t("dashboard.views")}
                                   </span>
                                   <span className="inline-flex items-center gap-1">
                                     <PhoneCall size={14} />
-                                    {item.call_clicks ?? 0} calls
+                                    {item.call_clicks ?? 0} {t("dashboard.calls")}
                                   </span>
                                   <span className="inline-flex items-center gap-1">
                                     <MessageCircle size={14} />
-                                    {item.whatsapp_clicks ?? 0} WhatsApp
+                                    {item.whatsapp_clicks ?? 0} {t("dashboard.whatsapp")}
                                   </span>
                                 </div>
                               </div>
@@ -517,7 +524,7 @@ export default function DashboardPage() {
                           disabled={currentPage === 1}
                           className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          Previous
+                          {t("dashboard.previous")}
                         </button>
 
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -541,7 +548,7 @@ export default function DashboardPage() {
                           disabled={currentPage === totalPages}
                           className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          Next
+                          {t("dashboard.next")}
                         </button>
                       </div>
                     )}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MapPin,
   House,
@@ -74,11 +75,11 @@ function getListingIcon(type: Listing["listing_type"]) {
   return <Building2 size={16} />;
 }
 
-function getListingLabel(type: Listing["listing_type"]) {
-  if (type === "house") return "House";
-  if (type === "parcel") return "Parcel";
-  if (type === "car") return "Car";
-  return "Business Ad";
+function getListingLabel(type: Listing["listing_type"], t: (key: string) => string) {
+  if (type === "house") return t("listings.house");
+  if (type === "parcel") return t("listings.parcel");
+  if (type === "car") return t("listings.car");
+  return t("listings.business_ad");
 }
 
 function formatPrice(value: string | number) {
@@ -118,6 +119,7 @@ function getAnonymousInterestUserId() {
 }
 
 export default function ListingsPage() {
+  const { t } = useTranslation();
   const loggedIn = isAuthenticated();
   const queryClient = useQueryClient();
 
@@ -238,13 +240,13 @@ export default function ListingsPage() {
     onSuccess: async ({ data }) => {
       setInterestMessage(
         data?.interested
-          ? "Listing marked as Interested."
-          : "Interest removed from listing."
+          ? t("listings.interested_success")
+          : t("listings.interested_removed")
       );
       await queryClient.invalidateQueries({ queryKey: ["listings"] });
     },
     onError: (error: any) => {
-      setInterestMessage(getErrorMessage(error, "Unable to update interest."));
+      setInterestMessage(getErrorMessage(error, t("listings.interest_error")));
     },
   });
 
@@ -299,7 +301,7 @@ export default function ListingsPage() {
 
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <p className="text-sm text-slate-600 md:text-base">
-          Explore houses, parcels, cars, and business advertisements across Rwanda.
+          {t("listings.explore_text")}
         </p>
 
         {loggedIn && (
@@ -307,7 +309,7 @@ export default function ListingsPage() {
             to="/publish"
             className="rounded-2xl bg-slate-400 px-5 py-3 text-white"
           >
-            Post Listing...
+            {t("listings.post_listing_button")}
           </Link>
         )}
       </div>
@@ -317,7 +319,7 @@ export default function ListingsPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title, description, location..."
+            placeholder={t("listings.search_placeholder")}
           />
 
           <select
@@ -325,11 +327,11 @@ export default function ListingsPage() {
             onChange={(e) => setListingType(e.target.value)}
             className="rounded-2xl border border-slate-300 bg-white px-3 py-3 outline-none focus:border-slate-700"
           >
-            <option value="">All types</option>
-            <option value="house">House</option>
-            <option value="parcel">Parcel</option>
-            <option value="car">Car</option>
-            <option value="business_ad">Business Ad</option>
+            <option value="">{t("listings.all_types")}</option>
+            <option value="house">{t("listings.house")}</option>
+            <option value="parcel">{t("listings.parcel")}</option>
+            <option value="car">{t("listings.car")}</option>
+            <option value="business_ad">{t("listings.business_ad")}</option>
           </select>
 
           <select
@@ -337,10 +339,10 @@ export default function ListingsPage() {
             onChange={(e) => setSaleMode(e.target.value)}
             className="rounded-2xl border border-slate-300 bg-white px-3 py-3 outline-none focus:border-slate-700"
           >
-            <option value="">All sale modes</option>
-            <option value="sell">Sell</option>
-            <option value="rent">Rent</option>
-            <option value="ads">Ads</option>
+            <option value="">{t("listings.all_sale_modes")}</option>
+            <option value="sell">{t("listings.sell")}</option>
+            <option value="rent">{t("listings.rent")}</option>
+            <option value="ads">{t("listings.ads")}</option>
           </select>
 
           <select
@@ -348,7 +350,7 @@ export default function ListingsPage() {
             onChange={(e) => setCategory(e.target.value)}
             className="rounded-2xl border border-slate-300 bg-white px-3 py-3 outline-none focus:border-slate-700"
           >
-            <option value="">All categories</option>
+            <option value="">{t("listings.all_categories")}</option>
             {categories.map((item) => (
               <option key={item.id} value={String(item.id)}>
                 {item.name}
@@ -359,27 +361,27 @@ export default function ListingsPage() {
           <Input
             value={district}
             onChange={(e) => setDistrict(e.target.value)}
-            placeholder="District"
+            placeholder={t("listings.district")}
           />
 
           <Input
             value={sector}
             onChange={(e) => setSector(e.target.value)}
-            placeholder="Sector"
+            placeholder={t("listings.sector")}
           />
 
           <Input
             type="number"
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
-            placeholder="Min price"
+            placeholder={t("listings.min_price")}
           />
 
           <Input
             type="number"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="Max price"
+            placeholder={t("listings.max_price")}
           />
 
           <label className="flex items-center gap-3 rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-700">
@@ -389,7 +391,7 @@ export default function ListingsPage() {
               onChange={(e) => setWithDiscount(e.target.checked)}
               className="h-4 w-4"
             />
-            With discount
+            {t("listings.with_discount")}
           </label>
 
           <label className="flex items-center gap-3 rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-700">
@@ -399,7 +401,7 @@ export default function ListingsPage() {
               onChange={(e) => setNegotiableOnly(e.target.checked)}
               className="h-4 w-4"
             />
-            Negotiable only
+            {t("listings.negotiable_only")}
           </label>
         </div>
 
@@ -409,7 +411,7 @@ export default function ListingsPage() {
             onClick={resetFilters}
             className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
           >
-            Reset
+            {t("listings.reset")}
           </button>
         </div>
       </Card>
@@ -422,12 +424,12 @@ export default function ListingsPage() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-600">
-          {isLoading ? "Loading..." : `${listings.length} listing(s) found`}
+          {isLoading ? t("listings.loading") : `${listings.length} ${t("listings.listings_found")}`}
         </p>
 
         {!isLoading && listings.length > 0 && (
           <p className="text-sm text-slate-500">
-            Page {currentPage} of {totalPages}
+            {t("listings.page")} {currentPage} {t("listings.of")} {totalPages}
           </p>
         )}
       </div>
@@ -448,14 +450,14 @@ export default function ListingsPage() {
         </div>
       ) : isError ? (
         <Card>
-          <p className="text-red-600">Unable to load listings.</p>
+          <p className="text-red-600">{t("listings.load_error")}</p>
         </Card>
       ) : listings.length === 0 ? (
         <Card>
           <div className="py-10 text-center">
-            <h2 className="text-xl font-semibold text-slate-900">No listings found</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{t("listings.no_listings")}</h2>
             <p className="mt-2 text-slate-600">
-              Try changing your search or filters.
+              {t("listings.no_listings_suggestion")}
             </p>
           </div>
         </Card>
@@ -495,7 +497,7 @@ export default function ListingsPage() {
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-100 text-center text-slate-500">
-                          No Image
+                          {t("listings.no_image")}
                         </div>
                       )}
                     </div>
@@ -506,16 +508,16 @@ export default function ListingsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                           {getListingIcon(item.listing_type)}
-                          {getListingLabel(item.listing_type)}
+                          {getListingLabel(item.listing_type, t)}
                         </span>
 
                         {item.sale_mode && (
                           <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                             {item.sale_mode === "sell"
-                              ? "For Sale"
+                              ? t("listings.for_sale")
                               : item.sale_mode === "rent"
-                              ? "For Rent"
-                              : "Advertisement"}
+                              ? t("listings.for_rent")
+                              : t("listings.advertisement")}
                           </span>
                         )}
 
@@ -527,7 +529,7 @@ export default function ListingsPage() {
                                 : "bg-red-50 text-red-700"
                             }`}
                           >
-                            {item.visibility_status === "active" ? "Active" : "Inactive"}
+                            {item.visibility_status === "active" ? t("listings.active") : t("listings.inactive")}
                           </span>
                         )}
                       </div>
@@ -564,12 +566,12 @@ export default function ListingsPage() {
                     <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-600">
                       <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 font-medium">
                         <Eye size={14} />
-                        {formatNumber(item.views_count || 0)} Impressions
+                        {formatNumber(item.views_count || 0)} {t("listings.impressions")}
                       </span>
 
                       <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1.5 font-medium text-amber-700">
                         <Star size={14} />
-                        {formatNumber(item.interested_count || 0)} Interested
+                        {formatNumber(item.interested_count || 0)} {t("listings.interested_label")}
                       </span>
                     </div>
 
@@ -579,27 +581,27 @@ export default function ListingsPage() {
                           <div className="flex flex-col">
                             <span className="text-[16px] text-slate-400 line-through">
                               {item.sale_mode === "rent"
-                                ? `RWF ${formatPrice(item.price)} / month`
+                                ? `RWF ${formatPrice(item.price)} / ${t("listings.month")}`
                                 : `RWF ${formatPrice(item.price)}`}
                             </span>
 
                             <span className="text-[16px] font-bold text-green-600">
                               {item.sale_mode === "rent"
-                                ? `${formatRWF(item.discount_price)} / month`
+                                ? `${formatRWF(item.discount_price)} / ${t("listings.month")}`
                                 : formatRWF(item.discount_price)}
                             </span>
                           </div>
                         ) : (
                           <p className="text-[16px] font-bold text-slate-900">
                             {item.sale_mode === "rent"
-                              ? `RWF ${formatPrice(item.price)} / month`
+                              ? `RWF ${formatPrice(item.price)} / ${t("listings.month")}`
                               : `RWF ${formatPrice(item.price)}`}
                           </p>
                         )}
 
                         {item.negotiable && (
                           <span className="mt-1 inline-block rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-blue-700">
-                            Negotiable
+                            {t("listings.negotiable_badge")}
                           </span>
                         )}
                       </div>
@@ -620,17 +622,17 @@ export default function ListingsPage() {
                         >
                           <Star size={14} />
                           {isInterestUpdating
-                            ? "Saving..."
+                            ? t("listings.saving")
                             : item.has_interested
-                            ? "Interested ✓"
-                            : "Interested"}
+                            ? t("listings.interested_active")
+                            : t("listings.interested_button")}
                         </button>
 
                         <Link
                           to={`/listings/${item.id}`}
                           className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                         >
-                          Details
+                          {t("listings.details_button")}
                         </Link>
 
                         {isAdmin === true && (
@@ -639,7 +641,7 @@ export default function ListingsPage() {
                             className="inline-flex items-center gap-2 rounded-xl bg-slate-400 px-3 py-2 text-sm font-medium text-white transition hover:opacity-90"
                           >
                             <Pencil size={14} />
-                            Edit
+                            {t("listings.edit")}
                           </Link>
                         )}
 
@@ -650,7 +652,7 @@ export default function ListingsPage() {
                             disabled={hideMutation.isPending}
                             className="rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
                           >
-                            Hide
+                            {t("listings.hide")}
                           </button>
                         )}
 
@@ -661,7 +663,7 @@ export default function ListingsPage() {
                             disabled={unhideMutation.isPending}
                             className="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:opacity-50"
                           >
-                            Unhide
+                            {t("listings.unhide")}
                           </button>
                         )}
                       </div>
@@ -680,7 +682,7 @@ export default function ListingsPage() {
                 disabled={currentPage === 1}
                 className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Previous
+                {t("listings.previous")}
               </button>
 
               {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
@@ -704,7 +706,7 @@ export default function ListingsPage() {
                 disabled={currentPage === totalPages}
                 className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Next
+                {t("listings.next")}
               </button>
             </div>
           )}

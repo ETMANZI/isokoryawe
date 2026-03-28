@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
@@ -35,17 +36,14 @@ type ListingForm = {
 
   negotiable?: boolean;
 
-  // House
   bedrooms?: number;
   bathrooms?: number;
   has_electricity: boolean;
   has_water: boolean;
 
-  // Parcel
   upi: string;
   land_size?: number;
 
-  // Car
   car_make?: string;
   car_model?: string;
   car_year?: number;
@@ -55,7 +53,6 @@ type ListingForm = {
   car_condition?: string;
   car_color?: string;
 
-  // Common product fields
   brand?: string;
   stock_quantity?: number;
   sku?: string;
@@ -64,14 +61,12 @@ type ListingForm = {
   delivery_fee?: number;
   delivery_notes?: string;
 
-  // Clothes product
   clothes_gender?: string;
   clothes_size?: string;
   clothes_color?: string;
   clothes_material?: string;
   clothes_category?: string;
 
-  // Food product
   food_category?: string;
   food_unit?: string;
   food_weight_volume?: string;
@@ -79,7 +74,6 @@ type ListingForm = {
   expiry_date?: string;
   is_prepared_food?: boolean;
 
-  // Home & kitchen product
   home_product_category?: string;
   material?: string;
   color?: string;
@@ -100,6 +94,7 @@ const PRODUCT_TYPES = [
 ];
 
 export default function PublishListingPage() {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -384,7 +379,10 @@ export default function PublishListingPage() {
       });
 
       setMessage(
-        `Listing created successfully. Publishing fee required: ${paymentRes.data.amount} ${paymentRes.data.currency}`
+        t("publish.payment_message", {
+          amount: paymentRes.data.amount,
+          currency: paymentRes.data.currency,
+        })
       );
 
       clearAllImages();
@@ -467,7 +465,7 @@ export default function PublishListingPage() {
           .join(" | ");
         setError(firstError);
       } else {
-        setError("Failed to create listing.");
+        setError(t("publish.error_message"));
       }
     }
   };
@@ -478,34 +476,34 @@ export default function PublishListingPage() {
         <div className="mx-auto max-w-4xl py-10">
           <Card>
             <h1 className="mb-6 text-3xl font-bold text-slate-900">
-              Publish Listing
+              {t("publish.title")}
             </h1>
 
             <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Title
+                  {t("publish.title_label")}
                 </label>
-                <Input placeholder="Title" {...register("title", { required: true })} />
+                <Input placeholder={t("publish.title_placeholder")} {...register("title", { required: true })} />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Slug
+                  {t("publish.slug_label")}
                 </label>
-                <Input placeholder="Slug" {...register("slug", { required: true })} />
+                <Input placeholder={t("publish.slug_placeholder")} {...register("slug", { required: true })} />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Category
+                  {t("publish.category_label")}
                 </label>
                 <select
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   {...register("category")}
                 >
                   <option value="">
-                    {loadingCategories ? "Loading categories..." : "Select category"}
+                    {loadingCategories ? t("publish.loading_categories") : t("publish.select_category")}
                   </option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={String(cat.id)}>
@@ -517,26 +515,26 @@ export default function PublishListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Listing Type
+                  {t("publish.listing_type_label")}
                 </label>
                 <select
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   {...register("listing_type")}
                 >
-                  <option value="house">House</option>
-                  <option value="parcel">Parcel</option>
-                  <option value="business_ad">Business Advertisement</option>
-                  <option value="car">Car</option>
-                  <option value="clothes_product">Clothes Product</option>
-                  <option value="food_product">Food Product</option>
-                  <option value="home_kitchen_product">Home & Kitchen Product</option>
+                  <option value="house">{t("publish.house")}</option>
+                  <option value="parcel">{t("publish.parcel")}</option>
+                  <option value="business_ad">{t("publish.business_ad")}</option>
+                  <option value="car">{t("publish.car")}</option>
+                  <option value="clothes_product">{t("publish.clothes_product")}</option>
+                  <option value="food_product">{t("publish.food_product")}</option>
+                  <option value="home_kitchen_product">{t("publish.home_kitchen_product")}</option>
                 </select>
               </div>
 
               {showSaleMode && (
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Sale Mode
+                    {t("publish.sale_mode_label")}
                   </label>
                   <select
                     className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
@@ -544,8 +542,8 @@ export default function PublishListingPage() {
                   >
                     {listingType === "house" && (
                       <>
-                        <option value="sell">Sell</option>
-                        <option value="rent">Rent</option>
+                        <option value="sell">{t("publish.sell")}</option>
+                        <option value="rent">{t("publish.rent")}</option>
                       </>
                     )}
 
@@ -554,11 +552,11 @@ export default function PublishListingPage() {
                       listingType === "clothes_product" ||
                       listingType === "food_product" ||
                       listingType === "home_kitchen_product") && (
-                      <option value="sell">Sell</option>
+                      <option value="sell">{t("publish.sell")}</option>
                     )}
 
                     {listingType === "business_ad" && (
-                      <option value="ads">Ads</option>
+                      <option value="ads">{t("publish.ads")}</option>
                     )}
                   </select>
                 </div>
@@ -566,10 +564,10 @@ export default function PublishListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Price
+                  {t("publish.price_label")}
                 </label>
                 <Input
-                  placeholder="Price"
+                  placeholder={t("publish.price_placeholder")}
                   type="number"
                   {...register("price", { valueAsNumber: true, required: true })}
                 />
@@ -577,10 +575,10 @@ export default function PublishListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Discount Price
+                  {t("publish.discount_price_label")}
                 </label>
                 <Input
-                  placeholder="Discount Price"
+                  placeholder={t("publish.discount_price_placeholder")}
                   type="number"
                   step="0.01"
                   {...register("discount_price", {
@@ -591,7 +589,7 @@ export default function PublishListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Is Price Negotiable?
+                  {t("publish.negotiable_label")}
                 </label>
 
                 <label className="flex w-full rounded-2xl border border-slate-300 bg-white px-3 py-3 outline-none">
@@ -600,7 +598,7 @@ export default function PublishListingPage() {
                     className="mt-0.5 h-4 w-4 shrink-0"
                     {...register("negotiable")}
                   />
-                  <span className="ml-3 text-sm text-slate-700">Yes</span>
+                  <span className="ml-3 text-sm text-slate-700">{t("publish.yes")}</span>
                 </label>
               </div>
 
@@ -608,10 +606,10 @@ export default function PublishListingPage() {
                 <>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
-                      Bedrooms
+                      {t("publish.bedrooms_label")}
                     </label>
                     <Input
-                      placeholder="Bedrooms"
+                      placeholder={t("publish.bedrooms_placeholder")}
                       type="number"
                       {...register("bedrooms", {
                         setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -621,10 +619,10 @@ export default function PublishListingPage() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
-                      Bathrooms
+                      {t("publish.bathrooms_label")}
                     </label>
                     <Input
-                      placeholder="Bathrooms"
+                      placeholder={t("publish.bathrooms_placeholder")}
                       type="number"
                       {...register("bathrooms", {
                         setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -637,19 +635,19 @@ export default function PublishListingPage() {
               {showUpi && (
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    UPI
+                    {t("publish.upi_label")}
                   </label>
-                  <Input placeholder="UPI" {...register("upi")} />
+                  <Input placeholder={t("publish.upi_placeholder")} {...register("upi")} />
                 </div>
               )}
 
               {showLandSize && (
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Land Size (m²)
+                    {t("publish.land_size_label")}
                   </label>
                   <Input
-                    placeholder="Land Size in square meters"
+                    placeholder={t("publish.land_size_placeholder")}
                     type="number"
                     step="0.01"
                     {...register("land_size", {
@@ -661,29 +659,29 @@ export default function PublishListingPage() {
 
               {isCar && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Car Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("publish.car_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Make
+                        {t("publish.car_make_label")}
                       </label>
-                      <Input placeholder="e.g. Toyota" {...register("car_make")} />
+                      <Input placeholder={t("publish.car_make_placeholder")} {...register("car_make")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Model
+                        {t("publish.car_model_label")}
                       </label>
-                      <Input placeholder="e.g. Corolla" {...register("car_model")} />
+                      <Input placeholder={t("publish.car_model_placeholder")} {...register("car_model")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Year
+                        {t("publish.car_year_label")}
                       </label>
                       <Input
-                        placeholder="e.g. 2018"
+                        placeholder={t("publish.car_year_placeholder")}
                         type="number"
                         {...register("car_year", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -693,10 +691,10 @@ export default function PublishListingPage() {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Mileage (km)
+                        {t("publish.car_mileage_label")}
                       </label>
                       <Input
-                        placeholder="e.g. 85000"
+                        placeholder={t("publish.car_mileage_placeholder")}
                         type="number"
                         {...register("car_mileage", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -706,53 +704,53 @@ export default function PublishListingPage() {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Fuel Type
+                        {t("publish.car_fuel_type_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("car_fuel_type")}
                       >
-                        <option value="">Select fuel type</option>
-                        <option value="petrol">Petrol</option>
-                        <option value="diesel">Diesel</option>
-                        <option value="electric">Electric</option>
-                        <option value="hybrid">Hybrid</option>
+                        <option value="">{t("publish.select_fuel_type")}</option>
+                        <option value="petrol">{t("publish.petrol")}</option>
+                        <option value="diesel">{t("publish.diesel")}</option>
+                        <option value="electric">{t("publish.electric")}</option>
+                        <option value="hybrid">{t("publish.hybrid")}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Transmission
+                        {t("publish.car_transmission_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("car_transmission")}
                       >
-                        <option value="">Select transmission</option>
-                        <option value="manual">Manual</option>
-                        <option value="automatic">Automatic</option>
+                        <option value="">{t("publish.select_transmission")}</option>
+                        <option value="manual">{t("publish.manual")}</option>
+                        <option value="automatic">{t("publish.automatic")}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Condition
+                        {t("publish.car_condition_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("car_condition")}
                       >
-                        <option value="">Select condition</option>
-                        <option value="new">New</option>
-                        <option value="used">Used</option>
+                        <option value="">{t("publish.select_condition")}</option>
+                        <option value="new">{t("publish.new")}</option>
+                        <option value="used">{t("publish.used")}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Color
+                        {t("publish.car_color_label")}
                       </label>
-                      <Input placeholder="e.g. Black" {...register("car_color")} />
+                      <Input placeholder={t("publish.car_color_placeholder")} {...register("car_color")} />
                     </div>
                   </div>
                 </div>
@@ -760,22 +758,22 @@ export default function PublishListingPage() {
 
               {isProductType && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Product Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("publish.product_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Brand
+                        {t("publish.brand_label")}
                       </label>
-                      <Input placeholder="Brand" {...register("brand")} />
+                      <Input placeholder={t("publish.brand_placeholder")} {...register("brand")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Stock Quantity
+                        {t("publish.stock_quantity_label")}
                       </label>
                       <Input
-                        placeholder="Stock Quantity"
+                        placeholder={t("publish.stock_quantity_placeholder")}
                         type="number"
                         {...register("stock_quantity", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -785,22 +783,22 @@ export default function PublishListingPage() {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        SKU
+                        {t("publish.sku_label")}
                       </label>
-                      <Input placeholder="SKU" {...register("sku")} />
+                      <Input placeholder={t("publish.sku_placeholder")} {...register("sku")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Product Condition
+                        {t("publish.product_condition_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("product_condition")}
                       >
-                        <option value="">Select condition</option>
-                        <option value="new">New</option>
-                        <option value="used">Used</option>
+                        <option value="">{t("publish.select_condition")}</option>
+                        <option value="new">{t("publish.new")}</option>
+                        <option value="used">{t("publish.used")}</option>
                       </select>
                     </div>
 
@@ -812,7 +810,7 @@ export default function PublishListingPage() {
                           {...register("has_home_delivery")}
                         />
                         <span className="text-sm text-slate-700">
-                          Home delivery available
+                          {t("publish.home_delivery_available")}
                         </span>
                       </label>
                     </div>
@@ -821,10 +819,10 @@ export default function PublishListingPage() {
                       <>
                         <div>
                           <label className="mb-2 block text-sm font-medium text-slate-700">
-                            Delivery Fee
+                            {t("publish.delivery_fee_label")}
                           </label>
                           <Input
-                            placeholder="Delivery Fee"
+                            placeholder={t("publish.delivery_fee_placeholder")}
                             type="number"
                             step="0.01"
                             {...register("delivery_fee", {
@@ -835,10 +833,10 @@ export default function PublishListingPage() {
 
                         <div>
                           <label className="mb-2 block text-sm font-medium text-slate-700">
-                            Delivery Notes
+                            {t("publish.delivery_notes_label")}
                           </label>
                           <Input
-                            placeholder="Delivery within Kigali, same day..."
+                            placeholder={t("publish.delivery_notes_placeholder")}
                             {...register("delivery_notes")}
                           />
                         </div>
@@ -850,46 +848,44 @@ export default function PublishListingPage() {
 
               {listingType === "clothes_product" && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">
-                    Clothes Details
-                  </p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("publish.clothes_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Clothes Category
+                        {t("publish.clothes_category_label")}
                       </label>
                       <Input
-                        placeholder="Shirt, Dress, Shoes..."
+                        placeholder={t("publish.clothes_category_placeholder")}
                         {...register("clothes_category")}
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Gender
+                        {t("publish.clothes_gender_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("clothes_gender")}
                       >
-                        <option value="">Select gender</option>
-                        <option value="men">Men</option>
-                        <option value="women">Women</option>
-                        <option value="unisex">Unisex</option>
-                        <option value="kids">Kids</option>
+                        <option value="">{t("publish.select_gender")}</option>
+                        <option value="men">{t("publish.men")}</option>
+                        <option value="women">{t("publish.women")}</option>
+                        <option value="unisex">{t("publish.unisex")}</option>
+                        <option value="kids">{t("publish.kids")}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Size
+                        {t("publish.clothes_size_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("clothes_size")}
                       >
-                        <option value="">Select size</option>
+                        <option value="">{t("publish.select_size")}</option>
                         <option value="xs">XS</option>
                         <option value="s">S</option>
                         <option value="m">M</option>
@@ -902,16 +898,16 @@ export default function PublishListingPage() {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Color
+                        {t("publish.clothes_color_label")}
                       </label>
-                      <Input placeholder="Black" {...register("clothes_color")} />
+                      <Input placeholder={t("publish.clothes_color_placeholder")} {...register("clothes_color")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Material
+                        {t("publish.clothes_material_label")}
                       </label>
-                      <Input placeholder="Cotton" {...register("clothes_material")} />
+                      <Input placeholder={t("publish.clothes_material_placeholder")} {...register("clothes_material")} />
                     </div>
                   </div>
                 </div>
@@ -919,48 +915,46 @@ export default function PublishListingPage() {
 
               {listingType === "food_product" && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">
-                    Food Details
-                  </p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("publish.food_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Food Category
+                        {t("publish.food_category_label")}
                       </label>
                       <Input
-                        placeholder="Fresh food, snack, bakery, drink..."
+                        placeholder={t("publish.food_category_placeholder")}
                         {...register("food_category")}
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Unit
+                        {t("publish.food_unit_label")}
                       </label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("food_unit")}
                       >
-                        <option value="">Select unit</option>
-                        <option value="piece">Piece</option>
-                        <option value="kg">Kg</option>
-                        <option value="gram">Gram</option>
-                        <option value="liter">Liter</option>
-                        <option value="ml">Ml</option>
-                        <option value="pack">Pack</option>
-                        <option value="plate">Plate</option>
-                        <option value="box">Box</option>
-                        <option value="bottle">Bottle</option>
+                        <option value="">{t("publish.select_unit")}</option>
+                        <option value="piece">{t("publish.piece")}</option>
+                        <option value="kg">{t("publish.kg")}</option>
+                        <option value="gram">{t("publish.gram")}</option>
+                        <option value="liter">{t("publish.liter")}</option>
+                        <option value="ml">{t("publish.ml")}</option>
+                        <option value="pack">{t("publish.pack")}</option>
+                        <option value="plate">{t("publish.plate")}</option>
+                        <option value="box">{t("publish.box")}</option>
+                        <option value="bottle">{t("publish.bottle")}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Weight / Volume
+                        {t("publish.food_weight_volume_label")}
                       </label>
                       <Input
-                        placeholder="1kg, 500ml, 12 pieces"
+                        placeholder={t("publish.food_weight_volume_placeholder")}
                         {...register("food_weight_volume")}
                       />
                     </div>
@@ -972,7 +966,7 @@ export default function PublishListingPage() {
                           className="h-4 w-4"
                           {...register("is_perishable")}
                         />
-                        <span className="text-sm text-slate-700">Perishable</span>
+                        <span className="text-sm text-slate-700">{t("publish.perishable")}</span>
                       </label>
 
                       <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
@@ -981,14 +975,14 @@ export default function PublishListingPage() {
                           className="h-4 w-4"
                           {...register("is_prepared_food")}
                         />
-                        <span className="text-sm text-slate-700">Prepared food</span>
+                        <span className="text-sm text-slate-700">{t("publish.prepared_food")}</span>
                       </label>
                     </div>
 
                     {isPerishable && (
                       <div>
                         <label className="mb-2 block text-sm font-medium text-slate-700">
-                          Expiry Date
+                          {t("publish.expiry_date_label")}
                         </label>
                         <Input type="date" {...register("expiry_date")} />
                       </div>
@@ -999,55 +993,53 @@ export default function PublishListingPage() {
 
               {listingType === "home_kitchen_product" && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">
-                    Home & Kitchen Details
-                  </p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("publish.home_kitchen_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Product Category
+                        {t("publish.home_product_category_label")}
                       </label>
                       <Input
-                        placeholder="Cookware, furniture, decor..."
+                        placeholder={t("publish.home_product_category_placeholder")}
                         {...register("home_product_category")}
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Material
+                        {t("publish.material_label")}
                       </label>
-                      <Input placeholder="Wood, steel..." {...register("material")} />
+                      <Input placeholder={t("publish.material_placeholder")} {...register("material")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Color
+                        {t("publish.product_color_label")}
                       </label>
-                      <Input placeholder="Brown" {...register("color")} />
+                      <Input placeholder={t("publish.product_color_placeholder")} {...register("color")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Dimensions
+                        {t("publish.dimensions_label")}
                       </label>
-                      <Input placeholder="120x60x75 cm" {...register("dimensions")} />
+                      <Input placeholder={t("publish.dimensions_placeholder")} {...register("dimensions")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Weight
+                        {t("publish.weight_label")}
                       </label>
-                      <Input placeholder="5kg" {...register("weight")} />
+                      <Input placeholder={t("publish.weight_placeholder")} {...register("weight")} />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Warranty (months)
+                        {t("publish.warranty_label")}
                       </label>
                       <Input
-                        placeholder="12"
+                        placeholder={t("publish.warranty_placeholder")}
                         type="number"
                         {...register("warranty_months", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -1060,7 +1052,7 @@ export default function PublishListingPage() {
 
               {showUtilities && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-3 text-sm font-semibold text-slate-800">Utilities</p>
+                  <p className="mb-3 text-sm font-semibold text-slate-800">{t("publish.utilities")}</p>
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
@@ -1070,7 +1062,7 @@ export default function PublishListingPage() {
                         {...register("has_electricity")}
                       />
                       <span className="text-sm text-slate-700">
-                        House/Parcel has electricity
+                        {t("publish.has_electricity")}
                       </span>
                     </label>
 
@@ -1081,7 +1073,7 @@ export default function PublishListingPage() {
                         {...register("has_water")}
                       />
                       <span className="text-sm text-slate-700">
-                        House/Parcel has water
+                        {t("publish.has_water")}
                       </span>
                     </label>
                   </div>
@@ -1090,36 +1082,36 @@ export default function PublishListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  District
+                  {t("publish.district_label")}
                 </label>
-                <Input placeholder="District" {...register("district")} />
+                <Input placeholder={t("publish.district_placeholder")} {...register("district")} />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Sector
+                  {t("publish.sector_label")}
                 </label>
-                <Input placeholder="Sector" {...register("sector")} />
+                <Input placeholder={t("publish.sector_placeholder")} {...register("sector")} />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Village
+                  {t("publish.village_label")}
                 </label>
-                <Input placeholder="Village" {...register("village")} />
+                <Input placeholder={t("publish.village_placeholder")} {...register("village")} />
               </div>
 
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Address
+                  {t("publish.address_label")}
                 </label>
-                <Input placeholder="Address" {...register("address")} />
+                <Input placeholder={t("publish.address_placeholder")} {...register("address")} />
               </div>
 
               {showMap && (
                 <div className="md:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Property Location (click on map)
+                    {t("publish.map_label")}
                   </label>
 
                   <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -1134,9 +1126,9 @@ export default function PublishListingPage() {
                   </div>
 
                   <div className="mt-2 text-xs text-slate-500">
-                    Selected:{" "}
+                    {t("publish.selected_location")}{" "}
                     <span className="font-medium text-slate-700">
-                      {latitude ?? "N/A"}, {longitude ?? "N/A"}
+                      {latitude ?? t("publish.na")}, {longitude ?? t("publish.na")}
                     </span>
                   </div>
 
@@ -1154,17 +1146,17 @@ export default function PublishListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Contact Phone
+                  {t("publish.contact_phone_label")}
                 </label>
-                <Input placeholder="Contact Phone" {...register("contact_phone")} />
+                <Input placeholder={t("publish.contact_phone_placeholder")} {...register("contact_phone")} />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Contact Email
+                  {t("publish.contact_email_label")}
                 </label>
                 <Input
-                  placeholder="Contact Email"
+                  placeholder={t("publish.contact_email_placeholder")}
                   type="email"
                   {...register("contact_email")}
                 />
@@ -1172,10 +1164,10 @@ export default function PublishListingPage() {
 
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Description
+                  {t("publish.description_label")}
                 </label>
                 <textarea
-                  placeholder="Description"
+                  placeholder={t("publish.description_placeholder")}
                   className="min-h-36 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   {...register("description", { required: true })}
                 />
@@ -1183,7 +1175,7 @@ export default function PublishListingPage() {
 
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Listing Images
+                  {t("publish.images_label")}
                 </label>
 
                 <input
@@ -1195,14 +1187,14 @@ export default function PublishListingPage() {
                 />
 
                 <p className="mt-2 text-xs text-slate-500">
-                  You can upload multiple images. The first image will be treated as the cover image.
+                  {t("publish.images_hint")}
                 </p>
 
                 {images.length > 0 && (
                   <div className="mt-4">
                     <div className="mb-3 flex items-center justify-between">
                       <p className="text-sm font-medium text-slate-700">
-                        {images.length} image(s) selected
+                        {t("publish.images_selected", { count: images.length })}
                       </p>
 
                       <button
@@ -1210,7 +1202,7 @@ export default function PublishListingPage() {
                         onClick={clearAllImages}
                         className="text-sm font-medium text-red-600 transition hover:text-red-700"
                       >
-                        Clear all
+                        {t("publish.clear_all")}
                       </button>
                     </div>
 
@@ -1232,11 +1224,11 @@ export default function PublishListingPage() {
                             <div className="flex items-center justify-between gap-2">
                               {index === 0 ? (
                                 <span className="inline-block rounded-full bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
-                                  Cover image
+                                  {t("publish.cover_image")}
                                 </span>
                               ) : (
                                 <span className="inline-block rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
-                                  Image {index + 1}
+                                  {t("publish.image_number", { number: index + 1 })}
                                 </span>
                               )}
 
@@ -1245,7 +1237,7 @@ export default function PublishListingPage() {
                                 onClick={() => removeImage(index)}
                                 className="text-[11px] font-medium text-red-600 hover:text-red-700"
                               >
-                                Remove
+                                {t("publish.remove")}
                               </button>
                             </div>
                           </div>
@@ -1260,7 +1252,7 @@ export default function PublishListingPage() {
               {error && <p className="text-sm text-red-600 md:col-span-2">{error}</p>}
 
               <Button type="submit" className="md:col-span-2" disabled={isSubmitting}>
-                {isSubmitting ? "Creating listing..." : "Create listing and continue to payment"}
+                {isSubmitting ? t("publish.creating") : t("publish.submit_button")}
               </Button>
             </form>
           </Card>

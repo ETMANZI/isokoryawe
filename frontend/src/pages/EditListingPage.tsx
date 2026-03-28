@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
@@ -164,14 +165,14 @@ type SelectedImage = {
   preview: string;
 };
 
-function extractErrorMessage(err: any): string {
+function extractErrorMessage(err: any, t: (key: string) => string): string {
   const status = err?.response?.status;
   const data = err?.response?.data;
 
-  if (status === 401) return "Please login first.";
-  if (status === 403) return "Only admin can edit this listing.";
+  if (status === 401) return t("edit_listing.error_unauthorized");
+  if (status === 403) return t("edit_listing.error_forbidden");
 
-  if (!data) return "Failed to update listing.";
+  if (!data) return t("edit_listing.error_generic");
   if (typeof data === "string") return data;
   if (data.detail) return data.detail;
   if (data.message) return data.message;
@@ -187,7 +188,7 @@ function extractErrorMessage(err: any): string {
     if (messages.length > 0) return messages.join(" | ");
   }
 
-  return "Failed to update listing.";
+  return t("edit_listing.error_generic");
 }
 
 const normalizeId = (value: string | number | null | undefined): string | null => {
@@ -202,6 +203,7 @@ const PRODUCT_TYPES = [
 ];
 
 export default function EditListingPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -700,7 +702,7 @@ export default function EditListingPage() {
       return response.data;
     },
     onSuccess: async (updatedListing) => {
-      setMessage("Listing updated successfully.");
+      setMessage(t("edit_listing.success_message"));
       setError("");
       clearAllNewImages();
       setDeletedImageIds([]);
@@ -713,7 +715,7 @@ export default function EditListingPage() {
       navigate(`/listings/${updatedListing.id}`);
     },
     onError: (err: any) => {
-      setError(extractErrorMessage(err));
+      setError(extractErrorMessage(err, t));
       setMessage("");
     },
   });
@@ -732,7 +734,7 @@ export default function EditListingPage() {
         <PageContainer>
           <div className="mx-auto max-w-4xl py-10">
             <Card>
-              <p className="text-slate-600">Loading listing...</p>
+              <p className="text-slate-600">{t("edit_listing.loading")}</p>
             </Card>
           </div>
         </PageContainer>
@@ -746,7 +748,7 @@ export default function EditListingPage() {
         <PageContainer>
           <div className="mx-auto max-w-4xl py-10">
             <Card>
-              <p className="text-red-600">Unable to load listing.</p>
+              <p className="text-red-600">{t("edit_listing.load_error")}</p>
             </Card>
           </div>
         </PageContainer>
@@ -764,12 +766,12 @@ export default function EditListingPage() {
               className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
             >
               <ArrowLeft size={16} />
-              Back to listing
+              {t("edit_listing.back_to_listing")}
             </Link>
           </div>
 
           <Card>
-            <h1 className="mb-6 text-3xl font-bold text-slate-900">Edit Listing</h1>
+            <h1 className="mb-6 text-3xl font-bold text-slate-900">{t("edit_listing.title")}</h1>
 
             {error && (
               <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -785,23 +787,23 @@ export default function EditListingPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Title</label>
-                <Input placeholder="Title" {...register("title", { required: true })} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.title_label")}</label>
+                <Input placeholder={t("edit_listing.title_placeholder")} {...register("title", { required: true })} />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Slug</label>
-                <Input placeholder="Slug" {...register("slug", { required: true })} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.slug_label")}</label>
+                <Input placeholder={t("edit_listing.slug_placeholder")} {...register("slug", { required: true })} />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Category</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.category_label")}</label>
                 <select
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   {...register("category")}
                 >
                   <option value="">
-                    {loadingCategories ? "Loading categories..." : "Select category"}
+                    {loadingCategories ? t("edit_listing.loading_categories") : t("edit_listing.select_category")}
                   </option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={String(cat.id)}>
@@ -812,32 +814,32 @@ export default function EditListingPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Listing Type</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.listing_type_label")}</label>
                 <select
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   {...register("listing_type")}
                 >
-                  <option value="house">House</option>
-                  <option value="parcel">Parcel</option>
-                  <option value="business_ad">Business Advertisement</option>
-                  <option value="car">Car</option>
-                  <option value="clothes_product">Clothes Product</option>
-                  <option value="food_product">Food Product</option>
-                  <option value="home_kitchen_product">Home & Kitchen Product</option>
+                  <option value="house">{t("edit_listing.house")}</option>
+                  <option value="parcel">{t("edit_listing.parcel")}</option>
+                  <option value="business_ad">{t("edit_listing.business_ad")}</option>
+                  <option value="car">{t("edit_listing.car")}</option>
+                  <option value="clothes_product">{t("edit_listing.clothes_product")}</option>
+                  <option value="food_product">{t("edit_listing.food_product")}</option>
+                  <option value="home_kitchen_product">{t("edit_listing.home_kitchen_product")}</option>
                 </select>
               </div>
 
               {showSaleMode && (
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Sale Mode</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.sale_mode_label")}</label>
                   <select
                     className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                     {...register("sale_mode")}
                   >
                     {listingType === "house" && (
                       <>
-                        <option value="sell">Sell</option>
-                        <option value="rent">Rent</option>
+                        <option value="sell">{t("edit_listing.sell")}</option>
+                        <option value="rent">{t("edit_listing.rent")}</option>
                       </>
                     )}
 
@@ -846,25 +848,25 @@ export default function EditListingPage() {
                       listingType === "clothes_product" ||
                       listingType === "food_product" ||
                       listingType === "home_kitchen_product") && (
-                      <option value="sell">Sell</option>
+                      <option value="sell">{t("edit_listing.sell")}</option>
                     )}
                   </select>
                 </div>
               )}
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Price</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.price_label")}</label>
                 <Input
-                  placeholder="Price"
+                  placeholder={t("edit_listing.price_placeholder")}
                   type="number"
                   {...register("price", { valueAsNumber: true, required: true })}
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Discount Price</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.discount_price_label")}</label>
                 <Input
-                  placeholder="Discount Price"
+                  placeholder={t("edit_listing.discount_price_placeholder")}
                   type="number"
                   step="0.01"
                   {...register("discount_price", {
@@ -875,29 +877,29 @@ export default function EditListingPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Is Price Negotiable?
+                  {t("edit_listing.negotiable_label")}
                 </label>
                 <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
                   <input type="checkbox" className="h-4 w-4" {...register("negotiable")} />
-                  <span className="text-sm text-slate-700">Yes</span>
+                  <span className="text-sm text-slate-700">{t("edit_listing.yes")}</span>
                 </div>
               </div>
 
               {showBedroomsBathrooms && (
                 <>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">Bedrooms</label>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.bedrooms_label")}</label>
                     <Input
-                      placeholder="Bedrooms"
+                      placeholder={t("edit_listing.bedrooms_placeholder")}
                       type="number"
                       {...register("bedrooms", { valueAsNumber: true })}
                     />
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">Bathrooms</label>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.bathrooms_label")}</label>
                     <Input
-                      placeholder="Bathrooms"
+                      placeholder={t("edit_listing.bathrooms_placeholder")}
                       type="number"
                       {...register("bathrooms", { valueAsNumber: true })}
                     />
@@ -907,16 +909,16 @@ export default function EditListingPage() {
 
               {showUpi && (
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">UPI</label>
-                  <Input placeholder="UPI" {...register("upi")} />
+                  <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.upi_label")}</label>
+                  <Input placeholder={t("edit_listing.upi_placeholder")} {...register("upi")} />
                 </div>
               )}
 
               {showLandSize && (
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Land Size (m²)</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.land_size_label")}</label>
                   <Input
-                    placeholder="Land Size in square meters"
+                    placeholder={t("edit_listing.land_size_placeholder")}
                     type="number"
                     step="0.01"
                     {...register("land_size", { valueAsNumber: true })}
@@ -926,23 +928,23 @@ export default function EditListingPage() {
 
               {isCar && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Car Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("edit_listing.car_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Make</label>
-                      <Input placeholder="e.g. Toyota" {...register("car_make")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_make_label")}</label>
+                      <Input placeholder={t("edit_listing.car_make_placeholder")} {...register("car_make")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Model</label>
-                      <Input placeholder="e.g. Corolla" {...register("car_model")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_model_label")}</label>
+                      <Input placeholder={t("edit_listing.car_model_placeholder")} {...register("car_model")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Year</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_year_label")}</label>
                       <Input
-                        placeholder="e.g. 2018"
+                        placeholder={t("edit_listing.car_year_placeholder")}
                         type="number"
                         {...register("car_year", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -951,9 +953,9 @@ export default function EditListingPage() {
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Mileage (km)</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_mileage_label")}</label>
                       <Input
-                        placeholder="e.g. 85000"
+                        placeholder={t("edit_listing.car_mileage_placeholder")}
                         type="number"
                         {...register("car_mileage", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -962,46 +964,46 @@ export default function EditListingPage() {
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Fuel Type</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_fuel_type_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("car_fuel_type")}
                       >
-                        <option value="">Select fuel type</option>
-                        <option value="petrol">Petrol</option>
-                        <option value="diesel">Diesel</option>
-                        <option value="electric">Electric</option>
-                        <option value="hybrid">Hybrid</option>
+                        <option value="">{t("edit_listing.select_fuel_type")}</option>
+                        <option value="petrol">{t("edit_listing.petrol")}</option>
+                        <option value="diesel">{t("edit_listing.diesel")}</option>
+                        <option value="electric">{t("edit_listing.electric")}</option>
+                        <option value="hybrid">{t("edit_listing.hybrid")}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Transmission</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_transmission_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("car_transmission")}
                       >
-                        <option value="">Select transmission</option>
-                        <option value="manual">Manual</option>
-                        <option value="automatic">Automatic</option>
+                        <option value="">{t("edit_listing.select_transmission")}</option>
+                        <option value="manual">{t("edit_listing.manual")}</option>
+                        <option value="automatic">{t("edit_listing.automatic")}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Condition</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_condition_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("car_condition")}
                       >
-                        <option value="">Select condition</option>
-                        <option value="new">New</option>
-                        <option value="used">Used</option>
+                        <option value="">{t("edit_listing.select_condition")}</option>
+                        <option value="new">{t("edit_listing.new")}</option>
+                        <option value="used">{t("edit_listing.used")}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Color</label>
-                      <Input placeholder="e.g. Black" {...register("car_color")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.car_color_label")}</label>
+                      <Input placeholder={t("edit_listing.car_color_placeholder")} {...register("car_color")} />
                     </div>
                   </div>
                 </div>
@@ -1009,18 +1011,18 @@ export default function EditListingPage() {
 
               {isProductType && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Product Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("edit_listing.product_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Brand</label>
-                      <Input placeholder="Brand" {...register("brand")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.brand_label")}</label>
+                      <Input placeholder={t("edit_listing.brand_placeholder")} {...register("brand")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Stock Quantity</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.stock_quantity_label")}</label>
                       <Input
-                        placeholder="Stock Quantity"
+                        placeholder={t("edit_listing.stock_quantity_placeholder")}
                         type="number"
                         {...register("stock_quantity", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -1029,19 +1031,19 @@ export default function EditListingPage() {
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">SKU</label>
-                      <Input placeholder="SKU" {...register("sku")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.sku_label")}</label>
+                      <Input placeholder={t("edit_listing.sku_placeholder")} {...register("sku")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Product Condition</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.product_condition_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("product_condition")}
                       >
-                        <option value="">Select condition</option>
-                        <option value="new">New</option>
-                        <option value="used">Used</option>
+                        <option value="">{t("edit_listing.select_condition")}</option>
+                        <option value="new">{t("edit_listing.new")}</option>
+                        <option value="used">{t("edit_listing.used")}</option>
                       </select>
                     </div>
 
@@ -1052,16 +1054,16 @@ export default function EditListingPage() {
                           className="h-4 w-4"
                           {...register("has_home_delivery")}
                         />
-                        <span className="text-sm text-slate-700">Home delivery available</span>
+                        <span className="text-sm text-slate-700">{t("edit_listing.home_delivery_available")}</span>
                       </label>
                     </div>
 
                     {hasHomeDelivery && (
                       <>
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-slate-700">Delivery Fee</label>
+                          <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.delivery_fee_label")}</label>
                           <Input
-                            placeholder="Delivery Fee"
+                            placeholder={t("edit_listing.delivery_fee_placeholder")}
                             type="number"
                             step="0.01"
                             {...register("delivery_fee", {
@@ -1071,9 +1073,9 @@ export default function EditListingPage() {
                         </div>
 
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-slate-700">Delivery Notes</label>
+                          <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.delivery_notes_label")}</label>
                           <Input
-                            placeholder="Delivery within Kigali, same day..."
+                            placeholder={t("edit_listing.delivery_notes_placeholder")}
                             {...register("delivery_notes")}
                           />
                         </div>
@@ -1085,38 +1087,38 @@ export default function EditListingPage() {
 
               {listingType === "clothes_product" && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Clothes Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("edit_listing.clothes_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Clothes Category</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.clothes_category_label")}</label>
                       <Input
-                        placeholder="Shirt, Dress, Shoes..."
+                        placeholder={t("edit_listing.clothes_category_placeholder")}
                         {...register("clothes_category")}
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Gender</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.clothes_gender_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("clothes_gender")}
                       >
-                        <option value="">Select gender</option>
-                        <option value="men">Men</option>
-                        <option value="women">Women</option>
-                        <option value="unisex">Unisex</option>
-                        <option value="kids">Kids</option>
+                        <option value="">{t("edit_listing.select_gender")}</option>
+                        <option value="men">{t("edit_listing.men")}</option>
+                        <option value="women">{t("edit_listing.women")}</option>
+                        <option value="unisex">{t("edit_listing.unisex")}</option>
+                        <option value="kids">{t("edit_listing.kids")}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Size</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.clothes_size_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("clothes_size")}
                       >
-                        <option value="">Select size</option>
+                        <option value="">{t("edit_listing.select_size")}</option>
                         <option value="xs">XS</option>
                         <option value="s">S</option>
                         <option value="m">M</option>
@@ -1128,13 +1130,13 @@ export default function EditListingPage() {
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Color</label>
-                      <Input placeholder="Black" {...register("clothes_color")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.clothes_color_label")}</label>
+                      <Input placeholder={t("edit_listing.clothes_color_placeholder")} {...register("clothes_color")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Material</label>
-                      <Input placeholder="Cotton" {...register("clothes_material")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.clothes_material_label")}</label>
+                      <Input placeholder={t("edit_listing.clothes_material_placeholder")} {...register("clothes_material")} />
                     </div>
                   </div>
                 </div>
@@ -1142,40 +1144,40 @@ export default function EditListingPage() {
 
               {listingType === "food_product" && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Food Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("edit_listing.food_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Food Category</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.food_category_label")}</label>
                       <Input
-                        placeholder="Fresh food, snack, bakery, drink..."
+                        placeholder={t("edit_listing.food_category_placeholder")}
                         {...register("food_category")}
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Unit</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.food_unit_label")}</label>
                       <select
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         {...register("food_unit")}
                       >
-                        <option value="">Select unit</option>
-                        <option value="piece">Piece</option>
-                        <option value="kg">Kg</option>
-                        <option value="gram">Gram</option>
-                        <option value="liter">Liter</option>
-                        <option value="ml">Ml</option>
-                        <option value="pack">Pack</option>
-                        <option value="plate">Plate</option>
-                        <option value="box">Box</option>
-                        <option value="bottle">Bottle</option>
+                        <option value="">{t("edit_listing.select_unit")}</option>
+                        <option value="piece">{t("edit_listing.piece")}</option>
+                        <option value="kg">{t("edit_listing.kg")}</option>
+                        <option value="gram">{t("edit_listing.gram")}</option>
+                        <option value="liter">{t("edit_listing.liter")}</option>
+                        <option value="ml">{t("edit_listing.ml")}</option>
+                        <option value="pack">{t("edit_listing.pack")}</option>
+                        <option value="plate">{t("edit_listing.plate")}</option>
+                        <option value="box">{t("edit_listing.box")}</option>
+                        <option value="bottle">{t("edit_listing.bottle")}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Weight / Volume</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.food_weight_volume_label")}</label>
                       <Input
-                        placeholder="1kg, 500ml, 12 pieces"
+                        placeholder={t("edit_listing.food_weight_volume_placeholder")}
                         {...register("food_weight_volume")}
                       />
                     </div>
@@ -1187,7 +1189,7 @@ export default function EditListingPage() {
                           className="h-4 w-4"
                           {...register("is_perishable")}
                         />
-                        <span className="text-sm text-slate-700">Perishable</span>
+                        <span className="text-sm text-slate-700">{t("edit_listing.perishable")}</span>
                       </label>
 
                       <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
@@ -1196,13 +1198,13 @@ export default function EditListingPage() {
                           className="h-4 w-4"
                           {...register("is_prepared_food")}
                         />
-                        <span className="text-sm text-slate-700">Prepared food</span>
+                        <span className="text-sm text-slate-700">{t("edit_listing.prepared_food")}</span>
                       </label>
                     </div>
 
                     {isPerishable && (
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-slate-700">Expiry Date</label>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.expiry_date_label")}</label>
                         <Input type="date" {...register("expiry_date")} />
                       </div>
                     )}
@@ -1212,41 +1214,41 @@ export default function EditListingPage() {
 
               {listingType === "home_kitchen_product" && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-4 text-sm font-semibold text-slate-800">Home & Kitchen Details</p>
+                  <p className="mb-4 text-sm font-semibold text-slate-800">{t("edit_listing.home_kitchen_details")}</p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Product Category</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.home_product_category_label")}</label>
                       <Input
-                        placeholder="Cookware, furniture, decor..."
+                        placeholder={t("edit_listing.home_product_category_placeholder")}
                         {...register("home_product_category")}
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Material</label>
-                      <Input placeholder="Wood, steel..." {...register("material")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.material_label")}</label>
+                      <Input placeholder={t("edit_listing.material_placeholder")} {...register("material")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Color</label>
-                      <Input placeholder="Brown" {...register("color")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.product_color_label")}</label>
+                      <Input placeholder={t("edit_listing.product_color_placeholder")} {...register("color")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Dimensions</label>
-                      <Input placeholder="120x60x75 cm" {...register("dimensions")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.dimensions_label")}</label>
+                      <Input placeholder={t("edit_listing.dimensions_placeholder")} {...register("dimensions")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Weight</label>
-                      <Input placeholder="5kg" {...register("weight")} />
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.weight_label")}</label>
+                      <Input placeholder={t("edit_listing.weight_placeholder")} {...register("weight")} />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Warranty (months)</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.warranty_label")}</label>
                       <Input
-                        placeholder="12"
+                        placeholder={t("edit_listing.warranty_placeholder")}
                         type="number"
                         {...register("warranty_months", {
                           setValueAs: (v) => (v === "" ? undefined : Number(v)),
@@ -1259,45 +1261,45 @@ export default function EditListingPage() {
 
               {showUtilities && (
                 <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="mb-3 text-sm font-semibold text-slate-800">Utilities</p>
+                  <p className="mb-3 text-sm font-semibold text-slate-800">{t("edit_listing.utilities")}</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
                       <input type="checkbox" className="h-4 w-4" {...register("has_electricity")} />
-                      <span className="text-sm text-slate-700">Property has electricity</span>
+                      <span className="text-sm text-slate-700">{t("edit_listing.has_electricity")}</span>
                     </label>
 
                     <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
                       <input type="checkbox" className="h-4 w-4" {...register("has_water")} />
-                      <span className="text-sm text-slate-700">Property has water</span>
+                      <span className="text-sm text-slate-700">{t("edit_listing.has_water")}</span>
                     </label>
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">District</label>
-                <Input placeholder="District" {...register("district")} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.district_label")}</label>
+                <Input placeholder={t("edit_listing.district_placeholder")} {...register("district")} />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Sector</label>
-                <Input placeholder="Sector" {...register("sector")} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.sector_label")}</label>
+                <Input placeholder={t("edit_listing.sector_placeholder")} {...register("sector")} />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Village</label>
-                <Input placeholder="Village" {...register("village")} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.village_label")}</label>
+                <Input placeholder={t("edit_listing.village_placeholder")} {...register("village")} />
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-700">Address</label>
-                <Input placeholder="Address" {...register("address")} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.address_label")}</label>
+                <Input placeholder={t("edit_listing.address_placeholder")} {...register("address")} />
               </div>
 
               {showMap && (
                 <div className="md:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Property Location (click on map)
+                    {t("edit_listing.map_label")}
                   </label>
 
                   <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -1312,7 +1314,8 @@ export default function EditListingPage() {
                   </div>
 
                   <div className="mt-2 text-xs text-slate-500">
-                    Selected: <span className="font-medium text-slate-700">{latitude ?? "N/A"}, {longitude ?? "N/A"}</span>
+                    {t("edit_listing.selected_location")}{" "}
+                    <span className="font-medium text-slate-700">{latitude ?? t("edit_listing.na")}, {longitude ?? t("edit_listing.na")}</span>
                   </div>
 
                   <input type="hidden" {...register("latitude", { valueAsNumber: true })} />
@@ -1328,32 +1331,33 @@ export default function EditListingPage() {
               )}
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Contact Phone</label>
-                <Input placeholder="Contact Phone" {...register("contact_phone")} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.contact_phone_label")}</label>
+                <Input placeholder={t("edit_listing.contact_phone_placeholder")} {...register("contact_phone")} />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Contact Email</label>
-                <Input placeholder="Contact Email" type="email" {...register("contact_email")} />
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.contact_email_label")}</label>
+                <Input placeholder={t("edit_listing.contact_email_placeholder")} type="email" {...register("contact_email")} />
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-700">Description</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.description_label")}</label>
                 <textarea
-                  placeholder="Description"
+                  placeholder={t("edit_listing.description_placeholder")}
                   className="min-h-36 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   {...register("description", { required: true })}
                 />
               </div>
 
               <div className="md:col-span-2">
-                <h2 className="mb-3 text-lg font-semibold text-slate-900">Existing Images</h2>
+                <h2 className="mb-3 text-lg font-semibold text-slate-900">{t("edit_listing.existing_images")}</h2>
 
                 {normalizedImages.length > 0 ? (
                   <>
                     <div className="mb-4 flex items-center justify-between gap-3">
                       <p className="text-sm text-slate-600">
-                        Current selected cover: <span className="font-semibold">{selectedCoverImageId || "None"}</span>
+                        {t("edit_listing.current_selected_cover")}{" "}
+                        <span className="font-semibold">{selectedCoverImageId || t("edit_listing.none")}</span>
                       </p>
 
                       {selectedCoverImageId !== initialCoverImageId && (
@@ -1362,7 +1366,7 @@ export default function EditListingPage() {
                           onClick={resetCoverImage}
                           className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                         >
-                          Reset cover
+                          {t("edit_listing.reset_cover")}
                         </button>
                       )}
                     </div>
@@ -1381,7 +1385,7 @@ export default function EditListingPage() {
                           >
                             <img
                               src={img.image}
-                              alt={img.alt_text || "Listing image"}
+                              alt={img.alt_text || t("edit_listing.listing_image")}
                               className="h-32 w-full object-cover"
                             />
 
@@ -1389,13 +1393,13 @@ export default function EditListingPage() {
                               <div className="flex flex-wrap gap-2">
                                 {img.is_cover && !isDeleted && (
                                   <span className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
-                                    Current cover
+                                    {t("edit_listing.current_cover")}
                                   </span>
                                 )}
 
                                 {isSelectedCover && !isDeleted && (
                                   <span className="rounded-full bg-green-50 px-2 py-1 text-[11px] font-medium text-green-700">
-                                    Selected cover
+                                    {t("edit_listing.selected_cover")}
                                   </span>
                                 )}
                               </div>
@@ -1407,7 +1411,7 @@ export default function EditListingPage() {
                                   onClick={() => handleSetCoverImage(img.normalizedId)}
                                   className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                  Set as cover
+                                  {t("edit_listing.set_as_cover")}
                                 </button>
 
                                 <button
@@ -1417,7 +1421,7 @@ export default function EditListingPage() {
                                     isDeleted ? "bg-slate-500 hover:bg-slate-600" : "bg-red-600 hover:bg-red-700"
                                   }`}
                                 >
-                                  {isDeleted ? "Undo remove" : "Remove"}
+                                  {isDeleted ? t("edit_listing.undo_remove") : t("edit_listing.remove")}
                                 </button>
                               </div>
                             </div>
@@ -1427,12 +1431,12 @@ export default function EditListingPage() {
                     </div>
                   </>
                 ) : (
-                  <p className="text-sm text-slate-500">No existing images.</p>
+                  <p className="text-sm text-slate-500">{t("edit_listing.no_existing_images")}</p>
                 )}
               </div>
 
               <div className="md:col-span-2">
-                <h2 className="mb-3 text-lg font-semibold text-slate-900">Add New Images</h2>
+                <h2 className="mb-3 text-lg font-semibold text-slate-900">{t("edit_listing.add_new_images")}</h2>
 
                 <input
                   type="file"
@@ -1443,20 +1447,22 @@ export default function EditListingPage() {
                 />
 
                 <p className="mt-2 text-xs text-slate-500">
-                  You can add more images. After upload, you can later choose one of the saved images as cover.
+                  {t("edit_listing.add_images_hint")}
                 </p>
 
                 {newImages.length > 0 && (
                   <div className="mt-4">
                     <div className="mb-3 flex items-center justify-between">
-                      <p className="text-sm font-medium text-slate-700">{newImages.length} new image(s) selected</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {t("edit_listing.new_images_selected", { count: newImages.length })}
+                      </p>
 
                       <button
                         type="button"
                         onClick={clearAllNewImages}
                         className="text-sm font-medium text-red-600 hover:text-red-700"
                       >
-                        Clear all
+                        {t("edit_listing.clear_all")}
                       </button>
                     </div>
 
@@ -1476,7 +1482,7 @@ export default function EditListingPage() {
                               onClick={() => removeNewImage(index)}
                               className="w-full rounded-xl bg-red-600 px-3 py-2 text-xs font-medium text-white hover:bg-red-700"
                             >
-                              Remove
+                              {t("edit_listing.remove")}
                             </button>
                           </div>
                         </div>
@@ -1488,13 +1494,13 @@ export default function EditListingPage() {
 
               <div className="md:col-span-2">
                 <p className="text-sm text-slate-600">
-                  Remaining existing images after save:{" "}
+                  {t("edit_listing.remaining_images")}{" "}
                   <span className="font-semibold">{visibleExistingImages.length}</span>
                 </p>
               </div>
 
               <Button type="submit" className="md:col-span-2" disabled={isSubmitting || updateMutation.isPending}>
-                {isSubmitting || updateMutation.isPending ? "Saving changes..." : "Save changes"}
+                {isSubmitting || updateMutation.isPending ? t("edit_listing.saving") : t("edit_listing.save_changes")}
               </Button>
             </form>
           </Card>

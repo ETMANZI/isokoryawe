@@ -17,7 +17,7 @@ export default function Button({
   const variants = {
     default: "bg-slate-900 text-white hover:opacity-90",
     outline:
-      "border border-slate-300 bg-white text-slate-800 hover:bg-slate-100",
+      "border border-slate-300 bg-white text-slate-300 hover:bg-slate-100",
   };
 
   return (

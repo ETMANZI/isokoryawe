@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   Activity,
   BarChart3,
@@ -285,6 +286,7 @@ type ActiveTab =
   | "non_admin_users";
 
 export default function AdminModerationPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<ActiveTab>("moderation");
@@ -1119,19 +1121,19 @@ export default function AdminModerationPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900">Admin Panel</h1>
             <p className="mt-2 text-sm text-slate-500">
-              Manage moderation, categories, platform users, partners, banners, and visitor analytics.
+              {t("admin.admin_description")}
             </p>
           </div>
 
           <div className="mb-8 flex flex-wrap gap-3">
             {[
-              { key: "moderation", label: "Moderation Queue" },
-              { key: "categories", label: "Categories" },
-              { key: "visitor_stats", label: "Visitor Statistics" },
-              { key: "partners", label: "Partner Registration" },
-              { key: "video_banners", label: "Video Banners" },
-              { key: "admin_users", label: "Admin Users" },
-              { key: "non_admin_users", label: "Non-Admin Users" },
+              { key: "moderation", label: t("admin.moderation_queue") },
+              { key: "categories", label: t("admin.categories") },
+              { key: "visitor_stats", label: t("admin.visitor_stats") },
+              { key: "partners", label: t("admin.partner_registration") },
+              { key: "video_banners", label: t("admin.video_banners") },
+              { key: "admin_users", label: t("admin.admin_users") },
+              { key: "non_admin_users", label: t("admin.non_admin_users") },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -1150,15 +1152,15 @@ export default function AdminModerationPage() {
 
           {activeTab === "moderation" && (
             <>
-              <h2 className="mb-6 text-2xl font-semibold text-slate-900">Moderation Queue</h2>
+              <h2 className="mb-6 text-2xl font-semibold text-slate-900">{t("admin.moderation_queue")}</h2>
 
               {isLoadingModeration ? (
-                <p className="text-slate-600">Loading...</p>
+                <p className="text-slate-600">{t("admin.loading")}</p>
               ) : moderationData.length === 0 ? (
                 <Card>
                   <div className="py-10 text-center">
-                    <h2 className="text-xl font-semibold text-slate-900">No pending listings</h2>
-                    <p className="mt-2 text-slate-600">Everything is up to date.</p>
+                    <h2 className="text-xl font-semibold text-slate-900">{t("admin.no_pending_listings")}</h2>
+                    <p className="mt-2 text-slate-600">{t("admin.up_to_date")}.</p>
                   </div>
                 </Card>
               ) : (
@@ -1183,7 +1185,7 @@ export default function AdminModerationPage() {
                               />
                             ) : (
                               <div className="flex h-36 items-center justify-center text-sm text-slate-500">
-                                No Image
+                                {t("admin.no_image")}
                               </div>
                             )}
                           </div>
@@ -1192,7 +1194,7 @@ export default function AdminModerationPage() {
                             <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
 
                             <p className="mt-1 text-sm text-slate-500">
-                              {item.listing_type} • {item.district || "N/A"} • {item.sector || "N/A"}
+                              {item.listing_type} • {item.district || t("admin.na")} • {item.sector || t("admin.na")}
                             </p>
 
                             <p className="mt-2 text-base font-semibold text-slate-900">
@@ -1212,13 +1214,13 @@ export default function AdminModerationPage() {
                             {isRejectingThis && (
                               <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                                  Reject reason
+                                  {t("admin.reject_reason")}
                                 </label>
 
                                 <textarea
                                   value={rejectReason}
                                   onChange={(e) => setRejectReason(e.target.value)}
-                                  placeholder="Why is this listing being rejected?"
+                                  placeholder={t("admin.reject_placeholder")}
                                   className="min-h-24 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                                 />
 
@@ -1228,7 +1230,7 @@ export default function AdminModerationPage() {
                                     onClick={submitReject}
                                     disabled={rejectMutation.isPending}
                                   >
-                                    {rejectMutation.isPending ? "Rejecting..." : "Confirm Reject"}
+                                    {rejectMutation.isPending ? t("admin.rejecting") : t("admin.confirm_reject")}
                                   </Button>
 
                                   <button
@@ -1239,7 +1241,7 @@ export default function AdminModerationPage() {
                                     }}
                                     className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                                   >
-                                    Cancel
+                                    {t("admin.cancel")}
                                   </button>
                                 </div>
                               </div>
@@ -1252,12 +1254,12 @@ export default function AdminModerationPage() {
                               onClick={() => approveMutation.mutate(item.id)}
                               disabled={approveMutation.isPending}
                             >
-                              {approveMutation.isPending ? "Approving..." : "Approve"}
+                              {approveMutation.isPending ? t("admin.approving") : t("admin.approve")}
                             </Button>
 
                             {!isRejectingThis && (
                               <Button className="bg-red-600" onClick={() => startReject(item.id)}>
-                                Reject
+                                {t("admin.reject")}
                               </Button>
                             )}
                           </div>

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import AnimatedText from "../components/ui/AnimatedText";
 import PageContainer from "../components/layout/PageContainer";
 import { api } from "../lib/api";
@@ -29,6 +30,7 @@ type HeroSlide = {
 };
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { data: listings = [] } = useQuery<Listing[]>({
@@ -95,16 +97,16 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <span className="inline-block rounded-full bg-slate-200 px-3 py-1 text-sm">
-              Homes • Parcels • Business Ads
+              {t("home.tagline")}
             </span>
 
             <h1 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-              <AnimatedText text="Modern marketplace for buying, selling, and advertising." />
+              <AnimatedText text={t("home.main_title")} />
             </h1>
 
             <div className="mt-4 text-lg text-slate-600">
               <AnimatedText
-                text="Publish property listings, advertise businesses, manage paid publishing, and connect buyers with sellers."
+                text={t("home.description")}
                 typingSpeed={20}
                 highlightSpeed={50}
               />
@@ -115,7 +117,7 @@ export default function HomePage() {
                 to="/listings"
                 className="rounded-xl bg-slate-500 px-6 py-3 text-white"
               >
-                Browse listings
+                {t("home.browse_button")}
               </Link>
             </div>
           </motion.div>
@@ -139,7 +141,7 @@ export default function HomePage() {
                   <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                     {activeSlide.isFeatured && (
                       <span className="mb-3 inline-block rounded-full bg-amber-400 px-3 py-1 text-xs font-semibold text-slate-900">
-                        Featured
+                        {t("home.featured_badge")}
                       </span>
                     )}
 
@@ -147,7 +149,7 @@ export default function HomePage() {
 
                     {activeSlide.contactPhone && (
                       <p className="mt-2 text-sm text-white/90">
-                        Contact: {activeSlide.contactPhone}
+                        {t("home.contact_label")}: {activeSlide.contactPhone}
                       </p>
                     )}
 
@@ -155,7 +157,7 @@ export default function HomePage() {
                       to={`/listings/${activeSlide.listingId}`}
                       className="mt-4 inline-block rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
                     >
-                      View details
+                      {t("home.view_details")}
                     </Link>
                   </div>
 
@@ -187,7 +189,7 @@ export default function HomePage() {
                 </>
               ) : (
                 <div className="flex h-full items-center justify-center text-center text-2xl font-semibold text-slate-500">
-                  Marketplace Hero Preview
+                  {t("home.hero_preview")}
                 </div>
               )}
             </div>

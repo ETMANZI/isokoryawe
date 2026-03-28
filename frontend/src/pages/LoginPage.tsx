@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
@@ -15,6 +16,7 @@ type LoginForm = {
 };
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const { register, handleSubmit } = useForm<LoginForm>();
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ export default function LoginPage() {
         err?.response?.data?.detail ||
         err?.response?.data?.non_field_errors?.[0] ||
         err?.response?.data?.message ||
-        "Invalid email or password.";
+        t("login.invalid_credentials");
 
       setError(backendMessage);
     }
@@ -48,15 +50,15 @@ export default function LoginPage() {
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
           <div className="flex flex-col justify-center space-y-6 px-2">
             <h1 className="text-4xl font-bold text-slate-800">
-              Welcome back 👋
+              {t("login.welcome_back")} 👋
             </h1>
             <p className="text-slate-500">
-              Sign in to manage your listings, post ads, and explore opportunities.
+              {t("login.welcome_description")}
             </p>
 
             <Link to="/listings">
               <Button variant="outline" className="flex items-center gap-2">
-                Browse Listings
+                {t("login.browse_listings")}
                 <ArrowRight size={16} />
               </Button>
             </Link>
@@ -65,14 +67,17 @@ export default function LoginPage() {
           <div>
             <Card className="p-6 shadow-lg">
               <h2 className="mb-6 text-2xl font-semibold text-slate-800">
-                Login to your account
+                {t("login.title")}
               </h2>
 
               <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                <Input placeholder="Email" {...register("email")} />
+                <Input 
+                  placeholder={t("login.email")} 
+                  {...register("email")} 
+                />
                 <Input
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("login.password")}
                   {...register("password")}
                 />
 
@@ -81,24 +86,24 @@ export default function LoginPage() {
                     to="/forgot-password"
                     className="text-sm font-medium text-indigo-600 hover:underline"
                   >
-                    Forgot password?
+                    {t("login.forgot_password")}
                   </Link>
                 </div>
 
                 {error && <p className="text-sm text-red-600">{error}</p>}
 
                 <Button type="submit" className="w-full">
-                  Sign in
+                  {t("login.sign_in_button")}
                 </Button>
               </form>
 
               <div className="mt-4 text-center text-sm text-slate-500">
-                Don’t have an account?{" "}
+                {t("login.no_account")}{" "}
                 <Link
                   to="/register"
                   className="font-medium text-indigo-600 hover:underline"
                 >
-                  Sign up
+                  {t("login.sign_up_link")}
                 </Link>
               </div>
             </Card>

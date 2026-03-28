@@ -72,17 +72,39 @@ TEMPLATES = [
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-DATABASES = {
-    "default": dj_database_url.parse(
-        DATABASE_URL if DATABASE_URL else f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=0,
-        ssl_require=False,
-    )
-}
+# DATABASES = {
+#     "default": dj_database_url.parse(
+#         DATABASE_URL if DATABASE_URL else f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+#         conn_max_age=0,
+#         ssl_require=False,
+#     )
+# }
 
-DATABASES["default"]["OPTIONS"] = {
-    "connect_timeout": 10,
-}
+# DATABASES["default"]["OPTIONS"] = {
+#     "connect_timeout": 10,
+# }
+
+
+
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,  # Railway PostgreSQL requires SSL
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+
+
 
 
 AUTH_USER_MODEL = "accounts.User"
@@ -133,10 +155,47 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Vite dev
+    "http://localhost:3000",
+    "https://*.railway.app",  # Your frontend will have this pattern
+]
+
+
+
+
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "")
+if FRONTEND_URL:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+
+
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+# FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 DEFAULT_FROM_EMAIL = "noreply@markethub.com"
 
 AUTH_PASSWORD_VALIDATORS = [

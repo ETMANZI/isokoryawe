@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Listing, ListingImage, Category, Favorite, PageVisit, Partner, PromoBanner
+from .models import Listing, ListingImage, Category, Favorite, Partner, PromoBanner
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -632,29 +632,29 @@ class PromoBannerSerializer(serializers.ModelSerializer):
         return data
 
 
-class PageVisitCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PageVisit
-        fields = ["path", "full_url"]
+# class PageVisitCreateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PageVisit
+#         fields = ["path", "full_url"]
 
 
-class PageVisitSerializer(serializers.ModelSerializer):
-    user_email = serializers.SerializerMethodField()
+# class PageVisitSerializer(serializers.ModelSerializer):
+#     user_email = serializers.SerializerMethodField()
 
-    class Meta:
-        model = PageVisit
-        fields = [
-            "id",
-            "user",
-            "user_email",
-            "path",
-            "full_url",
-            "ip_address",
-            "user_agent",
-            "referrer",
-            "session_key",
-            "visited_at",
-        ]
+#     class Meta:
+#         model = PageVisit
+#         fields = [
+#             "id",
+#             "user",
+#             "user_email",
+#             "path",
+#             "full_url",
+#             "ip_address",
+#             "user_agent",
+#             "referrer",
+#             "session_key",
+#             "visited_at",
+#         ]
 
-    def get_user_email(self, obj):
-        return obj.user.email if obj.user else None
+#     def get_user_email(self, obj):
+#         return obj.user.email if obj.user else None

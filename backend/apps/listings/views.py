@@ -4,8 +4,8 @@ from datetime import timedelta
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, permissions, parsers,generics
 from rest_framework.decorators import action
-from .models import Listing, Category, Favorite, Partner, PromoBanner
-from .serializers import AdTickerSerializer, ListingSerializer, CategorySerializer, FavoriteSerializer, PromoBannerSerializer
+from .models import Listing, Category, Favorite, PageVisit, Partner, PromoBanner
+from .serializers import AdTickerSerializer, ListingSerializer, CategorySerializer, FavoriteSerializer, PageVisitCreateSerializer, PageVisitSerializer, PromoBannerSerializer
 from rest_framework import viewsets, permissions, parsers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -945,3 +945,45 @@ class PromoBannerViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+    
+    
+    
+    
+class TrackPageVisitView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PageVisitCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if not request.session.session_key:
+            request.session.create()
+
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        ip = x_forwarded_for.split(",")[0].strip() if x_forwarded_for else request.META.get("REMOTE_ADDR")
+
+        from django.utils import timezone
+        from datetime import timedelta
+
+        one_hour_ago = timezone.now() - timedelta(hours=1)
+
+        exists = PageVisit.objects.filter(
+            path=serializer.validated_data["path"],
+            session_key=request.session.session_key,
+            visited_at__gte=one_hour_ago
+        ).exists()
+
+        if exists:
+            return Response({"message": "Already tracked recently"})
+
+        visit = PageVisit.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            path=serializer.validated_data["path"],
+            full_url=serializer.validated_data.get("full_url"),
+            ip_address=ip,
+            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            referrer=request.META.get("HTTP_REFERER", ""),
+            session_key=request.session.session_key,
+        )
+
+        return Response(PageVisitSerializer(visit).data)

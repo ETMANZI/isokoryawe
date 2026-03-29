@@ -483,23 +483,21 @@ class ListingViewLog(models.Model):
 
 
 
-# class ListingViewLog(models.Model):
-#     listing = models.ForeignKey(
-#         Listing,
-#         on_delete=models.CASCADE,
-#         related_name="view_logs"
-#     )
-#     session_key = models.CharField(max_length=100)
-#     ip_address = models.CharField(max_length=100)
-#     created_at = models.DateTimeField(auto_now_add=True)
+class PageVisit(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+    path = models.CharField(max_length=500)
+    full_url = models.URLField(blank=True, null=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, null=True)
+    referrer = models.URLField(blank=True, null=True)
+    session_key = models.CharField(max_length=100, blank=True, null=True)
+    visited_at = models.DateTimeField(auto_now_add=True)
 
-#     class Meta:
-#         indexes = [
-#             models.Index(fields=["listing", "session_key", "created_at"]),
-#             models.Index(fields=["listing", "ip_address", "created_at"]),
-#             models.Index(fields=["created_at"]),
-#         ]
-
-#     def __str__(self):
-#         return f"{self.listing} - {self.session_key} - {self.created_at}"
+    def __str__(self):
+        return f"{self.path} - {self.visited_at}"
     

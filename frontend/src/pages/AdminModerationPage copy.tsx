@@ -93,32 +93,6 @@ type VisitorStatsResponse = {
   monthly?: { period: string; total: number }[];
 };
 
-
-type VisitorStatsResponse = {
-  total_visits?: number;
-  unique_visitors?: number;
-  today_visits?: number;
-  this_month_visits?: number;
-  daily?: { period: string; total: number }[];
-  monthly?: { period: string; total: number }[];
-  top_pages?: { path: string; total: number }[];
-};
-
-type VisitorDetail = {
-  id: string | number;
-  user?: string | number | null;
-  user_email?: string | null;
-  path?: string;
-  full_url?: string | null;
-  ip_address?: string | null;
-  user_agent?: string | null;
-  referrer?: string | null;
-  session_key?: string | null;
-  visited_at?: string;
-};
-
-
-
 function formatPrice(value?: string | number) {
   return new Intl.NumberFormat("en-RW").format(Math.round(Number(value || 0)));
 }
@@ -159,68 +133,6 @@ function formatDate(value?: string) {
     day: "numeric",
   });
 }
-
-function formatDateTime(value?: string) {
-  if (!value) return "N/A";
-  return new Date(value).toLocaleString("en-RW", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-const [visitorDetailsSearch, setVisitorDetailsSearch] = useState("");
-const [visitorDetailsPage, setVisitorDetailsPage] = useState(1);
-
-const VISITOR_DETAILS_PER_PAGE = 10;
-
-
-const { data: visitorDetails = [], isLoading: isLoadingVisitorDetails } = useQuery<VisitorDetail[]>({
-  queryKey: ["visitor-details"],
-  queryFn: async () => {
-    const res = await api.get("/moderation/visitor-details/");
-    return Array.isArray(res.data) ? res.data : res.data.results || [];
-  },
-  enabled: activeTab === "visitor_stats",
-});
-
-const topPages = visitorStats?.top_pages || [];
-
-const filteredVisitorDetails = useMemo(() => {
-  const search = visitorDetailsSearch.trim().toLowerCase();
-
-  return visitorDetails.filter((item) => {
-    if (!search) return true;
-
-    const haystack = [
-      item.user_email,
-      item.path,
-      item.full_url,
-      item.ip_address,
-      item.referrer,
-      item.user_agent,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    return haystack.includes(search);
-  });
-}, [visitorDetails, visitorDetailsSearch]);
-
-const totalVisitorDetailsPages = Math.max(
-  1,
-  Math.ceil(filteredVisitorDetails.length / VISITOR_DETAILS_PER_PAGE)
-);
-
-const paginatedVisitorDetails = useMemo(() => {
-  const start = (visitorDetailsPage - 1) * VISITOR_DETAILS_PER_PAGE;
-  const end = start + VISITOR_DETAILS_PER_PAGE;
-  return filteredVisitorDetails.slice(start, end);
-}, [filteredVisitorDetails, visitorDetailsPage]);
-
 
 function getDisplayName(user: {
   username: string;
@@ -958,12 +870,11 @@ export default function AdminModerationPage() {
     return monthlyPerformanceStats.slice(start, end);
   }, [monthlyPerformanceStats, monthlyPerformancePage]);
 
-useEffect(() => {
-  setRecentDailyPage(1);
-  setDailyBreakdownPage(1);
-  setMonthlyPerformancePage(1);
-  setVisitorDetailsPage(1);
-}, [dailyStats, monthlyStats, visitorDetails]);
+  useEffect(() => {
+    setRecentDailyPage(1);
+    setDailyBreakdownPage(1);
+    setMonthlyPerformancePage(1);
+  }, [dailyStats, monthlyStats]);
 
   const startReject = (listingId: string) => {
     setRejectingId(listingId);
@@ -1583,331 +1494,255 @@ useEffect(() => {
             </>
           )}
 
-{activeTab === "visitor_stats" && (
-  <>
-    <div className="mb-6">
-      <h2 className="text-2xl font-semibold text-slate-900">Page Visit Metrics</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Full overview of page visits, unique visitors, trends, top pages, and detailed records.
-      </p>
-    </div>
-
-    {isLoadingStats ? (
-      <p className="text-slate-600">Loading statistics...</p>
-    ) : (
-      <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <StatMiniCard
-            title="Total Visits"
-            value={visitorStats?.total_visits || 0}
-            icon={<Activity className="h-5 w-5" />}
-            subtitle="All recorded page visits"
-          />
-          <StatMiniCard
-            title="Unique Visitors"
-            value={visitorStats?.unique_visitors || 0}
-            icon={<Users className="h-5 w-5" />}
-            subtitle="Distinct visitors"
-          />
-          <StatMiniCard
-            title="Today's Visits"
-            value={visitorStats?.today_visits || 0}
-            icon={<CalendarDays className="h-5 w-5" />}
-            subtitle="Visits recorded today"
-          />
-          <StatMiniCard
-            title="This Month"
-            value={visitorStats?.this_month_visits || 0}
-            icon={<BarChart3 className="h-5 w-5" />}
-            subtitle="Current month visits"
-          />
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-          <Card>
-            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Recent Daily Traffic</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Recent daily records shown in smaller pages
-                </p>
-              </div>
-
-              {totalRecentDailyPages > 1 && (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                  Page {recentDailyPage} of {totalRecentDailyPages}
-                </span>
-              )}
-            </div>
-
-            {paginatedRecentDaily.length === 0 ? (
-              <div className="py-8 text-center text-slate-500">No daily traffic data found.</div>
-            ) : (
-              <>
-                <div className="space-y-3">
-                  {paginatedRecentDaily.map((d) => {
-                    const max = Math.max(...paginatedRecentDaily.map((x) => x.total), 1);
-                    const width = `${(d.total / max) * 100}%`;
-
-                    return (
-                      <div key={d.period}>
-                        <div className="mb-1 flex items-center justify-between gap-3 text-sm">
-                          <span className="font-medium text-slate-700">
-                            {formatTrafficDate(d.period)}
-                          </span>
-                          <span className="shrink-0 text-slate-500">
-                            {formatNumber(d.total)}
-                          </span>
-                        </div>
-                        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="h-full rounded-full bg-slate-900 transition-all"
-                            style={{ width }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <Pagination
-                  currentPage={recentDailyPage}
-                  totalPages={totalRecentDailyPages}
-                  onPageChange={setRecentDailyPage}
-                />
-              </>
-            )}
-          </Card>
-
-          <Card>
-            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Monthly Performance</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Monthly records shown in smaller pages
-                </p>
-              </div>
-
-              {totalMonthlyPerformancePages > 1 && (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                  Page {monthlyPerformancePage} of {totalMonthlyPerformancePages}
-                </span>
-              )}
-            </div>
-
-            {paginatedMonthlyPerformance.length === 0 ? (
-              <div className="py-8 text-center text-slate-500">No monthly traffic data found.</div>
-            ) : (
-              <>
-                <div className="space-y-3">
-                  {paginatedMonthlyPerformance.map((m) => {
-                    const max = Math.max(...paginatedMonthlyPerformance.map((x) => x.total), 1);
-                    const width = `${(m.total / max) * 100}%`;
-
-                    return (
-                      <div key={m.period}>
-                        <div className="mb-1 flex items-center justify-between gap-3 text-sm">
-                          <span className="font-medium text-slate-700">
-                            {formatTrafficMonth(m.period)}
-                          </span>
-                          <span className="shrink-0 text-slate-500">
-                            {formatNumber(m.total)}
-                          </span>
-                        </div>
-                        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="h-full rounded-full bg-emerald-600 transition-all"
-                            style={{ width }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <Pagination
-                  currentPage={monthlyPerformancePage}
-                  totalPages={totalMonthlyPerformancePages}
-                  onPageChange={setMonthlyPerformancePage}
-                />
-              </>
-            )}
-          </Card>
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-2">
-          <Card>
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Daily Breakdown</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Detailed daily traffic table with paging
-                </p>
-              </div>
-
-              {recentDailyStats.length > 0 && (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                  {recentDailyStats.length} records
-                </span>
-              )}
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead>
-                  <tr className="text-left">
-                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">Date</th>
-                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visits</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {paginatedDailyBreakdown.length ? (
-                    paginatedDailyBreakdown.map((d) => (
-                      <tr key={d.period}>
-                        <td className="px-4 py-3 text-sm text-slate-700">
-                          {formatTrafficDate(d.period)}
-                        </td>
-                        <td className="px-4 py-3 text-sm font-semibold text-slate-900">
-                          {formatNumber(d.total)}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
-                        No daily data available.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <Pagination
-              currentPage={dailyBreakdownPage}
-              totalPages={totalDailyBreakdownPages}
-              onPageChange={setDailyBreakdownPage}
-            />
-          </Card>
-
-          <Card>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Most Visited Pages</h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Top page paths by number of visits
-              </p>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead>
-                  <tr className="text-left">
-                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">Path</th>
-                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visits</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {topPages.length ? (
-                    topPages.map((item, index) => (
-                      <tr key={`${item.path}-${index}`}>
-                        <td className="px-4 py-3 text-sm text-slate-700">{item.path || "-"}</td>
-                        <td className="px-4 py-3 text-sm font-semibold text-slate-900">
-                          {formatNumber(item.total)}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
-                        No top page data available.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        </div>
-
-        <Card>
-          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">Visitor Details</h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Recent recorded page visits with user, path, IP, referrer, and timestamp.
-              </p>
-            </div>
-
-            <div className="w-full lg:w-80">
-              <input
-                type="text"
-                value={visitorDetailsSearch}
-                onChange={(e) => {
-                  setVisitorDetailsSearch(e.target.value);
-                  setVisitorDetailsPage(1);
-                }}
-                placeholder="Search user, path, URL, IP..."
-                className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
-              />
-            </div>
-          </div>
-
-          {isLoadingVisitorDetails ? (
-            <p className="text-slate-600">Loading visitor details...</p>
-          ) : filteredVisitorDetails.length === 0 ? (
-            <div className="py-8 text-center text-slate-500">No visitor details found.</div>
-          ) : (
+          {activeTab === "visitor_stats" && (
             <>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
-                  <thead>
-                    <tr className="text-left">
-                      <th className="px-4 py-3 text-sm font-semibold text-slate-700">User</th>
-                      <th className="px-4 py-3 text-sm font-semibold text-slate-700">Path</th>
-                      <th className="px-4 py-3 text-sm font-semibold text-slate-700">IP Address</th>
-                      <th className="px-4 py-3 text-sm font-semibold text-slate-700">Referrer</th>
-                      <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visited At</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {paginatedVisitorDetails.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 text-sm text-slate-700">
-                          {item.user_email || "Anonymous"}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-700">
-                          <div className="max-w-xs">
-                            <p className="truncate font-medium text-slate-900">{item.path || "-"}</p>
-                            {item.full_url && (
-                              <p className="truncate text-xs text-slate-500">{item.full_url}</p>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-700">{item.ip_address || "-"}</td>
-                        <td className="px-4 py-3 text-sm text-slate-700">
-                          <div className="max-w-xs truncate">{item.referrer || "-"}</div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-700">
-                          {formatDateTime(item.visited_at)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="mb-6">
+                <h2 className="text-2xl font-semibold text-slate-900">Visitor Statistics</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Clean overview of traffic performance with daily and monthly trends.
+                </p>
               </div>
 
-              <Pagination
-                currentPage={visitorDetailsPage}
-                totalPages={totalVisitorDetailsPages}
-                onPageChange={setVisitorDetailsPage}
-              />
+              {isLoadingStats ? (
+                <p className="text-slate-600">Loading statistics...</p>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <StatMiniCard
+                      title="Total Visits"
+                      value={visitorStats?.total_visits || 0}
+                      icon={<Activity className="h-5 w-5" />}
+                      subtitle="All recorded visits"
+                    />
+                    <StatMiniCard
+                      title="Unique Visitors"
+                      value={visitorStats?.unique_visitors || 0}
+                      icon={<Users className="h-5 w-5" />}
+                      subtitle="Distinct visitors"
+                    />
+                    <StatMiniCard
+                      title="Today's Visits"
+                      value={visitorStats?.today_visits || 0}
+                      icon={<CalendarDays className="h-5 w-5" />}
+                      subtitle="Visits recorded today"
+                    />
+                    <StatMiniCard
+                      title="This Month"
+                      value={visitorStats?.this_month_visits || 0}
+                      icon={<BarChart3 className="h-5 w-5" />}
+                      subtitle="Current month visits"
+                    />
+                  </div>
+
+                  <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+                    <Card>
+                      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">Recent Daily Traffic</h3>
+                          <p className="mt-1 text-sm text-slate-500">
+                            Recent daily records shown in smaller pages
+                          </p>
+                        </div>
+
+                        {totalRecentDailyPages > 1 && (
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                            Page {recentDailyPage} of {totalRecentDailyPages}
+                          </span>
+                        )}
+                      </div>
+
+                      {paginatedRecentDaily.length === 0 ? (
+                        <div className="py-8 text-center text-slate-500">No daily traffic data found.</div>
+                      ) : (
+                        <>
+                          <div className="space-y-3">
+                            {paginatedRecentDaily.map((d) => {
+                              const max = Math.max(...paginatedRecentDaily.map((x) => x.total), 1);
+                              const width = `${(d.total / max) * 100}%`;
+
+                              return (
+                                <div key={d.period}>
+                                  <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                                    <span className="font-medium text-slate-700">
+                                      {formatTrafficDate(d.period)}
+                                    </span>
+                                    <span className="shrink-0 text-slate-500">
+                                      {formatNumber(d.total)}
+                                    </span>
+                                  </div>
+                                  <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                                    <div
+                                      className="h-full rounded-full bg-slate-900 transition-all"
+                                      style={{ width }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <Pagination
+                            currentPage={recentDailyPage}
+                            totalPages={totalRecentDailyPages}
+                            onPageChange={setRecentDailyPage}
+                          />
+                        </>
+                      )}
+                    </Card>
+
+                    <Card>
+                      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">Monthly Performance</h3>
+                          <p className="mt-1 text-sm text-slate-500">
+                            Monthly records shown in smaller pages
+                          </p>
+                        </div>
+
+                        {totalMonthlyPerformancePages > 1 && (
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                            Page {monthlyPerformancePage} of {totalMonthlyPerformancePages}
+                          </span>
+                        )}
+                      </div>
+
+                      {paginatedMonthlyPerformance.length === 0 ? (
+                        <div className="py-8 text-center text-slate-500">No monthly traffic data found.</div>
+                      ) : (
+                        <>
+                          <div className="space-y-3">
+                            {paginatedMonthlyPerformance.map((m) => {
+                              const max = Math.max(...paginatedMonthlyPerformance.map((x) => x.total), 1);
+                              const width = `${(m.total / max) * 100}%`;
+
+                              return (
+                                <div key={m.period}>
+                                  <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                                    <span className="font-medium text-slate-700">
+                                      {formatTrafficMonth(m.period)}
+                                    </span>
+                                    <span className="shrink-0 text-slate-500">
+                                      {formatNumber(m.total)}
+                                    </span>
+                                  </div>
+                                  <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                                    <div
+                                      className="h-full rounded-full bg-emerald-600 transition-all"
+                                      style={{ width }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <Pagination
+                            currentPage={monthlyPerformancePage}
+                            totalPages={totalMonthlyPerformancePages}
+                            onPageChange={setMonthlyPerformancePage}
+                          />
+                        </>
+                      )}
+                    </Card>
+                  </div>
+
+                  <div className="grid gap-6 xl:grid-cols-2">
+                    <Card>
+                      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">Daily Breakdown</h3>
+                          <p className="mt-1 text-sm text-slate-500">
+                            Detailed daily traffic table with paging
+                          </p>
+                        </div>
+
+                        {recentDailyStats.length > 0 && (
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                            {recentDailyStats.length} records
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-200">
+                          <thead>
+                            <tr className="text-left">
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Date</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visits</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {paginatedDailyBreakdown.length ? (
+                              paginatedDailyBreakdown.map((d) => (
+                                <tr key={d.period}>
+                                  <td className="px-4 py-3 text-sm text-slate-700">
+                                    {formatTrafficDate(d.period)}
+                                  </td>
+                                  <td className="px-4 py-3 text-sm font-semibold text-slate-900">
+                                    {formatNumber(d.total)}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
+                                  No daily data available.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <Pagination
+                        currentPage={dailyBreakdownPage}
+                        totalPages={totalDailyBreakdownPages}
+                        onPageChange={setDailyBreakdownPage}
+                      />
+                    </Card>
+
+                    <Card>
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Monthly Breakdown</h3>
+                        <p className="mt-1 text-sm text-slate-500">Detailed monthly traffic table.</p>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-200">
+                          <thead>
+                            <tr className="text-left">
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Month</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visits</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {monthlyStats.length ? (
+                              [...monthlyStats].reverse().map((m) => (
+                                <tr key={m.period}>
+                                  <td className="px-4 py-3 text-sm text-slate-700">
+                                    {formatTrafficMonth(m.period)}
+                                  </td>
+                                  <td className="px-4 py-3 text-sm font-semibold text-slate-900">
+                                    {formatNumber(m.total)}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
+                                  No monthly data available.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              )}
             </>
           )}
-        </Card>
-      </div>
-    )}
-  </>
-)}
 
           {activeTab === "partners" && (
             <>

@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import AdminAnalyticsOverviewView, ListingViewSet,CategoryViewSet, FavoriteViewSet,AdTickerView, PartnerDetailView, PartnerListView, PopularCategoriesView, PromoBannerViewSet, PublicBusinessAdListView, PublicListingDetailView, SellerDashboardStatsView,search_location
+from .views import AdminAnalyticsOverviewView, ListingViewSet,CategoryViewSet, FavoriteViewSet,AdTickerView, PartnerDetailView, PartnerListView, PopularCategoriesView, PromoBannerViewSet, PublicBusinessAdListView, PublicListingDetailView, SellerDashboardStatsView,search_location,TrackPageVisitView
 
 router = DefaultRouter()
 router.register("listings", ListingViewSet, basename="listing")
@@ -22,5 +22,8 @@ urlpatterns = router.urls + [
     
     path("public/business-ads/", PublicBusinessAdListView.as_view(), name="public-business-ads"),
     path("public/listings/<uuid:id>/", PublicListingDetailView.as_view(), name="public-listing-detail"),
+    
+    # path("track-visit/", TrackPageVisitView.as_view(), name="track-visit"),
+    path("analytics/track-visit/", TrackPageVisitView.as_view(), name="track-visit"),
 
 ]

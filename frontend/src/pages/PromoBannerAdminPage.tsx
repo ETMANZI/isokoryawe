@@ -47,47 +47,90 @@ export default function PromoBannerAdminPage() {
     },
   });
 
-  const uploadMutation = useMutation({
-    mutationFn: async () => {
-      if (!file) {
-        throw new Error("Please select a video file.");
-      }
 
-      const formData = new FormData();
-      formData.append("title", title.trim());
-      formData.append("media_type", "video");
-      formData.append("target_url", targetUrl.trim());
-      formData.append("is_active", String(isActive));
-      formData.append("file", file);
+const uploadMutation = useMutation({
+  mutationFn: async () => {
+    if (!file) {
+      throw new Error("Please select a video file.");
+    }
 
-      await api.post("/promo-banners/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-    },
-    onSuccess: async () => {
-      setTitle("");
-      setTargetUrl("");
-      setIsActive(true);
-      setFile(null);
-      setFormError("");
-      await queryClient.invalidateQueries({ queryKey: ["admin-promo-banners"] });
-      await queryClient.invalidateQueries({ queryKey: ["promo-banners"] });
-    },
-    onError: (error: any) => {
-      const data = error?.response?.data;
-      if (data?.file?.[0]) {
-        setFormError(data.file[0]);
-      } else if (data?.target_url?.[0]) {
-        setFormError(data.target_url[0]);
-      } else if (data?.title?.[0]) {
-        setFormError(data.title[0]);
-      } else {
-        setFormError(error?.message || "Failed to upload banner video.");
-      }
-    },
-  });
+    const formData = new FormData();
+    formData.append("title", title.trim());
+    formData.append("media_type", "video");
+    formData.append("target_url", targetUrl.trim());
+    formData.append("is_active", String(isActive));
+    formData.append("file", file);
+
+    // Let the browser set the correct Content-Type with boundary
+    await api.post("/promo-banners/", formData);
+  },
+  onSuccess: async () => {
+    setTitle("");
+    setTargetUrl("");
+    setIsActive(true);
+    setFile(null);
+    setFormError("");
+    await queryClient.invalidateQueries({ queryKey: ["admin-promo-banners"] });
+    await queryClient.invalidateQueries({ queryKey: ["promo-banners"] });
+  },
+  onError: (error: any) => {
+    const data = error?.response?.data;
+    if (data?.file?.[0]) {
+      setFormError(data.file[0]);
+    } else if (data?.target_url?.[0]) {
+      setFormError(data.target_url[0]);
+    } else if (data?.title?.[0]) {
+      setFormError(data.title[0]);
+    } else {
+      setFormError(error?.message || "Failed to upload banner video.");
+    }
+  },
+});
+
+
+
+
+  // const uploadMutation = useMutation({
+  //   mutationFn: async () => {
+  //     if (!file) {
+  //       throw new Error("Please select a video file.");
+  //     }
+
+  //     const formData = new FormData();
+  //     formData.append("title", title.trim());
+  //     formData.append("media_type", "video");
+  //     formData.append("target_url", targetUrl.trim());
+  //     formData.append("is_active", String(isActive));
+  //     formData.append("file", file);
+
+  //     await api.post("/promo-banners/", formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     });
+  //   },
+  //   onSuccess: async () => {
+  //     setTitle("");
+  //     setTargetUrl("");
+  //     setIsActive(true);
+  //     setFile(null);
+  //     setFormError("");
+  //     await queryClient.invalidateQueries({ queryKey: ["admin-promo-banners"] });
+  //     await queryClient.invalidateQueries({ queryKey: ["promo-banners"] });
+  //   },
+  //   onError: (error: any) => {
+  //     const data = error?.response?.data;
+  //     if (data?.file?.[0]) {
+  //       setFormError(data.file[0]);
+  //     } else if (data?.target_url?.[0]) {
+  //       setFormError(data.target_url[0]);
+  //     } else if (data?.title?.[0]) {
+  //       setFormError(data.title[0]);
+  //     } else {
+  //       setFormError(error?.message || "Failed to upload banner video.");
+  //     }
+  //   },
+  // });
 
   const toggleMutation = useMutation({
     mutationFn: async (banner: PromoBanner) => {

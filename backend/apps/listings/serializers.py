@@ -533,6 +533,37 @@ class PartnerSerializer(serializers.ModelSerializer):
         
         
         
+# class PromoBannerSerializer(serializers.ModelSerializer):
+#     file_url = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = PromoBanner
+#         fields = [
+#             "id",
+#             "title",
+#             "media_type",
+#             "file",
+#             "file_url",
+#             "target_url",
+#             "is_active",
+#             "created_at",
+#         ]
+#         read_only_fields = ["id", "file_url", "created_at"]
+
+#     def get_file_url(self, obj):
+#         request = self.context.get("request")
+#         if obj.file and request:
+#             return request.build_absolute_uri(obj.file.url)
+#         if obj.file:
+#             return obj.file.url
+#         return None
+
+#     def validate_target_url(self, value):
+#         if value:
+#             return value.strip()
+#         return value
+        
+        
 class PromoBannerSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
 
@@ -562,6 +593,40 @@ class PromoBannerSerializer(serializers.ModelSerializer):
         if value:
             return value.strip()
         return value
+
+    def validate_file(self, value):
+        """Validate file size and type"""
+        if value.size > 110 * 1024 * 1024:
+            raise serializers.ValidationError("File too large. Maximum size is 110MB.")
         
+        media_type = self.initial_data.get('media_type', 'video')
         
+        if media_type == 'video':
+            valid_types = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm']
+            if value.content_type not in valid_types:
+                raise serializers.ValidationError(f"Invalid video format. Allowed: MP4, MOV, AVI, WEBM")
         
+        elif media_type == 'image':
+            valid_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+            if value.content_type not in valid_types:
+                raise serializers.ValidationError(f"Invalid image format. Allowed: JPEG, PNG, GIF, WEBP")
+        
+        return value
+
+    def validate(self, data):
+        """Cross-field validation"""
+        if data.get('media_type') == 'video':
+            file_obj = data.get('file')
+            if file_obj and not file_obj.content_type.startswith('video/'):
+                raise serializers.ValidationError({
+                    'file': 'File must be a video when media_type is "video"'
+                })
+        
+        if data.get('media_type') == 'image':
+            file_obj = data.get('file')
+            if file_obj and not file_obj.content_type.startswith('image/'):
+                raise serializers.ValidationError({
+                    'file': 'File must be an image when media_type is "image"'
+                })
+        
+        return data

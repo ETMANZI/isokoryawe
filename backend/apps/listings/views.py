@@ -452,42 +452,58 @@ class ListingViewSet(viewsets.ModelViewSet):
     def increment_view(self, request, pk=None):
         listing = self.get_object()
         
+        # Get or create session key for anonymous users
         if not request.session.session_key:
             request.session.create()
         
         session_key = request.session.session_key
         ip = self.get_client_ip(request)
+        
+        # Check for duplicate view within last hour
         one_hour_ago = timezone.now() - timedelta(hours=1)
         
-        # Check if already viewed in the last hour
-        exists = ListingViewLog.objects.filter(
+        # Use anonymous tracking without requiring user login
+        existing_view = ListingViewLog.objects.filter(
             listing=listing,
             session_key=session_key,
             ip_address=ip,
             created_at__gte=one_hour_ago
         ).exists()
         
-        if not exists:
+        if not existing_view:
+            # Create view log with anonymous tracking
             ListingViewLog.objects.create(
                 listing=listing,
                 session_key=session_key,
-                ip_address=ip
+                ip_address=ip,
+                user=request.user if request.user.is_authenticated else None
             )
             
+            # Increment the view count
             listing.views_count += 1
             listing.save(update_fields=["views_count"])
             
-            # Send notification at milestone views
-            if listing.views_count in [10, 25, 50, 100]:
+            # Optional: Send notification to listing owner at milestones
+            if listing.views_count in [10, 25, 50, 100, 500, 1000]:
                 create_notification(
                     user=listing.owner,
                     title="Listing Performance",
-                    message=f'Your listing "{listing.title}" has reached {listing.views_count} views.',
+                    message=f'Your listing "{listing.title}" has reached {listing.views_count} views!',
                     notification_type="listing_view",
                     listing=listing,
                 )
+            
+            return Response({
+                "status": "success",
+                "message": "View tracked",
+                "views_count": listing.views_count
+            })
         
-        return Response({"message": "View tracked", "views_count": listing.views_count})
+        return Response({
+            "status": "already_counted",
+            "message": "View already counted in the last hour",
+            "views_count": listing.views_count
+        })
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):

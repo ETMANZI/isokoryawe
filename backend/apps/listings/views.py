@@ -452,17 +452,16 @@ class ListingViewSet(viewsets.ModelViewSet):
     def increment_view(self, request, pk=None):
         listing = self.get_object()
         
-        # Get or create session key for anonymous users
+        # Get or create session for anonymous users
         if not request.session.session_key:
             request.session.create()
         
         session_key = request.session.session_key
         ip = self.get_client_ip(request)
         
-        # Check for duplicate view within last hour
+        # Check if this user has already viewed this listing in the last hour
         one_hour_ago = timezone.now() - timedelta(hours=1)
         
-        # Use anonymous tracking without requiring user login
         existing_view = ListingViewLog.objects.filter(
             listing=listing,
             session_key=session_key,
@@ -471,7 +470,7 @@ class ListingViewSet(viewsets.ModelViewSet):
         ).exists()
         
         if not existing_view:
-            # Create view log with anonymous tracking
+            # Create view log entry
             ListingViewLog.objects.create(
                 listing=listing,
                 session_key=session_key,
@@ -483,7 +482,7 @@ class ListingViewSet(viewsets.ModelViewSet):
             listing.views_count += 1
             listing.save(update_fields=["views_count"])
             
-            # Optional: Send notification to listing owner at milestones
+            # Optional: Notify listing owner at milestones
             if listing.views_count in [10, 25, 50, 100, 500, 1000]:
                 create_notification(
                     user=listing.owner,
@@ -499,9 +498,10 @@ class ListingViewSet(viewsets.ModelViewSet):
                 "views_count": listing.views_count
             })
         
+        # Already counted in the last hour
         return Response({
             "status": "already_counted",
-            "message": "View already counted in the last hour",
+            "message": "View already counted for this user in the last hour",
             "views_count": listing.views_count
         })
 

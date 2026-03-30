@@ -350,7 +350,7 @@ export default function ListingDetailsPage() {
                           <img
                             src={img.image}
                             alt={listing.title}
-                            className="h-24 w-full object-cover"
+                            className="h-24 w-full object-contain"
                           />
                         </button>
                       ))}

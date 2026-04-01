@@ -3,16 +3,13 @@ import { useTranslation } from 'react-i18next';
 export default function LanguageSwitcher() {
     const { i18n } = useTranslation();
     
-    const changeLanguage = (lng: 'en' | 'rw') => {
-        i18n.changeLanguage(lng);
-        localStorage.setItem('preferred_language', lng);
-    };
+    console.log("LanguageSwitcher is rendering!"); // Debug log
     
-    // Return a very visible button to test
     return (
-        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
-            <button onClick={() => changeLanguage('en')} className="mr-2">EN</button>
-            <button onClick={() => changeLanguage('rw')}>RW</button>
+        <div className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg">
+            <button onClick={() => i18n.changeLanguage('en')} className="px-2">EN</button>
+            <span>|</span>
+            <button onClick={() => i18n.changeLanguage('rw')} className="px-2">RW</button>
         </div>
     );
 }

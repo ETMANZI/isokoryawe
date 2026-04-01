@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { isAuthenticated, logoutUser } from "../../lib/auth";
 import { api } from "../../lib/api";
 import AdMarquee from "./AdMarquee";
-import LanguageSwitcher from "../ui/LanguageSwitcher";
+// Remove this import: import LanguageSwitcher from "../ui/LanguageSwitcher";
 
 type CurrentUser = {
   id: string | number;
@@ -26,7 +26,7 @@ type AdItem = {
 export default function Navbar() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(); // Add i18n here
 
   const [loggedIn, setLoggedIn] = useState(isAuthenticated());
 
@@ -78,6 +78,11 @@ export default function Navbar() {
       .filter(Boolean)
       .join(" ")
       .trim() || currentUser?.username || t("nav.account");
+
+  const changeLanguage = (lng: 'en' | 'rw') => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('preferred_language', lng);
+  };
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -138,8 +143,30 @@ export default function Navbar() {
             </>
           )}
           
-          {/* Language Switcher - Add this at the end */}
-          <LanguageSwitcher />
+          {/* Language Switcher - Direct buttons */}
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-2 py-1 ml-2">
+            <button
+              onClick={() => changeLanguage('en')}
+              className={`px-2 py-1 rounded text-sm font-medium ${
+                i18n.language === 'en' 
+                  ? 'bg-white text-indigo-600 shadow' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              EN
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              onClick={() => changeLanguage('rw')}
+              className={`px-2 py-1 rounded text-sm font-medium ${
+                i18n.language === 'rw' 
+                  ? 'bg-white text-indigo-600 shadow' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              RW
+            </button>
+          </div>
         </div>
       </div>
 

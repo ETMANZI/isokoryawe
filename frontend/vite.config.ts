@@ -1,9 +1,13 @@
-
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
+  build: {
+    outDir: 'dist',  // Change this from '../backend/static/frontend' to 'dist'
+    emptyOutDir: true,
+  },
   server: {
     port: 3000,
     host: true
@@ -11,9 +15,5 @@ export default defineConfig({
   preview: {
     port: 3000,
     host: true
-  },
-  build: {
-    outDir: '../backend/static/frontend',  // This might be causing issues
-    emptyOutDir: true
   }
 })

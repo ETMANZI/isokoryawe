@@ -142,28 +142,20 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Language Switcher - Direct buttons */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-2 py-1 ml-2">
-            <button
+          {/* Language Switcher - BRIGHT RED TEST BUTTONS */}
+          <div className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded-lg ml-2">
+            <button 
               onClick={() => changeLanguage('en')}
-              className={`px-2 py-1 rounded text-sm font-medium ${
-                i18n.language === 'en' 
-                  ? 'bg-white text-indigo-600 shadow' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className="font-bold hover:underline"
             >
-              EN
+              ENGLISH
             </button>
-            <span className="text-gray-300">|</span>
-            <button
+            <span>|</span>
+            <button 
               onClick={() => changeLanguage('rw')}
-              className={`px-2 py-1 rounded text-sm font-medium ${
-                i18n.language === 'rw' 
-                  ? 'bg-white text-indigo-600 shadow' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className="font-bold hover:underline"
             >
-              RW
+              KINYARWANDA
             </button>
           </div>
         </div>

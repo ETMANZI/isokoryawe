@@ -1,14 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 export default function LanguageSwitcher() {
-    const { i18n, t } = useTranslation();
-    
-    // Debug - log when component renders
-    console.log('LanguageSwitcher rendered, current language:', i18n.language);
-    console.log('i18n object:', i18n);
+    const { i18n } = useTranslation();  // Remove 't' - only use i18n
     
     const changeLanguage = (lng: 'en' | 'rw') => {
-        console.log('Changing language to:', lng);
         i18n.changeLanguage(lng);
         localStorage.setItem('preferred_language', lng);
     };

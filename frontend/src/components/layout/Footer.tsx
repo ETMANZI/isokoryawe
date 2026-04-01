@@ -1,18 +1,15 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 export default function Footer() {
-  const { i18n } = useTranslation();
-
-  const changeLanguage = (lng: 'en' | 'rw') => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('preferred_language', lng);
-  };
-
   return (
     <footer className="mt-10 bg-gradient-to-r from-slate-100 via-white to-slate-100 border-t border-slate-200">
       <div className="mx-auto w-full max-w-screen-2xl px-6 py-10">
+        
+        {/* BIG TEST BANNER - SHOULD BE VISIBLE */}
+        <div className="bg-purple-600 text-white text-center py-4 mb-8 rounded-lg text-xl font-bold">
+          🚀 DEPLOYMENT TEST - IF YOU SEE THIS, UPDATES ARE WORKING! 🚀
+        </div>
         
         <div className="grid gap-10 md:grid-cols-3">
           
@@ -23,7 +20,6 @@ export default function Footer() {
               Simple, fast, and reliable.
             </p>
 
-            {/* Social icons */}
             <div className="mt-4 flex items-center gap-3">
               <a href="#" className="p-2 rounded-full bg-white shadow hover:bg-slate-200 transition">
                 <Facebook size={16} />
@@ -37,19 +33,12 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Links */}
           <div>
             <h4 className="text-sm font-semibold text-slate-900 mb-3">Quick Links</h4>
             <div className="space-y-2 text-sm text-slate-600">
-              <Link to="/listings" className="block hover:text-slate-900 transition">
-                Listings
-              </Link>
-              <Link to="/register" className="block hover:text-slate-900 transition">
-                Register
-              </Link>
-              <Link to="/login" className="block hover:text-slate-900 transition">
-                Login
-              </Link>
+              <Link to="/listings" className="block hover:text-slate-900 transition">Listings</Link>
+              <Link to="/register" className="block hover:text-slate-900 transition">Register</Link>
+              <Link to="/login" className="block hover:text-slate-900 transition">Login</Link>
             </div>
           </div>
 
@@ -72,28 +61,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* LANGUAGE TEST BUTTONS - BRIGHT RED */}
-        <div className="mt-8 pt-4 flex justify-center">
-          <div className="flex items-center gap-2 bg-red-600 text-white px-5 py-2 rounded-full shadow-lg">
-            <button 
-              onClick={() => changeLanguage('en')}
-              className="font-semibold hover:underline text-sm"
-            >
-              ENGLISH
-            </button>
-            <span className="text-white/50">|</span>
-            <button 
-              onClick={() => changeLanguage('rw')}
-              className="font-semibold hover:underline text-sm"
-            >
-              KINYARWANDA
-            </button>
-          </div>
-        </div>
-
         <div className="mt-8 border-t border-slate-200 pt-4 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Market Hub. All rights reserved.</p>
-
           <div className="flex gap-4 mt-2 md:mt-0">
             <Link to="#" className="hover:text-slate-700">Privacy Policy</Link>
             <Link to="#" className="hover:text-slate-700">Terms</Link>

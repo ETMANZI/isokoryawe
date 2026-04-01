@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { isAuthenticated, logoutUser } from "../../lib/auth";
 import { api } from "../../lib/api";
 import AdMarquee from "./AdMarquee";
+import LanguageSwitcher from "../ui/LanguageSwitcher";
 
 type CurrentUser = {
   id: string | number;
@@ -24,6 +26,7 @@ type AdItem = {
 export default function Navbar() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const [loggedIn, setLoggedIn] = useState(isAuthenticated());
 
@@ -74,7 +77,7 @@ export default function Navbar() {
     [currentUser?.first_name, currentUser?.last_name]
       .filter(Boolean)
       .join(" ")
-      .trim() || currentUser?.username || "Account";
+      .trim() || currentUser?.username || t("nav.account");
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -83,37 +86,37 @@ export default function Navbar() {
           Market Hub
         </Link>
 
-        <nav className="flex flex-wrap items-center gap-2 text-sm md:text-base">
+        <div className="flex flex-wrap items-center gap-2 text-sm md:text-base">
           <Link to="/listings" className="rounded-xl px-3 py-2 hover:bg-slate-100">
-            Listings
+            {t("nav.listings")}
           </Link>
 
           {!loggedIn ? (
             <>
               <Link to="/register" className="rounded-xl px-3 py-2 hover:bg-slate-100">
-                Register
+                {t("nav.register")}
               </Link>
 
               <Link to="/login" className="rounded-xl bg-slate-500 px-4 py-2 text-white">
-                Login
+                {t("nav.login")}
               </Link>
             </>
           ) : (
             <>
               <span className="rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700">
-                Hi, {isLoadingCurrentUser ? "..." : displayName}
+                {t("nav.hi")}, {isLoadingCurrentUser ? "..." : displayName}
               </span>
 
               <Link to="/publish" className="rounded-xl px-3 py-2 hover:bg-slate-100">
-                Publish
+                {t("nav.publish")}
               </Link>
 
               <Link to="/dashboard" className="rounded-xl px-3 py-2 hover:bg-slate-100">
-                Dashboard
+                {t("nav.dashboard")}
               </Link>
 
               <Link to="/profile" className="rounded-xl px-3 py-2 hover:bg-slate-100">
-                Profile
+                {t("nav.profile")}
               </Link>
 
               {!isLoadingCurrentUser && !isError && canModerate && (
@@ -121,7 +124,7 @@ export default function Navbar() {
                   to="/admin/moderation"
                   className="rounded-xl px-3 py-2 hover:bg-slate-100"
                 >
-                  Moderation
+                  {t("nav.moderation")}
                 </Link>
               )}
 
@@ -130,11 +133,14 @@ export default function Navbar() {
                 onClick={handleLogout}
                 className="rounded-xl bg-slate-900 px-4 py-2 text-white"
               >
-                Logout
+                {t("nav.logout")}
               </button>
             </>
           )}
-        </nav>
+          
+          {/* Language Switcher - Add this at the end */}
+          <LanguageSwitcher />
+        </div>
       </div>
 
       <AdMarquee ads={ads || []} />

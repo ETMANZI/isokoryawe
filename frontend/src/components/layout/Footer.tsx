@@ -2,6 +2,9 @@ import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
 
 export default function Footer() {
+  // Console log to verify if this component is loaded
+  console.log("🔥🔥🔥 FOOTER COMPONENT IS LOADING - PURPLE BANNER SHOULD BE VISIBLE 🔥🔥🔥");
+  
   return (
     <footer className="mt-10 bg-gradient-to-r from-slate-100 via-white to-slate-100 border-t border-slate-200">
       <div className="mx-auto w-full max-w-screen-2xl px-6 py-10">

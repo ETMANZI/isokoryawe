@@ -91,6 +91,10 @@ export default function Navbar() {
           Market Hub
         </Link>
 
+        <div className="bg-red-500 text-white px-3 py-1 rounded">
+  TEST: Language Buttons Should Be Here
+</div>
+
         <div className="flex flex-wrap items-center gap-2 text-sm md:text-base">
           <Link to="/listings" className="rounded-xl px-3 py-2 hover:bg-slate-100">
             {t("nav.listings")}

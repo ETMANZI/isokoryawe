@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 export default function LanguageSwitcher() {
-    const { i18n, t } = useTranslation();
+    const { i18n } = useTranslation(); // Remove 't' since it's not used
     
     const changeLanguage = (lng: 'en' | 'rw') => {
         i18n.changeLanguage(lng);

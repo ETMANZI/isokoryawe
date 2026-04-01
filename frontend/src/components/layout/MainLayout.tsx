@@ -26,19 +26,7 @@ export default function MainLayout() {
             </div>
 
 
-{/* <div className="mt-8 xl:hidden">
-  <div className="xl:block">
-    <details className="mb-4">
-      <summary className="cursor-pointer font-semibold text-slate-700">
-        Filters / Info
-      </summary>
 
-      <div className="mt-3">
-        <RightSidebar />
-      </div>
-    </details>
-  </div>
-</div> */}
 
 
 

@@ -307,7 +307,7 @@ export default function ListingsPage() {
             to="/publish"
             className="rounded-2xl bg-slate-400 px-5 py-3 text-white"
           >
-            Post Listing
+            Post Listing...
           </Link>
         )}
       </div>

@@ -1,7 +1,15 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
+  const { i18n } = useTranslation();
+
+  const changeLanguage = (lng: 'en' | 'rw') => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('preferred_language', lng);
+  };
+
   return (
     <footer className="mt-10 bg-gradient-to-r from-slate-100 via-white to-slate-100 border-t border-slate-200">
       <div className="mx-auto w-full max-w-screen-2xl px-6 py-10">
@@ -61,6 +69,25 @@ export default function Footer() {
                 eugenetuyizere@gmail.com
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* LANGUAGE TEST BUTTONS - BRIGHT RED */}
+        <div className="mt-8 pt-4 flex justify-center">
+          <div className="flex items-center gap-2 bg-red-600 text-white px-5 py-2 rounded-full shadow-lg">
+            <button 
+              onClick={() => changeLanguage('en')}
+              className="font-semibold hover:underline text-sm"
+            >
+              ENGLISH
+            </button>
+            <span className="text-white/50">|</span>
+            <button 
+              onClick={() => changeLanguage('rw')}
+              className="font-semibold hover:underline text-sm"
+            >
+              KINYARWANDA
+            </button>
           </div>
         </div>
 

@@ -9,7 +9,9 @@ i18n
   .use(initReactI18next)
   .init({
     backend: {
-      loadPath: '/locales/{{lng}}/translation.json',
+      loadPath: import.meta.env.DEV
+        ? '/locales/{{lng}}/translation.json'
+        : '/static/locales/{{lng}}/translation.json',
     },
     lng: savedLanguage,
     fallbackLng: 'en',

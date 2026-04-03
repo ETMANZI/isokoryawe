@@ -11,7 +11,7 @@ i18n
     backend: {
       loadPath: import.meta.env.DEV
         ? '/locales/{{lng}}/translation.json'
-        : '/static/locales/{{lng}}/translation.json',
+        : '/static/frontend/locales/{{lng}}/translation.json',
     },
     lng: savedLanguage,
     fallbackLng: 'en',

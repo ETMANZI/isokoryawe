@@ -11,8 +11,9 @@
     "hi": "Hi",
     "account": "Account"
   },
-  
+
   "listings": {
+    
     "title": "Listings",
     "search_placeholder": "Search by title, description...",
     "all_types": "All types",

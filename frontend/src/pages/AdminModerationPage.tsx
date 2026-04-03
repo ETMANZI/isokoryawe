@@ -1820,7 +1820,7 @@ export default function AdminModerationPage() {
                         onChange={(e) => setPartnerIsActive(e.target.checked)}
                         className="h-4 w-4"
                       />
-                      <span className="text-sm text-slate-700">Active</span>
+                      <span className="text-sm text-slate-700">{t("admin.active")}</span>
                     </label>
 
                     {partnerError && <p className="text-sm text-red-600">{partnerError}</p>}

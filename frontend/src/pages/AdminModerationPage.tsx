@@ -1280,9 +1280,10 @@ export default function AdminModerationPage() {
             <>
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold text-slate-900">Categories</h2>
+                  <h2 className="text-2xl font-semibold text-slate-900">{t("admin.categories_title")}</h2>
                   <p className="mt-1 text-sm text-slate-600">
-                    Manage main categories and subcategories with a cleaner admin view.
+                    {/* Manage main categories and subcategories with a cleaner admin view. */}
+                    {t("admin.categories_description")}
                   </p>
                 </div>
 

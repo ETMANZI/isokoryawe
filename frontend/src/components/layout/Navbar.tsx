@@ -123,7 +123,7 @@ export default function Navbar() {
       <div className="mx-auto max-w-screen-2xl px-4 md:px-6">
         <div className="hidden md:flex md:items-center md:justify-between md:py-4">
           <Link to="/" className="text-2xl font-bold text-slate-800 transition-colors hover:text-slate-600">
-            Market Hub ...
+            Market Hub
           </Link>
 
           <div className="flex items-center gap-1 text-sm">

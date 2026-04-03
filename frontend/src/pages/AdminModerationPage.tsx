@@ -1272,6 +1272,1382 @@ export default function AdminModerationPage() {
             </>
           )}
 
+
+
+{activeTab === "categories" && (
+  <>
+    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 className="text-2xl font-semibold text-slate-900">{t("admin.categories_title")}</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          {t("admin.categories_description")}
+        </p>
+      </div>
+
+      <Button onClick={openCategoryModal} className="inline-flex items-center gap-2">
+        <Plus size={16} />
+        {t("admin.add_new_category")}
+      </Button>
+    </div>
+
+    {categoryError && (
+      <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {categoryError}
+      </div>
+    )}
+
+    {categorySuccess && (
+      <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        {categorySuccess}
+      </div>
+    )}
+
+    {isLoadingCategories ? (
+      <p className="text-slate-600">{t("admin.loading")}</p>
+    ) : sortedCategories.length === 0 ? (
+      <Card>
+        <div className="py-10 text-center">
+          <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_categories_found")}</h3>
+          <p className="mt-2 text-slate-600">{t("admin.add_first_category")}</p>
+        </div>
+      </Card>
+    ) : (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500">{t("admin.total_categories")}</p>
+                <p className="mt-2 text-3xl font-bold text-slate-900">
+                  {formatNumber(categorySummary.total)}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-slate-100 p-3 text-slate-700">
+                <FolderTree size={20} />
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500">{t("admin.main_categories")}</p>
+                <p className="mt-2 text-3xl font-bold text-slate-900">
+                  {formatNumber(categorySummary.main)}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-blue-50 p-3 text-blue-700">
+                <Layers3 size={20} />
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500">{t("admin.subcategories")}</p>
+                <p className="mt-2 text-3xl font-bold text-slate-900">
+                  {formatNumber(categorySummary.sub)}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-700">
+                <Tag size={20} />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1.1fr_1.6fr]">
+          <Card>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">{t("admin.main_categories_title")}</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("admin.main_categories_subtitle")}
+                </p>
+              </div>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                {parentCategories.length}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {parentCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <h4 className="text-base font-semibold text-slate-900">
+                        {category.name}
+                      </h4>
+                      <p className="mt-1 break-all text-sm text-slate-500">
+                        {t("admin.slug_label")} {category.slug}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {t("admin.children_label")}{" "}
+                        {
+                          childCategories.filter(
+                            (child) => String(child.parent) === String(category.id)
+                          ).length
+                        }
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEditCategory(category)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                      >
+                        <Edit3 size={15} />
+                        {t("admin.edit")}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCategory(category)}
+                        disabled={deleteCategoryMutation.isPending}
+                        className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                      >
+                        <Trash2 size={15} />
+                        {t("admin.delete")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">{t("admin.all_categories_title")}</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("admin.all_categories_subtitle")}
+                </p>
+              </div>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                {sortedCategories.length} {t("admin.total")}
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead>
+                  <tr className="bg-slate-50 text-left">
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.name")}</th>
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.slug")}</th>
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.type")}</th>
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.parent")}</th>
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.actions")}</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-slate-100">
+                  {sortedCategories.map((category) => (
+                    <tr key={category.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-4 text-sm font-medium text-slate-900">
+                        {category.name}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-slate-600">{category.slug}</td>
+                      <td className="px-4 py-4 text-sm">
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            category.parent
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
+                          {category.parent ? t("admin.subcategory") : t("admin.main")}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-slate-600">
+                        {getParentName(category.parent)}
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditCategory(category)}
+                            className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                          >
+                            {t("admin.edit")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCategory(category)}
+                            disabled={deleteCategoryMutation.isPending}
+                            className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-60"
+                          >
+                            {t("admin.delete")}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      </div>
+    )}
+  </>
+)}
+
+{activeTab === "visitor_stats" && (
+  <>
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-slate-900">{t("admin.visitor_stats_title")}</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        {t("admin.visitor_stats_description")}
+      </p>
+    </div>
+
+    {isLoadingStats ? (
+      <p className="text-slate-600">{t("admin.loading_stats")}</p>
+    ) : (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatMiniCard
+            title={t("admin.total_visits")}
+            value={visitorStats?.total_visits || 0}
+            icon={<Activity className="h-5 w-5" />}
+            subtitle={t("admin.all_recorded_visits")}
+          />
+          <StatMiniCard
+            title={t("admin.unique_visitors")}
+            value={visitorStats?.unique_visitors || 0}
+            icon={<Users className="h-5 w-5" />}
+            subtitle={t("admin.distinct_visitors")}
+          />
+          <StatMiniCard
+            title={t("admin.todays_visits")}
+            value={visitorStats?.today_visits || 0}
+            icon={<CalendarDays className="h-5 w-5" />}
+            subtitle={t("admin.visits_today")}
+          />
+          <StatMiniCard
+            title={t("admin.this_month")}
+            value={visitorStats?.this_month_visits || 0}
+            icon={<BarChart3 className="h-5 w-5" />}
+            subtitle={t("admin.current_month_visits")}
+          />
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+          <Card>
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">{t("admin.recent_daily_traffic")}</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("admin.recent_daily_subtitle")}
+                </p>
+              </div>
+
+              {totalRecentDailyPages > 1 && (
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {t("admin.page")} {recentDailyPage} {t("admin.of")} {totalRecentDailyPages}
+                </span>
+              )}
+            </div>
+
+            {paginatedRecentDaily.length === 0 ? (
+              <div className="py-8 text-center text-slate-500">{t("admin.no_daily_data")}</div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {paginatedRecentDaily.map((d) => {
+                    const max = Math.max(...paginatedRecentDaily.map((x) => x.total), 1);
+                    const width = `${(d.total / max) * 100}%`;
+
+                    return (
+                      <div key={d.period}>
+                        <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                          <span className="font-medium text-slate-700">
+                            {formatTrafficDate(d.period)}
+                          </span>
+                          <span className="shrink-0 text-slate-500">
+                            {formatNumber(d.total)}
+                          </span>
+                        </div>
+                        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full bg-slate-900 transition-all"
+                            style={{ width }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <Pagination
+                  currentPage={recentDailyPage}
+                  totalPages={totalRecentDailyPages}
+                  onPageChange={setRecentDailyPage}
+                />
+              </>
+            )}
+          </Card>
+
+          <Card>
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">{t("admin.monthly_performance")}</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("admin.monthly_performance_subtitle")}
+                </p>
+              </div>
+
+              {totalMonthlyPerformancePages > 1 && (
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {t("admin.page")} {monthlyPerformancePage} {t("admin.of")} {totalMonthlyPerformancePages}
+                </span>
+              )}
+            </div>
+
+            {paginatedMonthlyPerformance.length === 0 ? (
+              <div className="py-8 text-center text-slate-500">{t("admin.no_monthly_data")}</div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {paginatedMonthlyPerformance.map((m) => {
+                    const max = Math.max(...paginatedMonthlyPerformance.map((x) => x.total), 1);
+                    const width = `${(m.total / max) * 100}%`;
+
+                    return (
+                      <div key={m.period}>
+                        <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                          <span className="font-medium text-slate-700">
+                            {formatTrafficMonth(m.period)}
+                          </span>
+                          <span className="shrink-0 text-slate-500">
+                            {formatNumber(m.total)}
+                          </span>
+                        </div>
+                        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full bg-emerald-600 transition-all"
+                            style={{ width }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <Pagination
+                  currentPage={monthlyPerformancePage}
+                  totalPages={totalMonthlyPerformancePages}
+                  onPageChange={setMonthlyPerformancePage}
+                />
+              </>
+            )}
+          </Card>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-2">
+          <Card>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">{t("admin.daily_breakdown")}</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("admin.daily_breakdown_subtitle")}
+                </p>
+              </div>
+
+              {recentDailyStats.length > 0 && (
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {recentDailyStats.length} {t("admin.records")}
+                </span>
+              )}
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead>
+                  <tr className="text-left">
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.date")}</th>
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.visits")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {paginatedDailyBreakdown.length ? (
+                    paginatedDailyBreakdown.map((d) => (
+                      <tr key={d.period}>
+                        <td className="px-4 py-3 text-sm text-slate-700">
+                          {formatTrafficDate(d.period)}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-semibold text-slate-900">
+                          {formatNumber(d.total)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
+                        {t("admin.no_daily_available")}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <Pagination
+              currentPage={dailyBreakdownPage}
+              totalPages={totalDailyBreakdownPages}
+              onPageChange={setDailyBreakdownPage}
+            />
+          </Card>
+
+          <Card>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">{t("admin.monthly_breakdown")}</h3>
+              <p className="mt-1 text-sm text-slate-500">{t("admin.monthly_breakdown_subtitle")}</p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead>
+                  <tr className="text-left">
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.month")}</th>
+                    <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.visits")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {monthlyStats.length ? (
+                    [...monthlyStats].reverse().map((m) => (
+                      <tr key={m.period}>
+                        <td className="px-4 py-3 text-sm text-slate-700">
+                          {formatTrafficMonth(m.period)}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-semibold text-slate-900">
+                          {formatNumber(m.total)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
+                        {t("admin.no_monthly_available")}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      </div>
+    )}
+  </>
+)}
+
+{activeTab === "partners" && (
+  <>
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-slate-900">{t("admin.partner_registration_title")}</h2>
+      <p className="mt-1 text-sm text-slate-600">{t("admin.partner_registration_description")}</p>
+    </div>
+
+    <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+      <Card>
+        <h3 className="mb-4 text-lg font-semibold text-slate-900">
+          {editingPartnerId ? t("admin.edit_partner") : t("admin.add_new_partner")}
+        </h3>
+
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.partner_name")}
+            </label>
+            <input
+              type="text"
+              value={partnerName}
+              onChange={(e) => setPartnerName(e.target.value)}
+              placeholder={t("admin.partner_name_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">{t("admin.website")}</label>
+            <input
+              type="url"
+              value={partnerWebsite}
+              onChange={(e) => setPartnerWebsite(e.target.value)}
+              placeholder={t("admin.website_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.description")}
+            </label>
+            <textarea
+              value={partnerDescription}
+              onChange={(e) => setPartnerDescription(e.target.value)}
+              placeholder={t("admin.description_placeholder")}
+              className="min-h-28 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.logo")} {editingPartnerId ? t("admin.logo_optional") : ""}
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPartnerLogo(e.target.files?.[0] || null)}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <input
+              type="checkbox"
+              checked={partnerIsActive}
+              onChange={(e) => setPartnerIsActive(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <span className="text-sm text-slate-700">{t("admin.active")}</span>
+          </label>
+
+          {partnerError && <p className="text-sm text-red-600">{partnerError}</p>}
+          {partnerSuccess && <p className="text-sm text-green-700">{partnerSuccess}</p>}
+
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={submitPartner}
+              disabled={
+                createPartnerMutation.isPending ||
+                updatePartnerMutation.isPending ||
+                togglePartnerStatusMutation.isPending
+              }
+            >
+              {createPartnerMutation.isPending || updatePartnerMutation.isPending
+                ? t("admin.saving")
+                : editingPartnerId
+                ? t("admin.update_partner")
+                : t("admin.save_partner")}
+            </Button>
+
+            {editingPartnerId && (
+              <button
+                type="button"
+                onClick={resetPartnerForm}
+                className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                {t("admin.cancel_edit")}
+              </button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">{t("admin.registered_partners")}</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              {t("admin.partners_subtitle")}
+            </p>
+          </div>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+            {partnersData.length} {t("admin.total")}
+          </span>
+        </div>
+
+        {isLoadingPartners ? (
+          <p className="text-slate-600">{t("admin.loading_partners")}</p>
+        ) : partnersData.length === 0 ? (
+          <div className="py-10 text-center">
+            <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_partners_found")}</h3>
+            <p className="mt-2 text-slate-600">{t("admin.register_first_partner")}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {partnersData.map((partner) => (
+              <div
+                key={partner.id}
+                className={`rounded-2xl border p-4 transition ${
+                  partner.is_active
+                    ? "border-slate-200 bg-slate-50"
+                    : "border-red-200 bg-red-50/40"
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    {partner.logo ? (
+                      <img
+                        src={partner.logo}
+                        alt={partner.name}
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <span className="text-xs text-slate-400">{t("admin.no_logo")}</span>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-base font-semibold text-slate-900">{partner.name}</h4>
+
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          partner.is_active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {partner.is_active ? t("admin.active") : t("admin.inactive")}
+                      </span>
+                    </div>
+
+                    {partner.description && (
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        {partner.description}
+                      </p>
+                    )}
+
+                    {partner.website && (
+                      <a
+                        href={partner.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-block break-all text-sm font-medium text-blue-600 hover:underline"
+                      >
+                        {partner.website}
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="shrink-0">
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEditPartner(partner)}
+                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                      >
+                        {t("admin.edit")}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleTogglePartnerStatus(partner)}
+                        disabled={togglePartnerStatusMutation.isPending}
+                        className={`rounded-xl px-4 py-2 text-sm font-medium text-white transition ${
+                          partner.is_active
+                            ? "bg-red-600 hover:bg-red-700"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
+                      >
+                        {partner.is_active ? t("admin.deactivate") : t("admin.activate")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    </div>
+  </>
+)}
+
+{activeTab === "video_banners" && (
+  <>
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-slate-900">{t("admin.video_banners_title")}</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        {t("admin.video_banners_description")}
+      </p>
+    </div>
+
+    <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+      <Card>
+        <h3 className="mb-4 text-lg font-semibold text-slate-900">
+          {editingBannerId ? t("admin.edit_video_banner") : t("admin.add_video_banner")}
+        </h3>
+
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.banner_title")}
+            </label>
+            <input
+              type="text"
+              value={bannerTitle}
+              onChange={(e) => setBannerTitle(e.target.value)}
+              placeholder={t("admin.banner_title_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.target_link")}
+            </label>
+            <input
+              type="url"
+              value={bannerTargetUrl}
+              onChange={(e) => setBannerTargetUrl(e.target.value)}
+              placeholder={t("admin.target_link_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.video_file")} {editingBannerId ? t("admin.video_file_optional") : ""}
+            </label>
+            <input
+              type="file"
+              accept="video/mp4,video/webm,video/ogg"
+              onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <input
+              type="checkbox"
+              checked={bannerIsActive}
+              onChange={(e) => setBannerIsActive(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <span className="text-sm text-slate-700">{t("admin.active")}</span>
+          </label>
+
+          {bannerError && <p className="text-sm text-red-600">{bannerError}</p>}
+          {bannerSuccess && <p className="text-sm text-green-700">{bannerSuccess}</p>}
+
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={submitBanner}
+              disabled={
+                createPromoBannerMutation.isPending ||
+                updatePromoBannerMutation.isPending ||
+                togglePromoBannerStatusMutation.isPending
+              }
+            >
+              {createPromoBannerMutation.isPending || updatePromoBannerMutation.isPending
+                ? t("admin.saving")
+                : editingBannerId
+                ? t("admin.update_banner")
+                : t("admin.save_banner")}
+            </Button>
+
+            {editingBannerId && (
+              <button
+                type="button"
+                onClick={resetBannerForm}
+                className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                {t("admin.cancel_edit")}
+              </button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">{t("admin.uploaded_banners")}</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              {t("admin.banners_subtitle")}
+            </p>
+          </div>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+            {promoBannersData.length} {t("admin.total")}
+          </span>
+        </div>
+
+        {isLoadingPromoBanners ? (
+          <p className="text-slate-600">{t("admin.loading_banners")}</p>
+        ) : promoBannersData.length === 0 ? (
+          <div className="py-10 text-center">
+            <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_banners_found")}</h3>
+            <p className="mt-2 text-slate-600">{t("admin.upload_first_banner")}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {promoBannersData.map((banner) => (
+              <div
+                key={banner.id}
+                className={`rounded-2xl border p-4 transition ${
+                  banner.is_active
+                    ? "border-slate-200 bg-slate-50"
+                    : "border-red-200 bg-red-50/40"
+                }`}
+              >
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="flex min-w-0 flex-1 gap-4">
+                    <div className="h-24 w-40 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                      <video
+                        src={banner.file_url}
+                        className="h-full w-full object-cover"
+                        muted
+                        controls
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h4 className="text-base font-semibold text-slate-900">
+                          {banner.title || t("admin.untitled_banner")}
+                        </h4>
+
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            banner.is_active
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {banner.is_active ? t("admin.active") : t("admin.inactive")}
+                        </span>
+                      </div>
+
+                      {banner.target_url && (
+                        <a
+                          href={banner.target_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-block break-all text-sm font-medium text-blue-600 hover:underline"
+                        >
+                          {banner.target_url}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="shrink-0">
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEditBanner(banner)}
+                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                      >
+                        {t("admin.edit")}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => togglePromoBannerStatusMutation.mutate(banner)}
+                        disabled={togglePromoBannerStatusMutation.isPending}
+                        className={`rounded-xl px-4 py-2 text-sm font-medium text-white transition ${
+                          banner.is_active
+                            ? "bg-red-600 hover:bg-red-700"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
+                      >
+                        {banner.is_active ? t("admin.deactivate") : t("admin.activate")}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => deletePromoBannerMutation.mutate(banner.id)}
+                        disabled={deletePromoBannerMutation.isPending}
+                        className="rounded-xl bg-slate-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
+                      >
+                        {t("admin.delete")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    </div>
+  </>
+)}
+
+{activeTab === "admin_users" && (
+  <>
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-slate-900">{t("admin.admin_users_title")}</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        {t("admin.admin_users_description")}
+      </p>
+    </div>
+
+    <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+      <Card>
+        <h3 className="mb-4 text-lg font-semibold text-slate-900">
+          {editingAdminUserId ? t("admin.edit_admin_user") : t("admin.create_admin_user")}
+        </h3>
+
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.username")}
+            </label>
+            <input
+              type="text"
+              value={adminUsername}
+              onChange={(e) => setAdminUsername(e.target.value)}
+              placeholder={t("admin.username_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">{t("admin.email")}</label>
+            <input
+              type="email"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              placeholder={t("admin.email_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
+                {t("admin.first_name")}
+              </label>
+              <input
+                type="text"
+                value={adminFirstName}
+                onChange={(e) => setAdminFirstName(e.target.value)}
+                placeholder={t("admin.first_name_placeholder")}
+                className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
+                {t("admin.last_name")}
+              </label>
+              <input
+                type="text"
+                value={adminLastName}
+                onChange={(e) => setAdminLastName(e.target.value)}
+                placeholder={t("admin.last_name_placeholder")}
+                className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.password")} {editingAdminUserId ? t("admin.password_keep") : ""}
+            </label>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder={t("admin.password_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              {t("admin.confirm_password")}
+            </label>
+            <input
+              type="password"
+              value={adminConfirmPassword}
+              onChange={(e) => setAdminConfirmPassword(e.target.value)}
+              placeholder={t("admin.confirm_password_placeholder")}
+              className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+            />
+          </div>
+
+          <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <input
+              type="checkbox"
+              checked={adminIsActive}
+              onChange={(e) => setAdminIsActive(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <span className="text-sm text-slate-700">{t("admin.active")}</span>
+          </label>
+
+          <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <input
+              type="checkbox"
+              checked={adminIsSuperuser}
+              onChange={(e) => setAdminIsSuperuser(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <span className="text-sm text-slate-700">{t("admin.superuser")}</span>
+          </label>
+
+          {adminError && <p className="text-sm text-red-600">{adminError}</p>}
+          {adminSuccess && <p className="text-sm text-green-700">{adminSuccess}</p>}
+
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={submitAdminUser}
+              disabled={
+                createAdminUserMutation.isPending ||
+                updateAdminUserMutation.isPending ||
+                toggleAdminUserStatusMutation.isPending
+              }
+            >
+              {createAdminUserMutation.isPending || updateAdminUserMutation.isPending
+                ? t("admin.saving")
+                : editingAdminUserId
+                ? t("admin.update_admin")
+                : t("admin.create_admin")}
+            </Button>
+
+            <button
+              type="button"
+              onClick={resetAdminForm}
+              className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            >
+              {editingAdminUserId ? t("admin.cancel_edit") : t("admin.reset")}
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">{t("admin.existing_admins")}</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              {t("admin.existing_admins_subtitle")}
+            </p>
+          </div>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+            {adminUsersData.length} {t("admin.total")}
+          </span>
+        </div>
+
+        {isLoadingAdminUsers ? (
+          <p className="text-slate-600">{t("admin.loading_admins")}</p>
+        ) : adminUsersData.length === 0 ? (
+          <div className="py-10 text-center">
+            <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_admins_found")}</h3>
+            <p className="mt-2 text-slate-600">{t("admin.create_first_admin")}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {adminUsersData.map((user) => (
+              <div
+                key={user.id}
+                className={`rounded-2xl border p-4 ${
+                  user.is_active
+                    ? "border-slate-200 bg-slate-50"
+                    : "border-red-200 bg-red-50/40"
+                }`}
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h4 className="text-base font-semibold text-slate-900">
+                      {user.first_name || user.last_name
+                        ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
+                        : user.username}
+                    </h4>
+                    <p className="text-sm text-slate-600">@{user.username}</p>
+                    <p className="text-sm text-slate-600">{user.email}</p>
+                  </div>
+
+                  <div className="flex flex-col gap-2 sm:items-end">
+                    <div className="flex flex-wrap gap-2">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          user.is_active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {user.is_active ? t("admin.active") : t("admin.inactive")}
+                      </span>
+
+                      <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                        {user.is_superuser ? t("admin.superuser") : t("admin.staff_admin")}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEditAdminUser(user)}
+                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                      >
+                        {t("admin.edit")}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => toggleAdminUserStatusMutation.mutate(user)}
+                        disabled={toggleAdminUserStatusMutation.isPending}
+                        className={`rounded-xl px-4 py-2 text-sm font-medium text-white transition ${
+                          user.is_active
+                            ? "bg-red-600 hover:bg-red-700"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
+                      >
+                        {user.is_active ? t("admin.disable") : t("admin.enable")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    </div>
+  </>
+)}
+
+{activeTab === "non_admin_users" && (
+  <>
+    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <h2 className="text-2xl font-semibold text-slate-900">{t("admin.non_admin_users_title")}</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          {t("admin.non_admin_users_description")}
+        </p>
+      </div>
+
+      <div className="w-full max-w-md">
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          {t("admin.search_users")}
+        </label>
+        <input
+          type="text"
+          value={nonAdminSearch}
+          onChange={(e) => handleSearchNonAdminUsers(e.target.value)}
+          placeholder={t("admin.search_placeholder")}
+          className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+        />
+      </div>
+    </div>
+
+    <Card>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">{t("admin.registered_users")}</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            {t("admin.registered_users_subtitle")}
+          </p>
+        </div>
+
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+          {filteredNonAdminUsers.length} {t("admin.total")}
+        </span>
+      </div>
+
+      {nonAdminUserError && <p className="mb-4 text-sm text-red-600">{nonAdminUserError}</p>}
+      {nonAdminUserSuccess && <p className="mb-4 text-sm text-green-700">{nonAdminUserSuccess}</p>}
+
+      {isLoadingNonAdminUsers ? (
+        <p className="text-slate-600">{t("admin.loading_users")}</p>
+      ) : filteredNonAdminUsers.length === 0 ? (
+        <div className="py-10 text-center">
+          <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_users_found")}</h3>
+          <p className="mt-2 text-slate-600">
+            {t("admin.no_matching_users")}
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-4">
+            {paginatedNonAdminUsers.map((user) => (
+              <div
+                key={user.id}
+                className={`rounded-2xl border p-4 ${
+                  user.is_active
+                    ? "border-slate-200 bg-slate-50"
+                    : "border-red-200 bg-red-50/40"
+                }`}
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <h4 className="text-base font-semibold text-slate-900">
+                      {getDisplayName(user)}
+                    </h4>
+                    <p className="text-sm text-slate-600">@{user.username}</p>
+                    <p className="text-sm text-slate-600">{user.email}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t("admin.joined")}: {formatDate(user.date_joined)}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-2 lg:items-end">
+                    <div className="flex flex-wrap gap-2">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          user.is_active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {user.is_active ? t("admin.active") : t("admin.inactive")}
+                      </span>
+
+                      <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                        {t("admin.regular_user")}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNonAdminUserError("");
+                        setNonAdminUserSuccess("");
+                        toggleNonAdminUserStatusMutation.mutate(user);
+                      }}
+                      disabled={toggleNonAdminUserStatusMutation.isPending}
+                      className={`rounded-xl px-4 py-2 text-sm font-medium text-white transition ${
+                        user.is_active
+                          ? "bg-red-600 hover:bg-red-700"
+                          : "bg-green-600 hover:bg-green-700"
+                      }`}
+                    >
+                      {user.is_active ? t("admin.deactivate") : t("admin.activate")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={nonAdminPage}
+            totalPages={totalNonAdminPages}
+            onPageChange={handleChangeNonAdminPage}
+          />
+        </>
+      )}
+    </Card>
+  </>
+)}
+</div>
+</PageContainer>
+
+{isCategoryModalOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+    <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-xl font-semibold text-slate-900">
+            {editingCategoryId ? t("admin.category_modal.edit_category") : t("admin.category_modal.add_category")}
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            {editingCategoryId
+              ? t("admin.category_modal.edit_description")
+              : t("admin.category_modal.add_description")}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={resetCategoryForm}
+          className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        >
+          {t("admin.category_modal.close")}
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            {t("admin.category_modal.category_name")}
+          </label>
+          <input
+            type="text"
+            value={newCategoryName}
+            onChange={(e) => {
+              const value = e.target.value;
+              setNewCategoryName(value);
+              setNewCategorySlug((current) =>
+                editingCategoryId && current ? current : slugify(value)
+              );
+            }}
+            placeholder={t("admin.category_modal.category_name_placeholder")}
+            className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">{t("admin.category_modal.slug")}</label>
+          <input
+            type="text"
+            value={newCategorySlug}
+            onChange={(e) => setNewCategorySlug(slugify(e.target.value))}
+            placeholder={t("admin.category_modal.slug_placeholder")}
+            className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            {t("admin.category_modal.parent_category")}
+          </label>
+          <select
+            value={newCategoryParent}
+            onChange={(e) => setNewCategoryParent(e.target.value)}
+            className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+          >
+            <option value="">{t("admin.category_modal.none_main")}</option>
+            {parentCategories
+              .filter((cat) => String(cat.id) !== String(editingCategoryId))
+              .map((category) => (
+                <option key={category.id} value={String(category.id)}>
+                  {category.name}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {categoryError && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {categoryError}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-3 pt-2">
+          <Button
+            onClick={submitCategory}
+            disabled={
+              createCategoryMutation.isPending ||
+              updateCategoryMutation.isPending ||
+              deleteCategoryMutation.isPending
+            }
+          >
+            {createCategoryMutation.isPending || updateCategoryMutation.isPending
+              ? t("admin.saving")
+              : editingCategoryId
+              ? t("admin.category_modal.update_category")
+              : t("admin.category_modal.create_category")}
+          </Button>
+
+          <button
+            type="button"
+            onClick={resetCategoryForm}
+            className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          >
+            {t("admin.category_modal.cancel")}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* 
+
           {activeTab === "categories" && (
             <>
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -2645,4 +4021,4 @@ export default function AdminModerationPage() {
       )}
     </div>
   );
-}
+} */}

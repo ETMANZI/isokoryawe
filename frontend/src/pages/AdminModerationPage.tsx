@@ -1289,7 +1289,7 @@ export default function AdminModerationPage() {
 
                 <Button onClick={openCategoryModal} className="inline-flex items-center gap-2">
                   <Plus size={16} />
-                  Add New Category
+                  {t("admin.add_new_category")}
                 </Button>
               </div>
 
@@ -1306,12 +1306,12 @@ export default function AdminModerationPage() {
               )}
 
               {isLoadingCategories ? (
-                <p className="text-slate-600">Loading categories...</p>
+                <p className="text-slate-600">{t("admin.loading")}</p>
               ) : sortedCategories.length === 0 ? (
                 <Card>
                   <div className="py-10 text-center">
-                    <h3 className="text-xl font-semibold text-slate-900">No categories found</h3>
-                    <p className="mt-2 text-slate-600">Start by adding your first category.</p>
+                    <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_categories_found")}</h3>
+                    <p className="mt-2 text-slate-600">{t("admin.add_first_category")}</p>
                   </div>
                 </Card>
               ) : (
@@ -1320,7 +1320,7 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-sm font-medium text-slate-500">Total Categories</p>
+                          <p className="text-sm font-medium text-slate-500">{t("admin.total_categories")}</p>
                           <p className="mt-2 text-3xl font-bold text-slate-900">
                             {formatNumber(categorySummary.total)}
                           </p>
@@ -1334,7 +1334,7 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-sm font-medium text-slate-500">Main Categories</p>
+                          <p className="text-sm font-medium text-slate-500">{t("admin.main_categories")}</p>
                           <p className="mt-2 text-3xl font-bold text-slate-900">
                             {formatNumber(categorySummary.main)}
                           </p>
@@ -1348,7 +1348,7 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-sm font-medium text-slate-500">Subcategories</p>
+                          <p className="text-sm font-medium text-slate-500">{t("admin.subcategories")}</p>
                           <p className="mt-2 text-3xl font-bold text-slate-900">
                             {formatNumber(categorySummary.sub)}
                           </p>
@@ -1364,9 +1364,9 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="mb-4 flex items-center justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">Main Categories</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{t("admin.main_categories_title")}</h3>
                           <p className="mt-1 text-sm text-slate-500">
-                            Top-level categories available on the platform.
+                            {t("admin.main_categories_subtitle")}
                           </p>
                         </div>
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
@@ -1386,10 +1386,10 @@ export default function AdminModerationPage() {
                                   {category.name}
                                 </h4>
                                 <p className="mt-1 break-all text-sm text-slate-500">
-                                  Slug: {category.slug}
+                                  {t("admin.slug_label")} {category.slug}
                                 </p>
                                 <p className="mt-1 text-xs text-slate-500">
-                                  Children:{" "}
+                                  {t("admin.children_label")} {" "}
                                   {
                                     childCategories.filter(
                                       (child) => String(child.parent) === String(category.id)
@@ -1405,7 +1405,7 @@ export default function AdminModerationPage() {
                                   className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
                                 >
                                   <Edit3 size={15} />
-                                  Edit
+                                  {t("admin.edit")}
                                 </button>
 
                                 <button
@@ -1415,7 +1415,7 @@ export default function AdminModerationPage() {
                                   className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
                                 >
                                   <Trash2 size={15} />
-                                  Delete
+                                  {t("admin.delete")}
                                 </button>
                               </div>
                             </div>
@@ -1427,13 +1427,13 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="mb-4 flex items-center justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">All Categories</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{t("admin.all_categories_title")}</h3>
                           <p className="mt-1 text-sm text-slate-500">
-                            Full category structure with parent mapping.
+                            {t("admin.all_categories_subtitle")}
                           </p>
                         </div>
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                          {sortedCategories.length} total
+                          {sortedCategories.length} {t("admin.total")}
                         </span>
                       </div>
 
@@ -1441,11 +1441,11 @@ export default function AdminModerationPage() {
                         <table className="min-w-full divide-y divide-slate-200">
                           <thead>
                             <tr className="bg-slate-50 text-left">
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Name</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Slug</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Type</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Parent</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Actions</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.name")}</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.slug")}</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.type")}</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.parent")}</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.actions")}</th>
                             </tr>
                           </thead>
 
@@ -1464,7 +1464,7 @@ export default function AdminModerationPage() {
                                         : "bg-blue-100 text-blue-700"
                                     }`}
                                   >
-                                    {category.parent ? "Subcategory" : "Main"}
+                                    {category.parent ? t("admin.subcategory") : t("admin.main")}
                                   </span>
                                 </td>
                                 <td className="px-4 py-4 text-sm text-slate-600">
@@ -1477,7 +1477,7 @@ export default function AdminModerationPage() {
                                       onClick={() => handleEditCategory(category)}
                                       className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                                     >
-                                      Edit
+                                      {t("admin.edit")}
                                     </button>
                                     <button
                                       type="button"
@@ -1485,7 +1485,7 @@ export default function AdminModerationPage() {
                                       disabled={deleteCategoryMutation.isPending}
                                       className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-60"
                                     >
-                                      Delete
+                                      {t("admin.delete")}
                                     </button>
                                   </div>
                                 </td>
@@ -1504,40 +1504,40 @@ export default function AdminModerationPage() {
           {activeTab === "visitor_stats" && (
             <>
               <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Visitor Statistics</h2>
+                <h2 className="text-2xl font-semibold text-slate-900">{t("admin.visitor_stats_title")}</h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  Clean overview of traffic performance with daily and monthly trends.
+                  {t("admin.visitor_stats_description")}
                 </p>
               </div>
 
               {isLoadingStats ? (
-                <p className="text-slate-600">Loading statistics...</p>
+                <p className="text-slate-600">{t("admin.loading_stats")}</p>
               ) : (
                 <div className="space-y-6">
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <StatMiniCard
-                      title="Total Visits"
+                      title={t("admin.total_visits")}
                       value={visitorStats?.total_visits || 0}
                       icon={<Activity className="h-5 w-5" />}
-                      subtitle="All recorded visits"
+                      subtitle={t("admin.all_recorded_visits")}
                     />
                     <StatMiniCard
-                      title="Unique Visitors"
+                      title={t("admin.unique_visitors")}
                       value={visitorStats?.unique_visitors || 0}
                       icon={<Users className="h-5 w-5" />}
-                      subtitle="Distinct visitors"
+                      subtitle={t("admin.distinct_visitors")}
                     />
                     <StatMiniCard
-                      title="Today's Visits"
+                      title={t("admin.todays_visits")}
                       value={visitorStats?.today_visits || 0}
                       icon={<CalendarDays className="h-5 w-5" />}
-                      subtitle="Visits recorded today"
+                      subtitle={t("admin.visits_today")}
                     />
                     <StatMiniCard
-                      title="This Month"
+                      title={t("admin.this_month")}
                       value={visitorStats?.this_month_visits || 0}
                       icon={<BarChart3 className="h-5 w-5" />}
-                      subtitle="Current month visits"
+                      subtitle={t("admin.current_month_visits")}
                     />
                   </div>
 
@@ -1545,21 +1545,21 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">Recent Daily Traffic</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{t("admin.recent_daily_traffic")}</h3>
                           <p className="mt-1 text-sm text-slate-500">
-                            Recent daily records shown in smaller pages
+                            {t("admin.recent_daily_subtitle")}
                           </p>
                         </div>
 
                         {totalRecentDailyPages > 1 && (
                           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                            Page {recentDailyPage} of {totalRecentDailyPages}
+                            {t("admin.page")} {recentDailyPage} {t("admin.of")} {totalRecentDailyPages}
                           </span>
                         )}
                       </div>
 
                       {paginatedRecentDaily.length === 0 ? (
-                        <div className="py-8 text-center text-slate-500">No daily traffic data found.</div>
+                        <div className="py-8 text-center text-slate-500">{t("admin.no_daily_data")}</div>
                       ) : (
                         <>
                           <div className="space-y-3">
@@ -1600,21 +1600,21 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">Monthly Performance</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{t("admin.monthly_performance")}</h3>
                           <p className="mt-1 text-sm text-slate-500">
-                            Monthly records shown in smaller pages
+                           {t("admin.monthly_performance_subtitle")}
                           </p>
                         </div>
 
                         {totalMonthlyPerformancePages > 1 && (
                           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                            Page {monthlyPerformancePage} of {totalMonthlyPerformancePages}
+                            {t("admin.page")} {monthlyPerformancePage} {t("admin.of")} {totalMonthlyPerformancePages}
                           </span>
                         )}
                       </div>
 
                       {paginatedMonthlyPerformance.length === 0 ? (
-                        <div className="py-8 text-center text-slate-500">No monthly traffic data found.</div>
+                        <div className="py-8 text-center text-slate-500">{t("admin.no_monthly_data")}</div>
                       ) : (
                         <>
                           <div className="space-y-3">
@@ -1657,15 +1657,15 @@ export default function AdminModerationPage() {
                     <Card>
                       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">Daily Breakdown</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{t("admin.daily_breakdown")}</h3>
                           <p className="mt-1 text-sm text-slate-500">
-                            Detailed daily traffic table with paging
+                            {t("admin.daily_breakdown_subtitle")}
                           </p>
                         </div>
 
                         {recentDailyStats.length > 0 && (
                           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                            {recentDailyStats.length} records
+                            {recentDailyStats.length} {t("admin.records")}
                           </span>
                         )}
                       </div>
@@ -1674,8 +1674,8 @@ export default function AdminModerationPage() {
                         <table className="min-w-full divide-y divide-slate-200">
                           <thead>
                             <tr className="text-left">
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Date</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visits</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.date")}</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.visits")}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
@@ -1693,7 +1693,7 @@ export default function AdminModerationPage() {
                             ) : (
                               <tr>
                                 <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
-                                  No daily data available.
+                                  {t("admin.no_daily_available")}
                                 </td>
                               </tr>
                             )}
@@ -1710,16 +1710,16 @@ export default function AdminModerationPage() {
 
                     <Card>
                       <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Monthly Breakdown</h3>
-                        <p className="mt-1 text-sm text-slate-500">Detailed monthly traffic table.</p>
+                        <h3 className="text-lg font-semibold text-slate-900">{t("admin.monthly_breakdown")}</h3>
+                        <p className="mt-1 text-sm text-slate-500">{t("admin.monthly_breakdown_subtitle")}</p>
                       </div>
 
                       <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-slate-200">
                           <thead>
                             <tr className="text-left">
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Month</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Visits</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.month")}</th>
+                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">{t("admin.visits")}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
@@ -1737,7 +1737,7 @@ export default function AdminModerationPage() {
                             ) : (
                               <tr>
                                 <td colSpan={2} className="px-4 py-6 text-center text-sm text-slate-500">
-                                  No monthly data available.
+                                  {t("admin.no_monthly_available")}
                                 </td>
                               </tr>
                             )}
@@ -1754,56 +1754,56 @@ export default function AdminModerationPage() {
           {activeTab === "partners" && (
             <>
               <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Partner Registration</h2>
-                <p className="mt-1 text-sm text-slate-600">Register and manage platform partners.</p>
+                <h2 className="text-2xl font-semibold text-slate-900">P{t("admin.partner_registration_title")}</h2>
+                <p className="mt-1 text-sm text-slate-600">{t("admin.partner_registration_description")}</p>
               </div>
 
               <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
                 <Card>
                   <h3 className="mb-4 text-lg font-semibold text-slate-900">
-                    {editingPartnerId ? "Edit Partner" : "Add New Partner"}
+                    {editingPartnerId ? t("admin.edit_partner") : t("admin.add_new_partner")}
                   </h3>
 
                   <div className="space-y-4">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Partner Name
+                        {t("admin.partner_name")}
                       </label>
                       <input
                         type="text"
                         value={partnerName}
                         onChange={(e) => setPartnerName(e.target.value)}
-                        placeholder="e.g. Auto Plaza"
+                        placeholder={t("admin.partner_name_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Website</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("admin.website")}</label>
                       <input
                         type="url"
                         value={partnerWebsite}
                         onChange={(e) => setPartnerWebsite(e.target.value)}
-                        placeholder="https://example.com"
+                        placeholder={t("admin.website_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Description
+                        {t("admin.description")}
                       </label>
                       <textarea
                         value={partnerDescription}
                         onChange={(e) => setPartnerDescription(e.target.value)}
-                        placeholder="Short description"
+                        placeholder={t("admin.description_placeholder")}
                         className="min-h-28 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Logo {editingPartnerId ? "(optional - choose only if changing)" : ""}
+                        {t("admin.logo")} {editingPartnerId ? t("admin.logo_optional") : ""}
                       </label>
                       <input
                         type="file"
@@ -1836,10 +1836,10 @@ export default function AdminModerationPage() {
                         }
                       >
                         {createPartnerMutation.isPending || updatePartnerMutation.isPending
-                          ? "Saving..."
+                          ? t("admin.saving")
                           : editingPartnerId
-                          ? "Update Partner"
-                          : "Save Partner"}
+                          ? t("admin.update_partner")
+                          : t("admin.save_partner")}
                       </Button>
 
                       {editingPartnerId && (
@@ -1848,7 +1848,7 @@ export default function AdminModerationPage() {
                           onClick={resetPartnerForm}
                           className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                         >
-                          Cancel Edit
+                          {t("admin.cancel_edit")}
                         </button>
                       )}
                     </div>
@@ -1858,22 +1858,22 @@ export default function AdminModerationPage() {
                 <Card>
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">Registered Partners</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t("admin.registered_partners")}</h3>
                       <p className="mt-1 text-sm text-slate-500">
-                        Active and inactive partners are listed here.
+                        {t("admin.partners_subtitle")}
                       </p>
                     </div>
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                      {partnersData.length} total
+                      {partnersData.length} {t("admin.total")}
                     </span>
                   </div>
 
                   {isLoadingPartners ? (
-                    <p className="text-slate-600">Loading partners...</p>
+                    <p className="text-slate-600">{t("admin.loading_partners")}</p>
                   ) : partnersData.length === 0 ? (
                     <div className="py-10 text-center">
-                      <h3 className="text-xl font-semibold text-slate-900">No partners found</h3>
-                      <p className="mt-2 text-slate-600">Start by registering your first partner.</p>
+                      <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_partners_found")}</h3>
+                      <p className="mt-2 text-slate-600">{t("admin.register_first_partner")}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -1895,7 +1895,7 @@ export default function AdminModerationPage() {
                                   className="h-full w-full object-contain"
                                 />
                               ) : (
-                                <span className="text-xs text-slate-400">No Logo</span>
+                                <span className="text-xs text-slate-400">{t("admin.no_logo")}</span>
                               )}
                             </div>
 
@@ -1910,7 +1910,7 @@ export default function AdminModerationPage() {
                                       : "bg-red-100 text-red-700"
                                   }`}
                                 >
-                                  {partner.is_active ? "Active" : "Inactive"}
+                                  {partner.is_active ? t("admin.active") : t("admin.inactive")}
                                 </span>
                               </div>
 
@@ -1939,7 +1939,7 @@ export default function AdminModerationPage() {
                                   onClick={() => handleEditPartner(partner)}
                                   className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
                                 >
-                                  Edit
+                                  {t("admin.edit")}
                                 </button>
 
                                 <button
@@ -1952,7 +1952,7 @@ export default function AdminModerationPage() {
                                       : "bg-green-600 hover:bg-green-700"
                                   }`}
                                 >
-                                  {partner.is_active ? "Deactivate" : "Activate"}
+                                  {partner.is_active ? t("admin.deactivate") : t("admin.activate")}
                                 </button>
                               </div>
                             </div>
@@ -1969,48 +1969,48 @@ export default function AdminModerationPage() {
           {activeTab === "video_banners" && (
             <>
               <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Video Banners</h2>
+                <h2 className="text-2xl font-semibold text-slate-900">{t("admin.video_banners_title")}</h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  Upload and manage promo banner videos for the listings page.
+                  {t("admin.video_banners_description")}
                 </p>
               </div>
 
               <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
                 <Card>
                   <h3 className="mb-4 text-lg font-semibold text-slate-900">
-                    {editingBannerId ? "Edit Video Banner" : "Add Video Banner"}
+                    {editingBannerId ? t("admin.edit_video_banner") : t("admin.add_video_banner")}
                   </h3>
 
                   <div className="space-y-4">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Banner Title
+                        {t("admin.banner_title")}
                       </label>
                       <input
                         type="text"
                         value={bannerTitle}
                         onChange={(e) => setBannerTitle(e.target.value)}
-                        placeholder="e.g. Visit Company Website"
+                        placeholder={t("admin.banner_title_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Target Link
+                        {t("admin.target_link")}
                       </label>
                       <input
                         type="url"
                         value={bannerTargetUrl}
                         onChange={(e) => setBannerTargetUrl(e.target.value)}
-                        placeholder="https://company.com"
+                        placeholder={t("admin.target_link_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Video File {editingBannerId ? "(optional - choose only if changing)" : ""}
+                        {t("admin.video_file")} {editingBannerId ? t("admin.video_file_optional") : ""}
                       </label>
                       <input
                         type="file"
@@ -2027,7 +2027,7 @@ export default function AdminModerationPage() {
                         onChange={(e) => setBannerIsActive(e.target.checked)}
                         className="h-4 w-4"
                       />
-                      <span className="text-sm text-slate-700">Active</span>
+                      <span className="text-sm text-slate-700">{t("admin.active")}</span>
                     </label>
 
                     {bannerError && <p className="text-sm text-red-600">{bannerError}</p>}
@@ -2043,10 +2043,10 @@ export default function AdminModerationPage() {
                         }
                       >
                         {createPromoBannerMutation.isPending || updatePromoBannerMutation.isPending
-                          ? "Saving..."
+                          ? t("admin.saving")
                           : editingBannerId
-                          ? "Update Video Banner"
-                          : "Save Video Banner"}
+                          ? t("admin.update_banner")
+                          : t("admin.save_banner")}
                       </Button>
 
                       {editingBannerId && (
@@ -2055,7 +2055,7 @@ export default function AdminModerationPage() {
                           onClick={resetBannerForm}
                           className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                         >
-                          Cancel Edit
+                          {t("admin.cancel_edit")}
                         </button>
                       )}
                     </div>
@@ -2065,22 +2065,22 @@ export default function AdminModerationPage() {
                 <Card>
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">Uploaded Video Banners</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t("admin.uploaded_banners")}</h3>
                       <p className="mt-1 text-sm text-slate-500">
-                        Active banners display automatically on the listings page.
+                        {t("admin.banners_subtitle")}
                       </p>
                     </div>
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                      {promoBannersData.length} total
+                      {promoBannersData.length} {t("admin.total")}
                     </span>
                   </div>
 
                   {isLoadingPromoBanners ? (
-                    <p className="text-slate-600">Loading video banners...</p>
+                    <p className="text-slate-600">{t("admin.loading_banners")}</p>
                   ) : promoBannersData.length === 0 ? (
                     <div className="py-10 text-center">
-                      <h3 className="text-xl font-semibold text-slate-900">No video banners found</h3>
-                      <p className="mt-2 text-slate-600">Upload your first banner video.</p>
+                      <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_banners_found")}</h3>
+                      <p className="mt-2 text-slate-600">{t("admin.upload_first_banner")}.</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -2107,7 +2107,7 @@ export default function AdminModerationPage() {
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <h4 className="text-base font-semibold text-slate-900">
-                                    {banner.title || "Untitled Banner"}
+                                    {banner.title || t("admin.untitled_banner")}
                                   </h4>
 
                                   <span
@@ -2117,7 +2117,7 @@ export default function AdminModerationPage() {
                                         : "bg-red-100 text-red-700"
                                     }`}
                                   >
-                                    {banner.is_active ? "Active" : "Inactive"}
+                                    {banner.is_active ? t("admin.active"): t("admin.inactive")}
                                   </span>
                                 </div>
 
@@ -2141,7 +2141,7 @@ export default function AdminModerationPage() {
                                   onClick={() => handleEditBanner(banner)}
                                   className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
                                 >
-                                  Edit
+                                  {t("admin.edit")}
                                 </button>
 
                                 <button
@@ -2154,7 +2154,7 @@ export default function AdminModerationPage() {
                                       : "bg-green-600 hover:bg-green-700"
                                   }`}
                                 >
-                                  {banner.is_active ? "Deactivate" : "Activate"}
+                                  {banner.is_active ? t("admin.deactivate") : t("admin.activate")}
                                 </button>
 
                                 <button
@@ -2163,7 +2163,7 @@ export default function AdminModerationPage() {
                                   disabled={deletePromoBannerMutation.isPending}
                                   className="rounded-xl bg-slate-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
                                 >
-                                  Delete
+                                  {t("admin.delete")}
                                 </button>
                               </div>
                             </div>
@@ -2180,39 +2180,39 @@ export default function AdminModerationPage() {
           {activeTab === "admin_users" && (
             <>
               <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Admin Users</h2>
+                <h2 className="text-2xl font-semibold text-slate-900">{t("admin.admin_users_title")}</h2>
                 <p className="mt-1 text-sm text-slate-600">
-                  Create, edit, enable, and disable admin users.
+                  {t("admin.admin_users_description")}
                 </p>
               </div>
 
               <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
                 <Card>
                   <h3 className="mb-4 text-lg font-semibold text-slate-900">
-                    {editingAdminUserId ? "Edit Admin User" : "Create Admin User"}
+                    {editingAdminUserId ? t("admin.edit_admin_user") : t("admin.create_admin_user")}
                   </h3>
 
                   <div className="space-y-4">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Username
+                        {t("admin.username")}
                       </label>
                       <input
                         type="text"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
-                        placeholder="Enter username"
+                        placeholder={t("admin.username_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">Email</label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">{t("admin.email")}</label>
                       <input
                         type="email"
                         value={adminEmail}
                         onChange={(e) => setAdminEmail(e.target.value)}
-                        placeholder="Enter email"
+                        placeholder={t("admin.email_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
@@ -2220,26 +2220,26 @@ export default function AdminModerationPage() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-2 block text-sm font-medium text-slate-700">
-                          First Name
+                          {t("admin.first_name")}
                         </label>
                         <input
                           type="text"
                           value={adminFirstName}
                           onChange={(e) => setAdminFirstName(e.target.value)}
-                          placeholder="First name"
+                          placeholder={t("admin.first_name_placeholder")}
                           className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         />
                       </div>
 
                       <div>
                         <label className="mb-2 block text-sm font-medium text-slate-700">
-                          Last Name
+                          {t("admin.last_name")}
                         </label>
                         <input
                           type="text"
                           value={adminLastName}
                           onChange={(e) => setAdminLastName(e.target.value)}
-                          placeholder="Last name"
+                          placeholder={t("admin.last_name_placeholder")}
                           className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                         />
                       </div>
@@ -2247,26 +2247,26 @@ export default function AdminModerationPage() {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Password {editingAdminUserId ? "(leave blank to keep current password)" : ""}
+                        {t("admin.password")} {editingAdminUserId ? t("admin.password_keep") : ""}
                       </label>
                       <input
                         type="password"
                         value={adminPassword}
                         onChange={(e) => setAdminPassword(e.target.value)}
-                        placeholder="Enter password"
+                        placeholder={t("admin.password_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Confirm Password
+                        {t("admin.confirm_password")}
                       </label>
                       <input
                         type="password"
                         value={adminConfirmPassword}
                         onChange={(e) => setAdminConfirmPassword(e.target.value)}
-                        placeholder="Confirm password"
+                        placeholder={t("admin.confirm_password_placeholder")}
                         className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                       />
                     </div>
@@ -2278,7 +2278,7 @@ export default function AdminModerationPage() {
                         onChange={(e) => setAdminIsActive(e.target.checked)}
                         className="h-4 w-4"
                       />
-                      <span className="text-sm text-slate-700">Active</span>
+                      <span className="text-sm text-slate-700">{t("admin.active")}</span>
                     </label>
 
                     <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -2288,7 +2288,7 @@ export default function AdminModerationPage() {
                         onChange={(e) => setAdminIsSuperuser(e.target.checked)}
                         className="h-4 w-4"
                       />
-                      <span className="text-sm text-slate-700">Superuser</span>
+                      <span className="text-sm text-slate-700">{t("admin.superuser")}</span>
                     </label>
 
                     {adminError && <p className="text-sm text-red-600">{adminError}</p>}
@@ -2304,10 +2304,10 @@ export default function AdminModerationPage() {
                         }
                       >
                         {createAdminUserMutation.isPending || updateAdminUserMutation.isPending
-                          ? "Saving..."
+                          ? t("admin.saving")
                           : editingAdminUserId
-                          ? "Update Admin User"
-                          : "Create Admin User"}
+                          ? t("admin.update_admin")
+                          : t("admin.create_admin")}
                       </Button>
 
                       <button
@@ -2315,7 +2315,7 @@ export default function AdminModerationPage() {
                         onClick={resetAdminForm}
                         className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                       >
-                        {editingAdminUserId ? "Cancel Edit" : "Reset"}
+                        {editingAdminUserId ? t("admin.cancel_edit") : t("admin.reset")}
                       </button>
                     </div>
                   </div>
@@ -2324,22 +2324,22 @@ export default function AdminModerationPage() {
                 <Card>
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">Existing Admin Users</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t("admin.existing_admins")}</h3>
                       <p className="mt-1 text-sm text-slate-500">
-                        All current admin accounts are listed here.
+                        {t("admin.existing_admins_subtitle")}
                       </p>
                     </div>
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                      {adminUsersData.length} total
+                      {adminUsersData.length} {t("admin.total")}
                     </span>
                   </div>
 
                   {isLoadingAdminUsers ? (
-                    <p className="text-slate-600">Loading admin users...</p>
+                    <p className="text-slate-600">{t("admin.loading_admins")}</p>
                   ) : adminUsersData.length === 0 ? (
                     <div className="py-10 text-center">
-                      <h3 className="text-xl font-semibold text-slate-900">No admin users found</h3>
-                      <p className="mt-2 text-slate-600">Create your first admin user.</p>
+                      <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_admins_found")}</h3>
+                      <p className="mt-2 text-slate-600">{t("admin.create_first_admin")}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -2372,11 +2372,11 @@ export default function AdminModerationPage() {
                                       : "bg-red-100 text-red-700"
                                   }`}
                                 >
-                                  {user.is_active ? "Active" : "Inactive"}
+                                  {user.is_active ? t("admin.active"): t("admin.inactive")}
                                 </span>
 
                                 <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
-                                  {user.is_superuser ? "Superuser" : "Staff Admin"}
+                                  {user.is_superuser ? t("admin.superuser") : t("admin.staff_admin")}
                                 </span>
                               </div>
 
@@ -2386,7 +2386,7 @@ export default function AdminModerationPage() {
                                   onClick={() => handleEditAdminUser(user)}
                                   className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
                                 >
-                                  Edit
+                                  {t("admin.edit")}
                                 </button>
 
                                 <button
@@ -2399,7 +2399,7 @@ export default function AdminModerationPage() {
                                       : "bg-green-600 hover:bg-green-700"
                                   }`}
                                 >
-                                  {user.is_active ? "Disable" : "Enable"}
+                                  {user.is_active ? t("admin.disable"): t("admin.enable")}
                                 </button>
                               </div>
                             </div>
@@ -2417,21 +2417,21 @@ export default function AdminModerationPage() {
             <>
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold text-slate-900">Non-Admin Users</h2>
+                  <h2 className="text-2xl font-semibold text-slate-900">{t("admin.non_admin_users_title")}</h2>
                   <p className="mt-1 text-sm text-slate-600">
-                    View regular users and only activate or deactivate them.
+                    {t("admin.non_admin_users_description")}
                   </p>
                 </div>
 
                 <div className="w-full max-w-md">
                   <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Search users
+                    {t("admin.search_users")}
                   </label>
                   <input
                     type="text"
                     value={nonAdminSearch}
                     onChange={(e) => handleSearchNonAdminUsers(e.target.value)}
-                    placeholder="Search by username, email, or name"
+                    placeholder={t("admin.search_placeholder")}
                     className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                   />
                 </div>
@@ -2440,14 +2440,14 @@ export default function AdminModerationPage() {
               <Card>
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">Registered Non-Admin Users</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">{t("admin.registered_users")}</h3>
                     <p className="mt-1 text-sm text-slate-500">
-                      You can only change user status here.
+                     {t("admin.registered_users_subtitle")}
                     </p>
                   </div>
 
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                    {filteredNonAdminUsers.length} total
+                    {filteredNonAdminUsers.length} {t("admin.total")}
                   </span>
                 </div>
 
@@ -2455,12 +2455,12 @@ export default function AdminModerationPage() {
                 {nonAdminUserSuccess && <p className="mb-4 text-sm text-green-700">{nonAdminUserSuccess}</p>}
 
                 {isLoadingNonAdminUsers ? (
-                  <p className="text-slate-600">Loading non-admin users...</p>
+                  <p className="text-slate-600">{t("admin.loading_users")}</p>
                 ) : filteredNonAdminUsers.length === 0 ? (
                   <div className="py-10 text-center">
-                    <h3 className="text-xl font-semibold text-slate-900">No non-admin users found</h3>
+                    <h3 className="text-xl font-semibold text-slate-900">{t("admin.no_users_found")}</h3>
                     <p className="mt-2 text-slate-600">
-                      There are no matching regular users at the moment.
+                      {t("admin.no_matching_users")}
                     </p>
                   </div>
                 ) : (
@@ -2483,7 +2483,7 @@ export default function AdminModerationPage() {
                               <p className="text-sm text-slate-600">@{user.username}</p>
                               <p className="text-sm text-slate-600">{user.email}</p>
                               <p className="mt-1 text-xs text-slate-500">
-                                Joined: {formatDate(user.date_joined)}
+                                {t("admin.joined")}: {formatDate(user.date_joined)}
                               </p>
                             </div>
 
@@ -2496,11 +2496,11 @@ export default function AdminModerationPage() {
                                       : "bg-red-100 text-red-700"
                                   }`}
                                 >
-                                  {user.is_active ? "Active" : "Inactive"}
+                                  {user.is_active ? t("admin.active") : t("admin.inactive")}
                                 </span>
 
                                 <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                                  Regular User
+                                  {t("admin.regular_user")}
                                 </span>
                               </div>
 
@@ -2518,7 +2518,7 @@ export default function AdminModerationPage() {
                                     : "bg-green-600 hover:bg-green-700"
                                 }`}
                               >
-                                {user.is_active ? "Deactivate" : "Activate"}
+                                {user.is_active ? t("admin.deactivate") : t("admin.activate")}
                               </button>
                             </div>
                           </div>
@@ -2545,12 +2545,12 @@ export default function AdminModerationPage() {
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold text-slate-900">
-                  {editingCategoryId ? "Edit Category" : "Add New Category"}
+                  {editingCategoryId ? t("admin.category_modal.edit_category") : t("admin.category_modal.add_category")}
                 </h3>
                 <p className="mt-1 text-sm text-slate-500">
                   {editingCategoryId
-                    ? "Update the selected category details."
-                    : "Create a new category or subcategory."}
+                    ? t("admin.category_modal.edit_description")
+                    : t("admin.category_modal.add_description")}
                 </p>
               </div>
 
@@ -2559,14 +2559,14 @@ export default function AdminModerationPage() {
                 onClick={resetCategoryForm}
                 className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
               >
-                Close
+                {t("admin.category_modal.close")}
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Category Name
+                  {t("admin.category_modal.category_name")}
                 </label>
                 <input
                   type="text"
@@ -2578,32 +2578,32 @@ export default function AdminModerationPage() {
                       editingCategoryId && current ? current : slugify(value)
                     );
                   }}
-                  placeholder="Enter category name"
+                  placeholder={t("admin.category_modal.category_name_placeholder")}
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Slug</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">{t("admin.category_modal.slug")}</label>
                 <input
                   type="text"
                   value={newCategorySlug}
                   onChange={(e) => setNewCategorySlug(slugify(e.target.value))}
-                  placeholder="category-slug"
+                  placeholder={t("admin.category_modal.slug_placeholder")}
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                 />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Parent Category
+                  {t("admin.category_modal.parent_category")}
                 </label>
                 <select
                   value={newCategoryParent}
                   onChange={(e) => setNewCategoryParent(e.target.value)}
                   className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
                 >
-                  <option value="">None (Main Category)</option>
+                  <option value="">{t("admin.category_modal.none_main")}</option>
                   {parentCategories
                     .filter((cat) => String(cat.id) !== String(editingCategoryId))
                     .map((category) => (
@@ -2630,10 +2630,10 @@ export default function AdminModerationPage() {
                   }
                 >
                   {createCategoryMutation.isPending || updateCategoryMutation.isPending
-                    ? "Saving..."
+                    ? t("admin.saving")
                     : editingCategoryId
-                    ? "Update Category"
-                    : "Create Category"}
+                    ? t("admin.category_modal.update_category")
+                    : t("admin.category_modal.create_category")}
                 </Button>
 
                 <button
@@ -2641,7 +2641,7 @@ export default function AdminModerationPage() {
                   onClick={resetCategoryForm}
                   className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                 >
-                  Cancel
+                  {t("admin.category_modal.cancel")}
                 </button>
               </div>
             </div>

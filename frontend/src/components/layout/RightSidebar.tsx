@@ -89,7 +89,7 @@ export default function RightSidebar() {
                 className="flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 <LayoutDashboard size={16} />
-                {t("sign_in")}
+                {t("sidebar.sign_in")}
               </Link>
             </>
           )}
@@ -108,7 +108,7 @@ export default function RightSidebar() {
               {t("sidebar.promote_listing")}
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              {t("promote_text")}
+              {t("sidebar.promote_text")}
             </p>
           </div>
         </div>

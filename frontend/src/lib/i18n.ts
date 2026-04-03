@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import HttpBackend from 'i18next-http-backend';
 
 const savedLanguage = localStorage.getItem('preferred_language') || 'en';
+const version = '2026-04-03-1'; // change this whenever you update translations
 
 i18n
   .use(HttpBackend)
@@ -10,24 +11,15 @@ i18n
   .init({
     backend: {
       loadPath: import.meta.env.DEV
-        ? '/locales/{{lng}}/translation.json'
-        : '/static/frontend/locales/{{lng}}/translation.json',
+        ? `/locales/{{lng}}/translation.json?v=${version}`
+        : `/static/frontend/locales/{{lng}}/translation.json?v=${version}`,
     },
-
     lng: savedLanguage,
     fallbackLng: 'en',
     supportedLngs: ['en', 'rw'],
-
-    // ✅ FIX STARTS HERE
-    ns: ['translation'],          // declare namespace
-    defaultNS: 'translation',     // set default namespace
-    keySeparator: '.',            // allow nested keys like sidebar.quick_actions
-    // ✅ FIX ENDS HERE
-
     interpolation: {
       escapeValue: false,
     },
-
     debug: import.meta.env.DEV,
   });
 

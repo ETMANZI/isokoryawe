@@ -246,7 +246,7 @@ export default function Navbar() {
         )}
       </div>
 
-      <AdMarquee ads={ads} speed="normal" />
+      <AdMarquee ads={ads} speed="slow" />
     </header>
   );
 }

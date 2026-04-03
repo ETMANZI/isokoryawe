@@ -67,20 +67,7 @@
     "next": "Next",
     "category": "Category"
   },
-  "listing_detail": {
-    "view_listing": "View Listing",
-    "contact_seller": "Contact Seller",
-    "call": "Call",
-    "whatsapp": "WhatsApp",
-    "interested": "Interested",
-    "interested_count": "{{count}} interested",
-    "share": "Share",
-    "report": "Report",
-    "views": "views",
-    "description": "Description",
-    "location": "Location",
-    "details": "Details"
-  },
+
   "auth": {
     "sign_up": "Sign up",
     "fill_details": "Fill in your details to get started.",
@@ -95,29 +82,6 @@
     "already_account": "Already have an account?",
     "browse_listings": "Browse Listings"
   },
-
-  "promo_banner": {
-    "title": "Banner Video Manager",
-    "description": "Upload promotional videos for the listings page banner.",
-    "upload": "Upload",
-    "control_status": "Control status",
-    "attach_link": "Attach link",
-    "create_banner": "Create Banner Video",
-    "upload_new": "Upload a new video banner",
-    "banner_title": "Banner Title",
-    "target_link": "Target Link",
-    "video_file": "Video File",
-    "active_immediately": "Make this banner active immediately",
-    "uploading": "Uploading...",
-    "upload_banner": "Upload Banner Video",
-    "existing_banners": "Existing Banners",
-    "active": "Active",
-    "inactive": "Inactive",
-    "deactivate": "Deactivate",
-    "activate": "Activate",
-    "delete": "Delete"
-  },
-
 
   "sidebar": {
   "quick_actions": "Quick Actions",

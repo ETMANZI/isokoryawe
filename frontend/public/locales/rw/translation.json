@@ -67,20 +67,7 @@
     "next": "Ibikurikira",
     "category": "Icyiciro"
   },
-  "listing_detail": {
-    "view_listing": "Reba Igurishwa",
-    "contact_seller": "Twandikire Uwagurisha",
-    "call": "Terefona",
-    "whatsapp": "WhatsApp",
-    "interested": "Ndishimishijwe",
-    "interested_count": "{{count}} bashimishijwe",
-    "share": "Sangiza",
-    "report": "Menyesha",
-    "views": "barebye",
-    "description": "Ibisobanuro",
-    "location": "Aho biherereye",
-    "details": "Ibyuzuye"
-  },
+
   "auth": {
     "sign_up": "Iyandikishe",
     "fill_details": "Uzuzisha amakuru yawe kugira ngo utangire.",
@@ -96,27 +83,6 @@
     "browse_listings": "Shakisha Ibigurishwa"
   },
 
-  "promo_banner": {
-    "title": "Genga Amashusho ya Videwo",
-    "description": "Shyiraho amashusho ya videwo yo kwamamaza ku ipaji y'ibigurishwa.",
-    "upload": "Shyiraho",
-    "control_status": "Genga imiterere",
-    "attach_link": "Shyiraho umurongo",
-    "create_banner": "Kora Ikwamamaza",
-    "upload_new": "Shyiraho ikwamamaza rishya",
-    "banner_title": "Umutwe w'Ikwamamaza",
-    "target_link": "Umurongo ujyamo",
-    "video_file": "Dosiye ya Videwo",
-    "active_immediately": "Kora iri kwamamaza rikore vuba",
-    "uploading": "Birimo...",
-    "upload_banner": "Shyiraho Ikwamamaza",
-    "existing_banners": "Ikwamamaza bihari",
-    "active": "Bikora",
-    "inactive": "Ntibikora",
-    "deactivate": "Hagarika",
-    "activate": "Kora",
-    "delete": "Hanura"
-  },
 
   "sidebar": {
   "quick_actions": "Ibikorwa Byihuse",

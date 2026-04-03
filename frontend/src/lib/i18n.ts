@@ -13,12 +13,21 @@ i18n
         ? '/locales/{{lng}}/translation.json'
         : '/static/frontend/locales/{{lng}}/translation.json',
     },
+
     lng: savedLanguage,
     fallbackLng: 'en',
     supportedLngs: ['en', 'rw'],
+
+    // ✅ FIX STARTS HERE
+    ns: ['translation'],          // declare namespace
+    defaultNS: 'translation',     // set default namespace
+    keySeparator: '.',            // allow nested keys like sidebar.quick_actions
+    // ✅ FIX ENDS HERE
+
     interpolation: {
       escapeValue: false,
     },
+
     debug: import.meta.env.DEV,
   });
 

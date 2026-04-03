@@ -10,16 +10,16 @@ i18n
   .init({
     backend: {
       loadPath: import.meta.env.DEV
-        ? '/locales/{{lng}}/translation.json'              // DEV (Vite)
-        : '/static/locales/{{lng}}/translation.json',     // PROD (Django)
+        ? '/locales/{{lng}}/translation.json'          
+        : '/static/locales/{{lng}}/translation.json',     
     },
     lng: savedLanguage,
     fallbackLng: 'en',
-    supportedLngs: ['en', 'rw'], // ✅ add this
+    supportedLngs: ['en', 'rw'], 
     interpolation: {
       escapeValue: false,
     },
-    debug: import.meta.env.DEV, // ✅ only debug in dev
+    debug: import.meta.env.DEV, 
   });
 
 i18n.on('languageChanged', (lng) => {

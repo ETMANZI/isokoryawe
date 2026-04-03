@@ -108,7 +108,7 @@ export default function RightSidebar() {
               {t("sidebar.promote_listing")}
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              {t("sidebar.promote_text")}
+              {t("promote_text")}
             </p>
           </div>
         </div>

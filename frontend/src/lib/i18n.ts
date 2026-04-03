@@ -9,17 +9,15 @@ i18n
   .use(initReactI18next)
   .init({
     backend: {
-      loadPath: import.meta.env.DEV
-        ? '/locales/{{lng}}/translation.json'          
-        : '/static/locales/{{lng}}/translation.json',     
+      loadPath: '/locales/{{lng}}/translation.json',
     },
     lng: savedLanguage,
     fallbackLng: 'en',
-    supportedLngs: ['en', 'rw'], 
+    supportedLngs: ['en', 'rw'],
     interpolation: {
       escapeValue: false,
     },
-    debug: import.meta.env.DEV, 
+    debug: import.meta.env.DEV,
   });
 
 i18n.on('languageChanged', (lng) => {

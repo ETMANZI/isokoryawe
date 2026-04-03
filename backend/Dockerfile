@@ -20,10 +20,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./
 
 RUN mkdir -p /app/templates
-RUN mkdir -p /app/static/frontend
+RUN mkdir -p /app/static/frontend/assets
+RUN mkdir -p /app/static/locales
 
 COPY --from=frontend-builder /frontend/dist/index.html /app/templates/index.html
 COPY --from=frontend-builder /frontend/dist/assets /app/static/frontend/assets
+
+# copy translations directly from public
+COPY frontend/public/locales /app/static/locales
 
 RUN python manage.py collectstatic --noinput
 

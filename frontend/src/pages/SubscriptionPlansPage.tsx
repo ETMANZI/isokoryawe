@@ -76,24 +76,41 @@ export default function SubscriptionPlansPage() {
           </div>
 
           {loggedIn && mySubscription?.subscription && (
-            <div className="mb-8 rounded-3xl border border-indigo-100 bg-indigo-50 p-5">
-              <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
-                Current Subscription
+            <div className="mb-8 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+              <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+                Active Subscription
               </p>
-              <h2 className="mt-1 text-xl font-bold text-slate-900">
-                {mySubscription.subscription.plan.name}
-              </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Status:{" "}
-                <span className="font-semibold">
-                  {mySubscription.subscription.status}
-                </span>
-              </p>
-              {mySubscription.subscription.end_date && (
-                <p className="mt-1 text-sm text-slate-600">
-                  Ends on: {new Date(mySubscription.subscription.end_date).toLocaleDateString()}
-                </p>
-              )}
+
+              <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">
+                    {mySubscription.subscription.plan.name}
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-600">
+                    Status:{" "}
+                    <span className="font-semibold text-emerald-700">
+                      {mySubscription.subscription.status}
+                    </span>
+                  </p>
+
+                  {mySubscription.subscription.end_date && (
+                    <p className="mt-1 text-sm text-slate-600">
+                      Ends on:{" "}
+                      {new Date(
+                        mySubscription.subscription.end_date
+                      ).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-emerald-100">
+                  <p className="text-sm text-slate-500">Listing Limit</p>
+                  <p className="text-xl font-bold text-slate-900">
+                    {mySubscription.subscription.plan.max_listings}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -115,6 +132,17 @@ export default function SubscriptionPlansPage() {
                 </Card>
               ))}
             </div>
+          ) : plans.length === 0 ? (
+            <Card>
+              <div className="py-12 text-center">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  No subscription plans available
+                </h2>
+                <p className="mt-2 text-slate-600">
+                  Please create active subscription plans from the admin panel.
+                </p>
+              </div>
+            </Card>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               {plans.map((plan) => {
@@ -123,11 +151,28 @@ export default function SubscriptionPlansPage() {
                   mySubscription?.subscription?.is_currently_active;
 
                 return (
-                  <Card key={plan.id}>
+                  <Card
+                    key={plan.id}
+                    className={`relative overflow-hidden border-2 ${
+                      isCurrentPlan
+                        ? "border-emerald-500 bg-emerald-50/40 shadow-lg"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    {isCurrentPlan && (
+                      <div className="absolute right-3 top-3 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow">
+                        Current Plan
+                      </div>
+                    )}
+
                     <div className="flex h-full flex-col">
                       <div className="mb-4">
-                        <h2 className="text-xl font-bold text-slate-900">{plan.name}</h2>
-                        <p className="mt-1 text-sm text-slate-500">{plan.description}</p>
+                        <h2 className="text-xl font-bold text-slate-900">
+                          {plan.name}
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {plan.description}
+                        </p>
                       </div>
 
                       <div className="mb-5">
@@ -143,26 +188,36 @@ export default function SubscriptionPlansPage() {
                         <p>• Max listings: {plan.max_listings}</p>
                         <p>
                           • Business ads:{" "}
-                          {plan.can_post_business_ads ? "Included" : "Not included"}
+                          {plan.can_post_business_ads
+                            ? "Included"
+                            : "Not included"}
                         </p>
                         <p>
                           • Featured listings:{" "}
-                          {plan.can_feature_listings ? "Included" : "Not included"}
+                          {plan.can_feature_listings
+                            ? "Included"
+                            : "Not included"}
                         </p>
                         <p>
                           • Advanced analytics:{" "}
-                          {plan.can_access_advanced_analytics ? "Included" : "Not included"}
+                          {plan.can_access_advanced_analytics
+                            ? "Included"
+                            : "Not included"}
                         </p>
                         <p>
                           • Priority support:{" "}
-                          {plan.priority_support ? "Included" : "Not included"}
+                          {plan.priority_support
+                            ? "Included"
+                            : "Not included"}
                         </p>
                       </div>
 
                       <div className="mt-auto">
                         {!loggedIn ? (
                           <Link to="/login">
-                            <Button className="w-full bg-slate-700">Login to Subscribe</Button>
+                            <Button className="w-full bg-slate-700">
+                              Login to Subscribe
+                            </Button>
                           </Link>
                         ) : isCurrentPlan ? (
                           <Button className="w-full bg-emerald-600" disabled>
@@ -174,7 +229,9 @@ export default function SubscriptionPlansPage() {
                             onClick={() => subscribeMutation.mutate(plan.id)}
                             disabled={subscribeMutation.isPending}
                           >
-                            {subscribeMutation.isPending ? "Processing..." : "Choose Plan"}
+                            {subscribeMutation.isPending
+                              ? "Processing..."
+                              : "Choose Plan"}
                           </Button>
                         )}
                       </div>

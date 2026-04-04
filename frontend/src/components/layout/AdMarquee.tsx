@@ -51,78 +51,54 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
   const [paused, setPaused] = useState(false);
 
   const pxPerSecondMap = {
-    slow: 18,
-    normal: 30,
-    fast: 50,
+    slow: 20,
+    normal: 35,
+    fast: 55,
   };
 
   const pxPerSecond = pxPerSecondMap[speed];
 
-  useEffect(() => {
-    if (validAds.length <= 1) return;
+  if (validAds.length === 0) return null;
 
+  // Important: even one ad should scroll
+  const displayAds = validAds.length === 1 ? [...validAds, ...validAds, ...validAds] : validAds;
+
+  useEffect(() => {
     const track = trackRef.current;
     const firstSet = firstSetRef.current;
-    const wrapper = wrapperRef.current;
 
-    if (!track || !firstSet || !wrapper) return;
+    if (!track || !firstSet) return;
 
     let frameId = 0;
     let lastTime = 0;
     let offset = 0;
 
-    const getLoopWidth = () => firstSet.scrollWidth;
-
     const animate = (time: number) => {
       if (!lastTime) lastTime = time;
+
       const delta = (time - lastTime) / 1000;
       lastTime = time;
 
       if (!paused) {
         offset += pxPerSecond * delta;
 
-        const loopWidth = getLoopWidth();
-        if (loopWidth > 0 && offset >= loopWidth) {
+        const firstWidth = firstSet.offsetWidth;
+
+        if (firstWidth > 0 && offset >= firstWidth) {
           offset = 0;
         }
 
-        track.style.transform = `translateX(-${offset}px)`;
+        track.style.transform = `translate3d(-${offset}px, 0, 0)`;
       }
 
-      frameId = window.requestAnimationFrame(animate);
+      frameId = requestAnimationFrame(animate);
     };
 
-    track.style.transform = "translateX(0)";
-    frameId = window.requestAnimationFrame(animate);
+    track.style.transform = "translate3d(0, 0, 0)";
+    frameId = requestAnimationFrame(animate);
 
-    const handleResize = () => {
-      const loopWidth = getLoopWidth();
-      if (loopWidth > 0 && offset >= loopWidth) {
-        offset = offset % loopWidth;
-        track.style.transform = `translateX(-${offset}px)`;
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [paused, pxPerSecond, validAds.length]);
-
-  if (validAds.length === 0) return null;
-
-  if (validAds.length === 1) {
-    const ad = validAds[0];
-    return (
-      <div className="w-full overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-50 py-2">
-        <div className="flex justify-center px-4">
-          <AdCard ad={ad} index={0} />
-        </div>
-      </div>
-    );
-  }
+    return () => cancelAnimationFrame(frameId);
+  }, [paused, pxPerSecond, displayAds.length]);
 
   return (
     <div className="w-full overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-50 py-2">
@@ -134,11 +110,11 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
       >
         <div
           ref={trackRef}
-          className="flex w-max items-center gap-4 px-4"
-          style={{ willChange: "transform" }}
+          className="flex items-center gap-4 px-4"
+          style={{ width: "max-content", willChange: "transform" }}
         >
           <div ref={firstSetRef} className="flex items-center gap-4">
-            {validAds.map((ad, index) => (
+            {displayAds.map((ad, index) => (
               <div key={`first-${ad.id}-${index}`} className="shrink-0">
                 <AdCard ad={ad} index={index} />
               </div>
@@ -146,9 +122,9 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
           </div>
 
           <div className="flex items-center gap-4" aria-hidden="true">
-            {validAds.map((ad, index) => (
+            {displayAds.map((ad, index) => (
               <div key={`second-${ad.id}-${index}`} className="shrink-0">
-                <AdCard ad={ad} index={index + validAds.length} />
+                <AdCard ad={ad} index={index + displayAds.length} />
               </div>
             ))}
           </div>

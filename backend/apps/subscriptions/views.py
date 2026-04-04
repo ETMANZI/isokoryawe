@@ -1,6 +1,8 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils import timezone
+
 
 from .models import SubscriptionPlan, UserSubscription, SubscriptionPayment
 from .serializers import (
@@ -62,16 +64,31 @@ class SubscribeToPlanView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        now = timezone.now()
+
         existing_pending = UserSubscription.objects.filter(
             user=request.user,
-            plan=plan,
-            status="pending",
             is_active=True,
+            status="pending",
         ).exists()
 
         if existing_pending:
             return Response(
-                {"detail": "You already have a pending request for this plan."},
+                {"detail": "You already have a pending subscription request awaiting approval."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        existing_approved = UserSubscription.objects.filter(
+            user=request.user,
+            is_active=True,
+            status="approved",
+            end_date__isnull=False,
+            end_date__gt=now,
+        ).exists()
+
+        if existing_approved:
+            return Response(
+                {"detail": "You already have an active approved subscription."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -97,6 +114,7 @@ class SubscribeToPlanView(APIView):
                 "amount": str(payment.amount),
                 "currency": payment.currency,
                 "status": subscription.status,
+                "can_renew_again_after_expiry": True,
             },
             status=status.HTTP_201_CREATED,
         )

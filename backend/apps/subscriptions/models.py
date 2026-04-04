@@ -44,8 +44,9 @@ class SubscriptionPlan(models.Model):
 
 class UserSubscription(models.Model):
     STATUS_CHOICES = (
-        ("pending", "Pending"),
-        ("active", "Active"),
+        ("pending", "Pending Approval"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
         ("expired", "Expired"),
         ("cancelled", "Cancelled"),
     )
@@ -58,37 +59,72 @@ class UserSubscription(models.Model):
     plan = models.ForeignKey(
         SubscriptionPlan,
         on_delete=models.PROTECT,
-        related_name="subscriptions",
+        related_name="user_subscriptions",
     )
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    rejection_reason = models.TextField(blank=True)
+
+    requested_at = models.DateTimeField(auto_now_add=True)
+
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="approved_subscriptions",
+    )
+
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
+
     auto_renew = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-requested_at"]
 
-    def activate(self):
+    def approve(self, admin_user):
         now = timezone.now()
+        self.status = "approved"
+        self.approved_at = now
+        self.approved_by = admin_user
         self.start_date = now
         self.end_date = now + timedelta(days=self.plan.duration_days)
-        self.status = "active"
-        self.save(update_fields=["start_date", "end_date", "status", "updated_at"])
+        self.rejection_reason = ""
+        self.save(
+            update_fields=[
+                "status",
+                "approved_at",
+                "approved_by",
+                "start_date",
+                "end_date",
+                "rejection_reason",
+                "updated_at",
+            ]
+        )
+
+    def reject(self, reason=""):
+        self.status = "rejected"
+        self.rejection_reason = reason or "Rejected by admin"
+        self.save(update_fields=["status", "rejection_reason", "updated_at"])
 
     @property
     def is_currently_active(self):
         return (
-            self.status == "active"
+            self.status == "approved"
+            and self.is_active
+            and self.start_date is not None
             and self.end_date is not None
             and self.end_date > timezone.now()
         )
 
     def __str__(self):
-        return f"{self.user} - {self.plan.name}"
+        return f"{self.user} - {self.plan.name} - {self.status}"
 
 
 class SubscriptionPayment(models.Model):

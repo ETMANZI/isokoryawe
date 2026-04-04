@@ -58,16 +58,14 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
 
   const pxPerSecond = pxPerSecondMap[speed];
 
-  if (validAds.length === 0) return null;
-
-  // Important: even one ad should scroll
-  const displayAds = validAds.length === 1 ? [...validAds, ...validAds, ...validAds] : validAds;
+  const displayAds =
+    validAds.length === 1 ? [...validAds, ...validAds, ...validAds] : validAds;
 
   useEffect(() => {
     const track = trackRef.current;
     const firstSet = firstSetRef.current;
 
-    if (!track || !firstSet) return;
+    if (!track || !firstSet || displayAds.length === 0) return;
 
     let frameId = 0;
     let lastTime = 0;
@@ -99,6 +97,8 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
 
     return () => cancelAnimationFrame(frameId);
   }, [paused, pxPerSecond, displayAds.length]);
+
+  if (displayAds.length === 0) return null;
 
   return (
     <div className="w-full overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-50 py-2">

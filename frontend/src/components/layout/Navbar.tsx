@@ -90,6 +90,10 @@ export default function Navbar() {
   const handleLogout = async () => {
     logoutUser();
     setLoggedIn(false);
+    queryClient.clear(); // cleaner than multiple removeQueries
+
+  // 🔥 FULL PAGE REFRESH
+    window.location.href = "/listings";
 
     queryClient.setQueryData(["navbar-current-user"], null);
     queryClient.removeQueries({ queryKey: ["navbar-current-user"] });

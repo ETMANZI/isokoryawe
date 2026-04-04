@@ -244,8 +244,15 @@ class ListingViewSet(viewsets.ModelViewSet):
             return
 
         subscription = get_active_subscription(user)
-        if not subscription:
-            raise PermissionDenied("You need an active subscription to publish a listing.")
+
+        if (
+            not subscription
+            or subscription.status != "approved"
+            or not subscription.is_currently_active
+        ):
+            raise PermissionDenied(
+                "Your subscription is not approved or has expired."
+            )
 
         current_listings_count = Listing.objects.filter(
             owner=user,

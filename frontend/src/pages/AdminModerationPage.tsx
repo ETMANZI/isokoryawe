@@ -96,6 +96,64 @@ type VisitorStatsResponse = {
   monthly?: { period: string; total: number }[];
 };
 
+type AdminSubscriptionPlan = {
+  id: number;
+  name: string;
+  code: string;
+  price: string;
+  currency: string;
+  billing_cycle: string;
+  duration_days: number;
+  max_listings: number;
+  can_post_business_ads: boolean;
+  can_feature_listings: boolean;
+  can_access_advanced_analytics: boolean;
+  priority_support: boolean;
+  is_active: boolean;
+};
+
+type AdminSubscriptionRequest = {
+  id: number;
+  user: number;
+  user_name: string;
+  user_email: string;
+  status: string;
+  rejection_reason?: string;
+  requested_at?: string;
+  approved_at?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  is_currently_active?: boolean;
+  plan: AdminSubscriptionPlan;
+  usage?: {
+    used_listings: number;
+    remaining_listings: number;
+  };
+  latest_payment?: {
+    id: number;
+    amount: string;
+    currency: string;
+    status: string;
+    payment_method?: string | null;
+    transaction_id?: string | null;
+    paid_at?: string | null;
+  } | null;
+};
+
+type SubscriptionPaymentItem = {
+  id: number;
+  subscription: number;
+  user: number;
+  amount: string;
+  currency: string;
+  payment_method?: string | null;
+  transaction_id?: string | null;
+  external_reference?: string | null;
+  status: string;
+  paid_at?: string | null;
+  created_at?: string;
+};
+
 function formatPrice(value?: string | number) {
   return new Intl.NumberFormat("en-RW").format(Math.round(Number(value || 0)));
 }
@@ -285,7 +343,8 @@ type ActiveTab =
   | "partners"
   | "video_banners"
   | "admin_users"
-  | "non_admin_users";
+  | "non_admin_users"
+  | "subscriptions";
 
 export default function AdminModerationPage() {
   const { t } = useTranslation();
@@ -341,6 +400,13 @@ export default function AdminModerationPage() {
   const [recentDailyPage, setRecentDailyPage] = useState(1);
   const [dailyBreakdownPage, setDailyBreakdownPage] = useState(1);
   const [monthlyPerformancePage, setMonthlyPerformancePage] = useState(1);
+
+
+  const [subscriptionRejectingId, setSubscriptionRejectingId] = useState<number | null>(null);
+  const [subscriptionRejectReason, setSubscriptionRejectReason] = useState("");
+  const [subscriptionActionError, setSubscriptionActionError] = useState("");
+  const [subscriptionActionSuccess, setSubscriptionActionSuccess] = useState("");
+
 
   const RECENT_DAILY_PER_PAGE = 7;
   const DAILY_BREAKDOWN_PER_PAGE = 10;
@@ -410,6 +476,30 @@ export default function AdminModerationPage() {
       await queryClient.invalidateQueries({ queryKey: ["listings"] });
     },
   });
+
+
+
+  const { data: subscriptionRequests = [], isLoading: isLoadingSubscriptionRequests } = useQuery<AdminSubscriptionRequest[]>({
+    queryKey: ["admin-subscription-requests"],
+    queryFn: async () => {
+      const res = await api.get("/subscriptions/admin/requests/");
+      return Array.isArray(res.data) ? res.data : res.data.results || [];
+    },
+    enabled: activeTab === "subscriptions",
+  });
+
+  const { data: subscriptionPayments = [], isLoading: isLoadingSubscriptionPayments } = useQuery<SubscriptionPaymentItem[]>({
+    queryKey: ["admin-subscription-payments"],
+    queryFn: async () => {
+      const res = await api.get("/subscriptions/admin/payments/");
+      return Array.isArray(res.data) ? res.data : res.data.results || [];
+    },
+    enabled: activeTab === "subscriptions",
+  });
+
+
+
+
 
   const rejectMutation = useMutation({
     mutationFn: async ({
@@ -541,6 +631,50 @@ export default function AdminModerationPage() {
       setPartnerError(extractErrorMessage(err, "Failed to update partner."));
     },
   });
+
+
+
+  const approveSubscriptionMutation = useMutation({
+    mutationFn: async (subscriptionId: number) => {
+      await api.post(`/subscriptions/admin/requests/${subscriptionId}/approve/`);
+    },
+    onSuccess: async () => {
+      setSubscriptionActionError("");
+      setSubscriptionActionSuccess("Subscription approved successfully.");
+      await queryClient.invalidateQueries({ queryKey: ["admin-subscription-requests"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-subscription"] });
+    },
+    onError: (err: any) => {
+      setSubscriptionActionSuccess("");
+      setSubscriptionActionError(
+        extractErrorMessage(err, "Failed to approve subscription.")
+      );
+    },
+  });
+
+  const rejectSubscriptionMutation = useMutation({
+    mutationFn: async ({ subscriptionId, reason }: { subscriptionId: number; reason: string }) => {
+      await api.post(`/subscriptions/admin/requests/${subscriptionId}/reject/`, { reason });
+    },
+    onSuccess: async () => {
+      setSubscriptionRejectingId(null);
+      setSubscriptionRejectReason("");
+      setSubscriptionActionError("");
+      setSubscriptionActionSuccess("Subscription rejected successfully.");
+      await queryClient.invalidateQueries({ queryKey: ["admin-subscription-requests"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-subscription"] });
+    },
+    onError: (err: any) => {
+      setSubscriptionActionSuccess("");
+      setSubscriptionActionError(
+        extractErrorMessage(err, "Failed to reject subscription.")
+      );
+    },
+  });
+
+
+
+
 
   const togglePartnerStatusMutation = useMutation({
     mutationFn: async (partner: Partner) => {
@@ -1136,6 +1270,7 @@ export default function AdminModerationPage() {
               { key: "video_banners", label: t("admin.video_banners") },
               { key: "admin_users", label: t("admin.admin_users") },
               { key: "non_admin_users", label: t("admin.non_admin_users") },
+              { key: "subscriptions", label: "Subscriptions" },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -2814,6 +2949,292 @@ export default function AdminModerationPage() {
               </Card>
             </>
           )}
+
+
+{activeTab === "subscriptions" && (
+  <>
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-slate-900">Subscription Requests</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Review subscription requests, approve or reject them, and monitor payment history.
+      </p>
+    </div>
+
+    {subscriptionActionError && (
+      <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {subscriptionActionError}
+      </div>
+    )}
+
+    {subscriptionActionSuccess && (
+      <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        {subscriptionActionSuccess}
+      </div>
+    )}
+
+    {isLoadingSubscriptionRequests ? (
+      <p className="text-slate-600">Loading subscription requests...</p>
+    ) : subscriptionRequests.length === 0 ? (
+      <Card>
+        <div className="py-10 text-center">
+          <h3 className="text-xl font-semibold text-slate-900">No subscription requests found</h3>
+          <p className="mt-2 text-slate-600">All requests will appear here once users subscribe.</p>
+        </div>
+      </Card>
+    ) : (
+      <div className="space-y-5">
+        {subscriptionRequests.map((item) => {
+          const isRejectingThis = subscriptionRejectingId === item.id;
+
+          return (
+            <Card key={item.id}>
+              <div className="flex flex-col gap-5 lg:flex-row">
+                <div className="flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900">
+                        {item.user_name}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-500">{item.user_email}</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-100">
+                        {item.plan.name}
+                      </span>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+                          item.status === "approved"
+                            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                            : item.status === "rejected"
+                            ? "bg-red-50 text-red-700 ring-red-100"
+                            : "bg-amber-50 text-amber-700 ring-amber-100"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Price
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.plan.currency} {formatNumber(item.plan.price)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Listing Limit
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.plan.max_listings}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Used Listings
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.usage?.used_listings ?? 0}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Remaining
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.usage?.remaining_listings ?? 0}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Requested At
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {formatDate(item.requested_at)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Start Date
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {formatDate(item.start_date || undefined)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        End Date
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {formatDate(item.end_date || undefined)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Latest Payment
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {item.latest_payment
+                          ? `${item.latest_payment.currency} ${formatNumber(item.latest_payment.amount)} • ${item.latest_payment.status}`
+                          : "No payment"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {item.rejection_reason && (
+                    <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-red-500">
+                        Rejection Reason
+                      </p>
+                      <p className="mt-1 text-sm text-red-700">{item.rejection_reason}</p>
+                    </div>
+                  )}
+
+                  {isRejectingThis && (
+                    <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Reject Reason
+                      </label>
+
+                      <textarea
+                        value={subscriptionRejectReason}
+                        onChange={(e) => setSubscriptionRejectReason(e.target.value)}
+                        placeholder="Why is this subscription being rejected?"
+                        className="min-h-24 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+                      />
+
+                      <div className="mt-3 flex flex-wrap gap-3">
+                        <Button
+                          className="bg-red-600"
+                          onClick={() =>
+                            rejectSubscriptionMutation.mutate({
+                              subscriptionId: item.id,
+                              reason: subscriptionRejectReason.trim() || "Rejected by admin",
+                            })
+                          }
+                          disabled={rejectSubscriptionMutation.isPending}
+                        >
+                          {rejectSubscriptionMutation.isPending ? "Rejecting..." : "Confirm Reject"}
+                        </Button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSubscriptionRejectingId(null);
+                            setSubscriptionRejectReason("");
+                          }}
+                          className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex w-full shrink-0 flex-row gap-3 lg:w-[180px] lg:flex-col">
+                  <Button
+                    className="flex-1 bg-green-600"
+                    onClick={() => approveSubscriptionMutation.mutate(item.id)}
+                    disabled={
+                      approveSubscriptionMutation.isPending || item.status === "approved"
+                    }
+                  >
+                    {approveSubscriptionMutation.isPending ? "Approving..." : "Approve"}
+                  </Button>
+
+                  {!isRejectingThis && (
+                    <Button
+                      className="flex-1 bg-red-600"
+                      onClick={() => {
+                        setSubscriptionRejectingId(item.id);
+                        setSubscriptionRejectReason("");
+                      }}
+                      disabled={item.status === "rejected"}
+                    >
+                      Reject
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    )}
+
+    <div className="mt-10">
+      <h2 className="text-2xl font-semibold text-slate-900">Payment History</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Review all recorded subscription payments.
+      </p>
+    </div>
+
+    <div className="mt-4">
+      {isLoadingSubscriptionPayments ? (
+        <p className="text-slate-600">Loading payment history...</p>
+      ) : subscriptionPayments.length === 0 ? (
+        <Card>
+          <div className="py-10 text-center">
+            <h3 className="text-xl font-semibold text-slate-900">No payments found</h3>
+            <p className="mt-2 text-slate-600">Subscription payments will appear here.</p>
+          </div>
+        </Card>
+      ) : (
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead>
+                <tr className="bg-slate-50 text-left">
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Payment ID</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Subscription</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Amount</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Status</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Method</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Transaction ID</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Paid At</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {subscriptionPayments.map((payment) => (
+                  <tr key={payment.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.id}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.subscription}</td>
+                    <td className="px-4 py-4 text-sm font-medium text-slate-900">
+                      {payment.currency} {formatNumber(payment.amount)}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.status}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.payment_method || "-"}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.transaction_id || "-"}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{formatDate(payment.paid_at || undefined)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  </>
+)}
+
+
+
+
+
         </div>
       </PageContainer>
 

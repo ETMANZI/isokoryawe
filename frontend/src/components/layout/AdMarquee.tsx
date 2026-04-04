@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { BadgeAlert, Phone, Mail, Megaphone, ArrowRight } from "lucide-react";
 
@@ -31,23 +32,25 @@ const softIconStyles = [
 export default function AdMarquee({ ads, speed = "normal" }: Props) {
   const adsArray: AdItem[] = Array.isArray(ads) ? ads : [];
 
-  const validAds = adsArray.filter(
-    (ad) =>
-      ad &&
-      ad.id !== undefined &&
-      ad.id !== null &&
-      (ad.title || ad.description || ad.contact_phone || ad.contact_email)
+  const validAds = useMemo(
+    () =>
+      adsArray.filter(
+        (ad) =>
+          ad &&
+          ad.id !== undefined &&
+          ad.id !== null &&
+          (ad.title || ad.description || ad.contact_phone || ad.contact_email)
+      ),
+    [adsArray]
   );
 
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const firstSetRef = useRef<HTMLDivElement | null>(null);
+
+  const [paused, setPaused] = useState(false);
+
   if (validAds.length === 0) return null;
-
-  const speedMap = {
-    slow: 120,
-    normal: 80,
-    fast: 45,
-  };
-
-  const duration = speedMap[speed];
 
   if (validAds.length === 1) {
     const ad = validAds[0];
@@ -60,60 +63,96 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
     );
   }
 
+  const pxPerSecondMap = {
+    slow: 18,
+    normal: 30,
+    fast: 50,
+  };
+
+  const pxPerSecond = pxPerSecondMap[speed];
   const scrollingAds = [...validAds, ...validAds];
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const firstSet = firstSetRef.current;
+    const wrapper = wrapperRef.current;
+
+    if (!track || !firstSet || !wrapper) return;
+
+    let frameId = 0;
+    let lastTime = 0;
+    let offset = 0;
+
+    const getFirstSetWidth = () => firstSet.scrollWidth;
+
+    const step = (time: number) => {
+      if (!lastTime) lastTime = time;
+      const delta = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (!paused) {
+        offset += pxPerSecond * delta;
+
+        const loopWidth = getFirstSetWidth();
+        if (loopWidth > 0 && offset >= loopWidth) {
+          offset = 0;
+        }
+
+        track.style.transform = `translateX(${-offset}px)`;
+      }
+
+      frameId = window.requestAnimationFrame(step);
+    };
+
+    track.style.transform = "translateX(0)";
+    frameId = window.requestAnimationFrame(step);
+
+    const handleResize = () => {
+      const loopWidth = getFirstSetWidth();
+      if (loopWidth > 0 && offset >= loopWidth) {
+        offset = offset % loopWidth;
+        track.style.transform = `translateX(${-offset}px)`;
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [paused, pxPerSecond, validAds.length]);
 
   return (
     <div className="w-full overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-50 py-2">
-      <div className="marquee-wrapper">
+      <div
+        ref={wrapperRef}
+        className="w-full overflow-hidden"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <div
-          className="marquee-track"
-          style={{ animationDuration: `${duration}s` }}
+          ref={trackRef}
+          className="flex w-max items-center gap-4 px-4"
+          style={{ willChange: "transform" }}
         >
-          {scrollingAds.map((ad, index) => (
-            <div key={`${ad.id}-${index}`} className="marquee-item">
-              <AdCard ad={ad} index={index} />
-            </div>
-          ))}
+          <div ref={firstSetRef} className="flex items-center gap-4">
+            {validAds.map((ad, index) => (
+              <div key={`first-${ad.id}-${index}`} className="shrink-0">
+                <AdCard ad={ad} index={index} />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4" aria-hidden="true">
+            {validAds.map((ad, index) => (
+              <div key={`second-${ad.id}-${index}`} className="shrink-0">
+                <AdCard ad={ad} index={index + validAds.length} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-
-      <style>{`
-        .marquee-wrapper {
-          width: 100%;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .marquee-track {
-          display: inline-flex;
-          align-items: center;
-          gap: 16px;
-          white-space: nowrap;
-          width: max-content;
-          padding: 0 16px;
-          will-change: transform;
-          animation-name: admarquee-scroll-left;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-        }
-
-        .marquee-item {
-          flex: 0 0 auto;
-        }
-
-        @keyframes admarquee-scroll-left {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-50%));
-          }
-        }
-
-        .marquee-wrapper:hover .marquee-track {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 }

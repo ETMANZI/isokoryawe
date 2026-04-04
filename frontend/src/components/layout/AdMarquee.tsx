@@ -50,6 +50,67 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
 
   const [paused, setPaused] = useState(false);
 
+  const pxPerSecondMap = {
+    slow: 18,
+    normal: 30,
+    fast: 50,
+  };
+
+  const pxPerSecond = pxPerSecondMap[speed];
+
+  useEffect(() => {
+    if (validAds.length <= 1) return;
+
+    const track = trackRef.current;
+    const firstSet = firstSetRef.current;
+    const wrapper = wrapperRef.current;
+
+    if (!track || !firstSet || !wrapper) return;
+
+    let frameId = 0;
+    let lastTime = 0;
+    let offset = 0;
+
+    const getLoopWidth = () => firstSet.scrollWidth;
+
+    const animate = (time: number) => {
+      if (!lastTime) lastTime = time;
+      const delta = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (!paused) {
+        offset += pxPerSecond * delta;
+
+        const loopWidth = getLoopWidth();
+        if (loopWidth > 0 && offset >= loopWidth) {
+          offset = 0;
+        }
+
+        track.style.transform = `translateX(-${offset}px)`;
+      }
+
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    track.style.transform = "translateX(0)";
+    frameId = window.requestAnimationFrame(animate);
+
+    const handleResize = () => {
+      const loopWidth = getLoopWidth();
+      if (loopWidth > 0 && offset >= loopWidth) {
+        offset = offset % loopWidth;
+        track.style.transform = `translateX(-${offset}px)`;
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [paused, pxPerSecond, validAds.length]);
+
   if (validAds.length === 0) return null;
 
   if (validAds.length === 1) {
@@ -62,66 +123,6 @@ export default function AdMarquee({ ads, speed = "normal" }: Props) {
       </div>
     );
   }
-
-  const pxPerSecondMap = {
-    slow: 18,
-    normal: 30,
-    fast: 50,
-  };
-
-  const pxPerSecond = pxPerSecondMap[speed];
-  const scrollingAds = [...validAds, ...validAds];
-
-  useEffect(() => {
-    const track = trackRef.current;
-    const firstSet = firstSetRef.current;
-    const wrapper = wrapperRef.current;
-
-    if (!track || !firstSet || !wrapper) return;
-
-    let frameId = 0;
-    let lastTime = 0;
-    let offset = 0;
-
-    const getFirstSetWidth = () => firstSet.scrollWidth;
-
-    const step = (time: number) => {
-      if (!lastTime) lastTime = time;
-      const delta = (time - lastTime) / 1000;
-      lastTime = time;
-
-      if (!paused) {
-        offset += pxPerSecond * delta;
-
-        const loopWidth = getFirstSetWidth();
-        if (loopWidth > 0 && offset >= loopWidth) {
-          offset = 0;
-        }
-
-        track.style.transform = `translateX(${-offset}px)`;
-      }
-
-      frameId = window.requestAnimationFrame(step);
-    };
-
-    track.style.transform = "translateX(0)";
-    frameId = window.requestAnimationFrame(step);
-
-    const handleResize = () => {
-      const loopWidth = getFirstSetWidth();
-      if (loopWidth > 0 && offset >= loopWidth) {
-        offset = offset % loopWidth;
-        track.style.transform = `translateX(${-offset}px)`;
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [paused, pxPerSecond, validAds.length]);
 
   return (
     <div className="w-full overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-50 py-2">
@@ -164,7 +165,7 @@ function AdCard({ ad, index }: { ad: AdItem; index: number }) {
   return (
     <Link
       to={`/listings/${ad.id}`}
-      className={`flex w-[320px] sm:w-[380px] md:w-[430px] shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:bg-white hover:shadow-md ${cardStyle}`}
+      className={`flex w-[320px] shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:bg-white hover:shadow-md sm:w-[380px] md:w-[430px] ${cardStyle}`}
     >
       <div
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconStyle}`}

@@ -25,9 +25,11 @@ type ListingImage = {
 };
 
 type ModerationListing = {
+
   id: string;
   title: string;
   listing_type: string;
+  contact_phone: string;
   district?: string;
   sector?: string;
   price?: string | number;
@@ -1150,7 +1152,283 @@ export default function AdminModerationPage() {
             ))}
           </div>
 
-          {activeTab === "moderation" && (
+
+
+{activeTab === "moderation" && (
+  <>
+    <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h2 className="text-2xl font-semibold text-slate-900">
+          {t("admin.moderation_queue")}
+        </h2>
+        <p className="text-sm text-slate-500">
+          Review submitted listings, inspect owner details, and approve or reject quickly.
+        </p>
+      </div>
+
+      {!isLoadingModeration && moderationData.length > 0 && (
+        <div className="inline-flex w-fit items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">
+          {moderationData.length} pending
+        </div>
+      )}
+    </div>
+
+    {isLoadingModeration ? (
+      <div className="grid gap-4">
+        {[...Array(3)].map((_, index) => (
+          <Card key={index}>
+            <div className="animate-pulse">
+              <div className="flex flex-col gap-5 lg:flex-row">
+                <div className="h-52 w-full rounded-3xl bg-slate-200 lg:w-[250px]" />
+                <div className="flex-1 space-y-3">
+                  <div className="h-6 w-1/2 rounded bg-slate-200" />
+                  <div className="h-4 w-1/3 rounded bg-slate-200" />
+                  <div className="h-8 w-40 rounded bg-slate-200" />
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="h-20 rounded-2xl bg-slate-200" />
+                    <div className="h-20 rounded-2xl bg-slate-200" />
+                    <div className="h-20 rounded-2xl bg-slate-200" />
+                  </div>
+                  <div className="h-24 rounded-2xl bg-slate-200" />
+                </div>
+                <div className="flex w-full gap-3 lg:w-[180px] lg:flex-col">
+                  <div className="h-11 flex-1 rounded-2xl bg-slate-200" />
+                  <div className="h-11 flex-1 rounded-2xl bg-slate-200" />
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    ) : moderationData.length === 0 ? (
+      <Card>
+        <div className="py-12 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-2xl">
+            ✅
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900">
+            {t("admin.no_pending_listings")}
+          </h2>
+          <p className="mt-2 text-slate-600">{t("admin.up_to_date")}.</p>
+        </div>
+      </Card>
+    ) : (
+      <div className="space-y-5">
+        {moderationData.map((item) => {
+          const coverImage =
+            item.images?.find((img) => img.is_cover)?.image ||
+            item.images?.[0]?.image ||
+            "";
+
+          const isRejectingThis = rejectingId === item.id;
+
+          const whatsappNumber = item.contact_phone
+            ? item.contact_phone.replace(/[^\d]/g, "")
+            : "";
+
+          return (
+            <Card key={item.id}>
+              <div className="flex flex-col gap-5 lg:flex-row">
+                {/* IMAGE */}
+                <div className="relative w-full shrink-0 lg:w-[250px]">
+                  <div className="overflow-hidden rounded-3xl bg-slate-100">
+                    {coverImage ? (
+                      <img
+                        src={coverImage}
+                        alt={item.title}
+                        className="h-52 w-full object-cover transition duration-300 hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-52 items-center justify-center text-sm text-slate-500">
+                        {t("admin.no_image")}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
+                      {item.listing_type}
+                    </span>
+                    <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 shadow-sm ring-1 ring-amber-200">
+                      Pending Review
+                    </span>
+                  </div>
+                </div>
+
+                {/* CONTENT */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <h2 className="truncate text-xl font-bold text-slate-900">
+                        {item.title}
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {item.district || t("admin.na")} • {item.sector || t("admin.na")}
+                      </p>
+                    </div>
+
+                    <div className="shrink-0">
+                      <div className="inline-flex rounded-2xl bg-indigo-50 px-4 py-2 text-lg font-bold text-indigo-700 ring-1 ring-indigo-100">
+                        RWF {formatPrice(item.price)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* INFO BOXES */}
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {item.owner_email && (
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                          Owner Email
+                        </p>
+                        <p className="mt-1 truncate text-sm font-medium text-slate-700">
+                          {item.owner_email}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Phone Number
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.contact_phone || t("admin.na")}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Location
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.district || t("admin.na")} / {item.sector || t("admin.na")}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* DESCRIPTION */}
+                  {item.description && (
+                    <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Description
+                      </p>
+                      <p className="line-clamp-3 text-sm leading-6 text-slate-600">
+                        {item.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* QUICK ACTIONS */}
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <a
+                      href={`/listings/${item.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    >
+                      View Details
+                    </a>
+
+                    {item.contact_phone && (
+                      <a
+                        href={`tel:${item.contact_phone}`}
+                        className="inline-flex items-center rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                      >
+                        Call Owner
+                      </a>
+                    )}
+
+                    {whatsappNumber && (
+                      <a
+                        href={`https://wa.me/${whatsappNumber}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-2xl border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 transition hover:bg-green-100"
+                      >
+                        WhatsApp
+                      </a>
+                    )}
+                  </div>
+
+                  {/* REJECT PANEL */}
+                  {isRejectingThis && (
+                    <div className="mt-5 rounded-3xl border border-red-100 bg-red-50/60 p-4">
+                      <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        {t("admin.reject_reason")}
+                      </label>
+
+                      <textarea
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        placeholder={t("admin.reject_placeholder")}
+                        className="min-h-28 w-full rounded-2xl border border-slate-300 bg-white p-3 text-sm outline-none focus:border-red-400"
+                      />
+
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <Button
+                          className="bg-red-600"
+                          onClick={submitReject}
+                          disabled={rejectMutation.isPending}
+                        >
+                          {rejectMutation.isPending
+                            ? t("admin.rejecting")
+                            : t("admin.confirm_reject")}
+                        </Button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRejectingId(null);
+                            setRejectReason("");
+                          }}
+                          className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                        >
+                          {t("admin.cancel")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* ACTIONS */}
+                <div className="flex w-full shrink-0 flex-row gap-3 lg:w-[180px] lg:flex-col">
+                  <Button
+                    className="flex-1 bg-green-600"
+                    onClick={() => approveMutation.mutate(item.id)}
+                    disabled={approveMutation.isPending}
+                  >
+                    {approveMutation.isPending
+                      ? t("admin.approving")
+                      : t("admin.approve")}
+                  </Button>
+
+                  {!isRejectingThis && (
+                    <Button
+                      className="flex-1 bg-red-600"
+                      onClick={() => startReject(item.id)}
+                    >
+                      {t("admin.reject")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    )}
+  </>
+)}
+
+
+
+
+
+
+
+
+
+          {/* {activeTab === "moderation" && (
             <>
               <h2 className="mb-6 text-2xl font-semibold text-slate-900">{t("admin.moderation_queue")}</h2>
 
@@ -1270,7 +1548,7 @@ export default function AdminModerationPage() {
                 </div>
               )}
             </>
-          )}
+          )} */}
 
 
 

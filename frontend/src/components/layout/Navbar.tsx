@@ -90,16 +90,17 @@ export default function Navbar() {
   const handleLogout = async () => {
     logoutUser();
     setLoggedIn(false);
-    queryClient.clear(); // cleaner than multiple removeQueries
+    queryClient.clear(); 
 
-  // 🔥 FULL PAGE REFRESH
+  
     window.location.href = "/listings";
 
     queryClient.setQueryData(["navbar-current-user"], null);
     queryClient.removeQueries({ queryKey: ["navbar-current-user"] });
     queryClient.removeQueries({ queryKey: ["current_user"] });
     queryClient.removeQueries({ queryKey: ["me"] });
-
+    localStorage.clear();
+    sessionStorage.clear();
     navigate("/listings", { replace: true });
   };
 

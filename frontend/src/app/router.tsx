@@ -13,6 +13,7 @@ import ProfilePage from "../pages/ProfilePage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import PromoBannerAdminPage from "../pages/PromoBannerAdminPage";
+import SubscriptionPlansPage from "../pages/SubscriptionPlansPage";
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +29,8 @@ export const router = createBrowserRouter([
       { path: "/profile", element: <ProfilePage />},
       { path: "/forgot-password", element: <ForgotPasswordPage />},
       { path: "/reset-password/:uid/:token", element: <ResetPasswordPage />},
-      { path: "/admin/promo-banners", element: <PromoBannerAdminPage />}
+      { path: "/admin/promo-banners", element: <PromoBannerAdminPage />},
+      { path: "/subscriptions", element: <SubscriptionPlansPage />},
     ],
   },
 

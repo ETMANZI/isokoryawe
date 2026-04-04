@@ -15,6 +15,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from .utils import create_notification
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from rest_framework.exceptions import PermissionDenied
+from apps.subscriptions.utils import get_active_subscription
 
 from django.db.models import Sum, Count
 from rest_framework.views import APIView
@@ -227,8 +229,48 @@ class ListingViewSet(viewsets.ModelViewSet):
         context["request"] = self.request
         return context
 
+    # def perform_create(self, serializer):
+    #     serializer.save()
+        
+#------------------------------------
     def perform_create(self, serializer):
-        serializer.save()
+        user = self.request.user
+
+        if not user.is_authenticated:
+            raise PermissionDenied("Please login first.")
+
+        if user.is_staff or user.is_superuser:
+            serializer.save(owner=user)
+            return
+
+        subscription = get_active_subscription(user)
+        if not subscription:
+            raise PermissionDenied("You need an active subscription to publish a listing.")
+
+        current_listings_count = Listing.objects.filter(
+            owner=user,
+            status__in=[Listing.Status.PENDING, Listing.Status.APPROVED],
+        ).count()
+
+        max_listings = subscription.plan.max_listings or 0
+
+        if current_listings_count >= max_listings:
+            raise PermissionDenied(
+                f"You have reached your subscription limit of {max_listings} listings."
+            )
+
+        listing_type = serializer.validated_data.get("listing_type")
+
+        if (
+            listing_type == Listing.ListingType.BUSINESS_AD
+            and not subscription.plan.can_post_business_ads
+        ):
+            raise PermissionDenied(
+                "Your current subscription does not allow business ads."
+            )
+
+        serializer.save(owner=user)
+#--------------------------------------
 
     def perform_update(self, serializer):
         serializer.save()

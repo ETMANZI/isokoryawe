@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.payments",
     "apps.moderation",
+    "apps.subscriptions",
     'cloudinary',
     'cloudinary_storage',
 ]

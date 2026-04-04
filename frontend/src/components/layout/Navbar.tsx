@@ -153,7 +153,7 @@ export default function Navbar() {
                 <NavLink to="/publish">{t("nav.publish")}</NavLink>
                 <NavLink to="/dashboard">{t("nav.dashboard")}</NavLink>
                 <NavLink to="/profile">{t("nav.profile")}</NavLink>
-                <NavLink to="/subscriptions">Subscriptions</NavLink>
+                <NavLink to="/subscriptions">{t("nav.subscriptions")}</NavLink>
 
                 {canModerate && <NavLink to="/admin/moderation">{t("nav.moderation")}</NavLink>}
 

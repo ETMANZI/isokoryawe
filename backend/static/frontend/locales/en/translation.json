@@ -72,8 +72,17 @@
 
     "subscription_expired": "Your subscription has expired. Please renew to post new listings.",
     "subscription_required": "An active subscription is required to post listings.",
-    "subscribe_to_post": "Subscribe to Post"
-  
+    "subscribe_to_post": "Subscribe to Post",
+    "max_images_error": "Your plan allows only {{max}} image(s). Please remove some images or upgrade your plan.",
+    "at_least_one_image": "Please add at least one image to your listing.",
+    "max_images": "{{current}}/{{max}} images",
+    "images_hint": "You can upload up to {{max}} images. First image will be the cover.",
+    "current_plan": "Current Plan: {{plan}}",
+    "free_plan": "Free Plan",
+    "images_allowed": "✓ {{count}} image(s) per listing",
+    "valid_until": "Valid until",
+    "upgrade_plan": "Upgrade Plan",
+    "upgrade_required": "Upgrade required"
 
   },
 

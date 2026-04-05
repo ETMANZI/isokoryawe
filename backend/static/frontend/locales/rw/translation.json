@@ -224,7 +224,17 @@
     "category": "Icyiciro",
     "subscription_expired": "Ifatabuguzi ryawe ryangiye. Bugurure kugira ngo ushobore gushyiraho ibicuruzwa bishya.",
     "subscription_required": "Ubusabirizimu bukora burakenewe kugira ngo ushobore gushyiraho ibicuruzwa.",
-    "subscribe_to_post": "Iyandikishe Kugira Ngo Ushyireho Ibicuruzwa"
+    "subscribe_to_post": "Iyandikishe Kugira Ngo Ushyireho Ibicuruzwa",
+    "max_images_error": "Gahunda yawe yemera amashusho {{max}} gusa. Kuraho amashusho cyangwa vugurura ubusabirizimu.",
+    "at_least_one_image": "Nyamuneka ongeraho byibuze shusho imwe.",
+    "max_images": "{{current}}/{{max}} amashusho",
+    "images_hint": "Urashobora gupakisha amashusho agera kuri {{max}}. Ushusho wa mbere nicyo kizaba ikiranga.",
+    "current_plan": "Gahunda Urimo: {{plan}}",
+    "free_plan": "Gahunda Y'ubuntu",
+    "images_allowed": "✓ amashusho {{count}} ku itangazwa",
+    "valid_until": "Imaraho",
+    "upgrade_plan": "Vugurura Gahunda",
+    "upgrade_required": "Vugurura ubusabirizimu"
   },
 
   "auth": {

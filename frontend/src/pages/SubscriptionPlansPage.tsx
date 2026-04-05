@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CheckCircle, XCircle, Image } from "lucide-react";
+import { CheckCircle, XCircle, Image as ImageIcon } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
@@ -167,7 +167,7 @@ export default function SubscriptionPlansPage() {
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
                     <p className="text-sm text-slate-500">
-                      {t("subscription.listing_limit")}
+                      {t("subscription.max_listings")}
                     </p>
                     <p className="text-xl font-bold text-slate-900">
                       {currentSubscription.plan.max_listings}
@@ -295,6 +295,7 @@ export default function SubscriptionPlansPage() {
                       </div>
 
                       <div className="mb-6 space-y-3 text-sm text-slate-700">
+                        {/* Max Listings */}
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
                             {t("subscription.max_listings")}:
@@ -302,14 +303,16 @@ export default function SubscriptionPlansPage() {
                           <span className="font-semibold text-indigo-600">{plan.max_listings}</span>
                         </div>
 
+                        {/* Max Images Per Listing - Now properly displayed */}
                         <div className="flex items-center gap-2">
-                          <Image className="h-4 w-4 shrink-0 text-indigo-500" />
+                          <ImageIcon className="h-4 w-4 shrink-0 text-indigo-500" />
                           <span className="font-medium">
                             {t("subscription.max_images_per_listing")}:
                           </span>
                           <span className="font-semibold text-indigo-600">{plan.max_images_per_listing}</span>
                         </div>
 
+                        {/* Business Ads */}
                         <div className="flex items-center gap-2">
                           {plan.can_post_business_ads ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
@@ -319,6 +322,7 @@ export default function SubscriptionPlansPage() {
                           <span>{t("subscription.business_ads")}</span>
                         </div>
 
+                        {/* Featured Listings */}
                         <div className="flex items-center gap-2">
                           {plan.can_feature_listings ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
@@ -328,6 +332,7 @@ export default function SubscriptionPlansPage() {
                           <span>{t("subscription.featured_listings")}</span>
                         </div>
 
+                        {/* Advanced Analytics */}
                         <div className="flex items-center gap-2">
                           {plan.can_access_advanced_analytics ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
@@ -337,6 +342,7 @@ export default function SubscriptionPlansPage() {
                           <span>{t("subscription.advanced_analytics")}</span>
                         </div>
 
+                        {/* Priority Support */}
                         <div className="flex items-center gap-2">
                           {plan.priority_support ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />

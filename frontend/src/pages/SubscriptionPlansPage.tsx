@@ -160,7 +160,7 @@ export default function SubscriptionPlansPage() {
                       {t("subscription.listing_limit")}
                     </p>
                     <p className="text-xl font-bold text-slate-900">
-                      {currentSubscription.plan.max_listings}
+                      {currentSubscription.plan.max_images_per_listing}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">

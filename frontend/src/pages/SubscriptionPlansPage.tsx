@@ -36,7 +36,7 @@ export default function SubscriptionPlansPage() {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const { data: plans = [], isLoading } = useQuery({
+  const { data: plans = [] } = useQuery<SubscriptionPlan[]>({
     queryKey: ["subscription-plans"],
     queryFn: async () => (await api.get("/subscriptions/plans/")).data,
   });
@@ -83,7 +83,6 @@ export default function SubscriptionPlansPage() {
             Choose a plan to publish listings.
           </p>
 
-          {/* 🔥 Hidden listings warning */}
           {loggedIn && mySubscription?.listings_hidden && (
             <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
               Your listings are hidden due to expired subscription.
@@ -93,7 +92,6 @@ export default function SubscriptionPlansPage() {
             </div>
           )}
 
-          {/* 🔥 Current subscription */}
           {loggedIn && current && (
             <div className="mb-6 rounded-xl border p-4">
               <h2 className="text-xl font-bold">{current.plan.name}</h2>
@@ -105,7 +103,6 @@ export default function SubscriptionPlansPage() {
                 </p>
               )}
 
-              {/* 🔥 Renew button */}
               {isExpired && (
                 <a
                   href="#plans"
@@ -117,78 +114,91 @@ export default function SubscriptionPlansPage() {
             </div>
           )}
 
-          {/* Messages */}
           {actionMessage && (
             <div className="mb-4 rounded bg-green-50 p-3 text-green-700">
               {actionMessage}
             </div>
           )}
+
           {actionError && (
             <div className="mb-4 rounded bg-red-50 p-3 text-red-700">
               {actionError}
             </div>
           )}
 
-          {/* Plans */}
-          <div id="plans" className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {plans.map((plan: SubscriptionPlan) => {
-              const isCurrent =
-                current?.plan?.id === plan.id &&
-                current?.is_currently_active;
+          {plans.length === 0 ? (
+            <Card>
+              <div className="py-12 text-center">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  No subscription plans available
+                </h2>
+                <p className="mt-2 text-slate-600">
+                  Please create active subscription plans from the admin panel.
+                </p>
+              </div>
+            </Card>
+          ) : (
+            <div id="plans" className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {plans.map((plan) => {
+                const isCurrent =
+                  current?.plan?.id === plan.id &&
+                  current?.is_currently_active;
 
-              return (
-                <Card key={plan.id}>
-                  <div className="flex flex-col h-full">
-                    <h2 className="text-lg font-bold">{plan.name}</h2>
-                    <p className="text-sm text-slate-500">
-                      {plan.description}
-                    </p>
+                return (
+                  <Card key={plan.id}>
+                    <div className="flex h-full flex-col">
+                      <h2 className="text-lg font-bold">{plan.name}</h2>
+                      <p className="text-sm text-slate-500">
+                        {plan.description}
+                      </p>
 
-                    <div className="my-3 text-xl font-bold text-indigo-600">
-                      {plan.currency} {plan.price}
-                    </div>
+                      <div className="my-3 text-xl font-bold text-indigo-600">
+                        {plan.currency} {plan.price}
+                      </div>
 
-                    <p className="text-sm">
-                      Max listings: {plan.max_listings}
-                    </p>
+                      <p className="text-sm">
+                        Max listings: {plan.max_listings}
+                      </p>
 
-                    <div className="mt-auto">
-                      {!loggedIn ? (
-                        <Link to="/login">
-                          <Button className="w-full">
-                            Login to Subscribe
+                      <div className="mt-auto">
+                        {!loggedIn ? (
+                          <Link to="/login">
+                            <Button className="w-full">
+                              Login to Subscribe
+                            </Button>
+                          </Link>
+                        ) : isCurrent ? (
+                          <Button disabled className="w-full bg-green-600">
+                            Current Plan
                           </Button>
-                        </Link>
-                      ) : isCurrent ? (
-                        <Button disabled className="w-full bg-green-600">
-                          Current Plan
-                        </Button>
-                      ) : isPending ? (
-                        <Button disabled className="w-full bg-yellow-500">
-                          Pending Approval
-                        </Button>
-                      ) : (
-                        <Button
-                          className="w-full bg-indigo-600"
-                          onClick={() => {
-                            setActionMessage(null);
-                            setActionError(null);
-                            subscribeMutation.mutate(plan.id);
-                          }}
-                        >
-                          {subscribeMutation.isPending
-                            ? "Processing..."
-                            : isExpired
-                            ? "Renew Plan"
-                            : "Choose Plan"}
-                        </Button>
-                      )}
+                        ) : isPending ? (
+                          <Button disabled className="w-full bg-yellow-500">
+                            Pending Approval
+                          </Button>
+                        ) : (
+                          <Button
+                            className="w-full bg-indigo-600"
+                            onClick={() => {
+                              setActionMessage(null);
+                              setActionError(null);
+                              subscribeMutation.mutate(plan.id);
+                            }}
+                            disabled={subscribeMutation.isPending}
+                          >
+                            {subscribeMutation.isPending
+                              ? "Processing..."
+                              : isExpired
+                              ? "Renew Plan"
+                              : "Choose Plan"}
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </PageContainer>
     </div>

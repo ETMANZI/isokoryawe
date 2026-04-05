@@ -43,6 +43,22 @@ class SubscriptionPlan(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if self.code == 'free':
+            self.max_images_per_listing = 1
+            self.max_listings = 1
+        elif self.code == 'basic':
+            self.max_images_per_listing = 2
+            self.max_listings = 5
+        elif self.code == 'premium':
+            self.max_images_per_listing = 3
+            self.max_listings = 15
+        elif self.code == 'business':
+            self.max_images_per_listing = 4
+            self.max_listings = 50
+        
+        super().save(*args, **kwargs)
 
 
 class UserSubscription(models.Model):

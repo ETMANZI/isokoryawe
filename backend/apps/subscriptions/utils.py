@@ -1,29 +1,55 @@
 from django.utils import timezone
 from .models import UserSubscription
+from apps.listings.models import Listing
 
 
-def get_active_subscription(user):
+def expire_user_subscriptions_and_hide_listings(user):
     """
-    Returns the latest approved and currently valid subscription for a user.
-
-    Also automatically marks expired subscriptions as "expired".
+    Marks expired subscriptions and hides all user listings when no valid subscription remains.
     """
-
     if not user or not user.is_authenticated:
-        return None
+        return
 
     now = timezone.now()
 
-    # 🔥 Step 1: mark expired subscriptions
-    UserSubscription.objects.filter(
+    expired_subscriptions = UserSubscription.objects.filter(
         user=user,
         status="approved",
         is_active=True,
         end_date__isnull=False,
         end_date__lte=now,
-    ).update(status="expired")
+    )
 
-    # 🔥 Step 2: return active subscription
+    if expired_subscriptions.exists():
+        expired_subscriptions.update(status="expired")
+
+    has_active_subscription = UserSubscription.objects.filter(
+        user=user,
+        status="approved",
+        is_active=True,
+        start_date__isnull=False,
+        end_date__isnull=False,
+        end_date__gt=now,
+    ).exists()
+
+    if not has_active_subscription:
+        Listing.objects.filter(owner=user).update(
+            visibility_status=Listing.VisibilityStatus.INACTIVE
+        )
+
+
+def get_active_subscription(user):
+    """
+    Returns the latest approved and currently valid subscription for a user.
+    Also expires old subscriptions and hides listings if needed.
+    """
+    if not user or not user.is_authenticated:
+        return None
+
+    expire_user_subscriptions_and_hide_listings(user)
+
+    now = timezone.now()
+
     return (
         UserSubscription.objects.filter(
             user=user,

@@ -31,6 +31,9 @@ class SubscriptionPlan(models.Model):
     priority_support = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=True)
+    max_listings = models.PositiveIntegerField(default=0)
+    max_images_per_listing = models.PositiveIntegerField(default=1)
+    can_post_business_ads = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

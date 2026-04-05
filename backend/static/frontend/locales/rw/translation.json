@@ -932,7 +932,8 @@
     "status_approved": "Byemejwe",
     "status_pending": "Bitegereje",
     "status_rejected": "Byanzwe",
-    "status_expired": "Byarangiye"
+    "status_expired": "Byarangiye",
+    "days":"Iminsi"
   },
   "common": {
     "included": "Birimo",

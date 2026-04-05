@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Bell } from "lucide-react";
@@ -47,7 +47,7 @@ function formatNotificationTime(value?: string) {
 }
 
 export default function Navbar() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
   const { t, i18n } = useTranslation();

@@ -222,9 +222,9 @@
     "previous": "Ibibanjirije",
     "next": "Ibikurikira",
     "category": "Icyiciro",
-    "subscription_expired": "Ubusabirizimu bwawe bwarangiye. Nyamukira kugira ngo ushobore gushyiraho ibitangazwa bishya.",
-    "subscription_required": "Ubusabirizimu bukora burakenewe kugira ngo ushobore gushyiraho ibitangazwa.",
-    "subscribe_to_post": "Iyandikishe Kugira Ngo Ushyireho"
+    "subscription_expired": "Ifatabuguzi ryawe ryangiye. Bugurure kugira ngo ushobore gushyiraho ibicuruzwa bishya.",
+    "subscription_required": "Ubusabirizimu bukora burakenewe kugira ngo ushobore gushyiraho ibicuruzwa.",
+    "subscribe_to_post": "Iyandikishe Kugira Ngo Ushyireho Ibicuruzwa"
   },
 
   "auth": {

@@ -119,7 +119,7 @@ export default function PublishListingPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const maxImages = limits?.max_images_per_listing || 0;
+  const maxImages = limits?.max_images_per_listing || 1;
   const canPostBusinessAds = limits?.can_post_business_ads || false;
   const hasActiveSubscription = limits?.has_active_subscription || false;
 
@@ -537,41 +537,6 @@ export default function PublishListingPage() {
     );
   }
 
-  // If user has no active subscription, show subscription required message
-  if (!hasActiveSubscription) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <PageContainer>
-          <div className="mx-auto max-w-4xl py-10">
-            <Card>
-              <div className="text-center py-12">
-                <div className="mb-6">
-                  <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
-                    <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                </div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                  {t("publish.subscription_required")}
-                </h2>
-                <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                  {t("publish.subscription_required_message")}
-                </p>
-                <a
-                  href="/subscriptions"
-                  className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition"
-                >
-                  {t("publish.view_subscription_plans")}
-                </a>
-              </div>
-            </Card>
-          </div>
-        </PageContainer>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
@@ -581,22 +546,36 @@ export default function PublishListingPage() {
               {t("publish.title")}
             </h1>
 
-            {/* Subscription Info Banner - Only shown for users with active subscription */}
-            <div className="mb-6 rounded-lg p-4 bg-green-50 border border-green-200">
+            {/* Subscription Info Banner */}
+            <div className={`mb-6 rounded-lg p-4 ${
+              hasActiveSubscription 
+                ? 'bg-green-50 border border-green-200' 
+                : 'bg-amber-50 border border-amber-200'
+            }`}>
               <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-green-800">
-                    {t("publish.current_plan")}: {limits?.current_plan}
+                  <p className="text-sm font-semibold text-slate-900">
+                    {hasActiveSubscription 
+                      ? t("publish.current_plan", { plan: limits?.current_plan })
+                      : t("publish.free_plan")}
                   </p>
-                  <p className="text-sm mt-1 text-green-700">
+                  <p className="text-sm mt-1">
                     {t("publish.images_allowed", { count: maxImages })}
                   </p>
                   {limits?.subscription_end_date && (
-                    <p className="text-xs mt-1 text-green-600">
+                    <p className="text-xs mt-1 text-slate-500">
                       {t("publish.valid_until")}: {new Date(limits.subscription_end_date).toLocaleDateString()}
                     </p>
                   )}
                 </div>
+                {!hasActiveSubscription && (
+                  <a
+                    href="/subscriptions"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+                  >
+                    {t("publish.upgrade_plan")}
+                  </a>
+                )}
               </div>
             </div>
 
@@ -1301,7 +1280,7 @@ export default function PublishListingPage() {
                 />
               </div>
 
-              {/* Image Upload Section */}
+              {/* Updated Image Upload Section */}
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700">
                   {t("publish.images_label")}
@@ -1322,7 +1301,7 @@ export default function PublishListingPage() {
                 />
 
                 <p className="mt-2 text-xs text-slate-500">
-                  {t("publish.images_hint", { max: maxImages })}
+                  {t("publish.images_hin", { max: maxImages })}
                 </p>
 
                 {/* Image slots indicator */}

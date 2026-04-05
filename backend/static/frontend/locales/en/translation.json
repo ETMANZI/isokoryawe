@@ -965,7 +965,8 @@
     "minutes": "Minutes",
     "pending_approval":"Pending Approval",
     "request_submitted":"Request Submitted",
-    "amount_to_pay":"Amount to pay"
+    "amount_to_pay":"Amount to pay",
+    "max_images_per_listing":"Image(s) Per listing"
   },
   "common": {
     "included": "Included",

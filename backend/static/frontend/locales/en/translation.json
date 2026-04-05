@@ -949,7 +949,7 @@
     "status_pending": "Pending",
     "status_rejected": "Rejected",
     "status_expired": "Expired",
-    "status_active":"Status",
+    "status_active":"ACTIVE",
     "days":"Days",
     "choose_plan":"Choose Plan",
     "current_subscription":"Current Subscription",

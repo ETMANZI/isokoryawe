@@ -2,7 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
-
+from apps.listings.models import Listing
 
 from .models import SubscriptionPlan, UserSubscription, SubscriptionPayment
 from .serializers import (
@@ -158,11 +158,22 @@ class AdminApproveSubscriptionView(APIView):
         try:
             subscription = UserSubscription.objects.select_related("plan", "user").get(pk=pk)
         except UserSubscription.DoesNotExist:
-            return Response({"detail": "Subscription request not found."}, status=404)
+            return Response(
+                {"detail": "Subscription request not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         subscription.approve(request.user)
 
-        return Response({"message": "Subscription approved successfully."})
+        Listing.objects.filter(owner=subscription.user).update(
+            visibility_status=Listing.VisibilityStatus.ACTIVE
+        )
+
+        return Response(
+            {
+                "message": "Subscription approved successfully. Listings are now visible."
+            }
+        )
 
 
 class AdminRejectSubscriptionView(APIView):
@@ -172,9 +183,22 @@ class AdminRejectSubscriptionView(APIView):
         try:
             subscription = UserSubscription.objects.select_related("plan", "user").get(pk=pk)
         except UserSubscription.DoesNotExist:
-            return Response({"detail": "Subscription request not found."}, status=404)
+            return Response(
+                {"detail": "Subscription request not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         reason = (request.data.get("reason") or "").strip()
+
         subscription.reject(reason)
 
-        return Response({"message": "Subscription rejected successfully."})
+        Listing.objects.filter(owner=subscription.user).update(
+            visibility_status=Listing.VisibilityStatus.INACTIVE
+        )
+
+        return Response(
+            {
+                "message": "Subscription rejected. All listings have been hidden.",
+                "reason": reason or "Rejected by admin",
+            }
+        )

@@ -232,7 +232,7 @@ class ListingViewSet(viewsets.ModelViewSet):
     # def perform_create(self, serializer):
     #     serializer.save()
         
-#------------------------------------
+#------------------------------------    
     def perform_create(self, serializer):
         user = self.request.user
 
@@ -274,6 +274,18 @@ class ListingViewSet(viewsets.ModelViewSet):
         ):
             raise PermissionDenied(
                 "Your current subscription does not allow business ads."
+            )
+
+        uploaded_images = self.request.FILES.getlist("new_images")
+        max_images = subscription.plan.max_images_per_listing or 0
+
+        if len(uploaded_images) > max_images:
+            raise ValidationError(
+                {
+                    "new_images": [
+                        f"You can upload a maximum of {max_images} images for your current subscription plan."
+                    ]
+                }
             )
 
         serializer.save(owner=user)

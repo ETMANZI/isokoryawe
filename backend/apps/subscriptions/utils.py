@@ -1,11 +1,13 @@
 from django.utils import timezone
 from .models import UserSubscription
 from apps.listings.models import Listing
+from apps.notifications.utils import create_notification
 
 
 def expire_user_subscriptions_and_hide_listings(user):
     """
-    Marks expired subscriptions and hides all user listings when no valid subscription remains.
+    Marks expired subscriptions, hides user listings when no valid subscription remains,
+    and sends a notification when a subscription expires.
     """
     if not user or not user.is_authenticated:
         return
@@ -18,10 +20,23 @@ def expire_user_subscriptions_and_hide_listings(user):
         is_active=True,
         end_date__isnull=False,
         end_date__lte=now,
-    )
+    ).select_related("plan")
 
-    if expired_subscriptions.exists():
+    expired_list = list(expired_subscriptions)
+
+    if expired_list:
         expired_subscriptions.update(status="expired")
+
+        for subscription in expired_list:
+            create_notification(
+                user=user,
+                title="Subscription Expired",
+                message=(
+                    f'Your "{subscription.plan.name}" subscription has expired. '
+                    f'Your listings are now hidden until you renew.'
+                ),
+                notification_type="subscription_expired",
+            )
 
     has_active_subscription = UserSubscription.objects.filter(
         user=user,
@@ -33,7 +48,10 @@ def expire_user_subscriptions_and_hide_listings(user):
     ).exists()
 
     if not has_active_subscription:
-        Listing.objects.filter(owner=user).update(
+        Listing.objects.filter(
+            owner=user,
+            visibility_status=Listing.VisibilityStatus.ACTIVE,
+        ).update(
             visibility_status=Listing.VisibilityStatus.INACTIVE
         )
 
@@ -41,7 +59,8 @@ def expire_user_subscriptions_and_hide_listings(user):
 def get_active_subscription(user):
     """
     Returns the latest approved and currently valid subscription for a user.
-    Also expires old subscriptions and hides listings if needed.
+    Also expires old subscriptions, hides listings if needed,
+    and sends expiry notifications.
     """
     if not user or not user.is_authenticated:
         return None

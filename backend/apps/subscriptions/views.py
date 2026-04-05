@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from apps.listings.models import Listing
 
+from apps.notifications.utils import create_notification
+
 from .models import SubscriptionPlan, UserSubscription, SubscriptionPayment
 from .serializers import (
     SubscriptionPlanSerializer,
@@ -31,16 +33,23 @@ class MySubscriptionView(APIView):
             .order_by("-requested_at")
             .first()
         )
-
+        hidden_count = Listing.objects.filter(
+            owner=request.user,
+            visibility_status=Listing.VisibilityStatus.INACTIVE
+        ).count()
         if not subscription:
             return Response({
                 "has_subscription": False,
                 "subscription": None,
+                "listings_hidden": hidden_count > 0,
+                "hidden_listings_count": hidden_count,
             })
 
         return Response({
             "has_subscription": True,
             "subscription": UserSubscriptionSerializer(subscription).data,
+            "listings_hidden": hidden_count > 0,
+            "hidden_listings_count": hidden_count,
         })
 
 
@@ -151,6 +160,9 @@ class AdminSubscriptionPaymentListView(generics.ListAPIView):
         )
 
 
+
+
+
 class AdminApproveSubscriptionView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
@@ -167,6 +179,16 @@ class AdminApproveSubscriptionView(APIView):
 
         Listing.objects.filter(owner=subscription.user).update(
             visibility_status=Listing.VisibilityStatus.ACTIVE
+        )
+
+        create_notification(
+            user=subscription.user,
+            title="Subscription Approved",
+            message=(
+                f'Your "{subscription.plan.name}" subscription has been approved. '
+                f'Your listings are now visible again.'
+            ),
+            notification_type="subscription_approved",
         )
 
         return Response(
@@ -190,10 +212,8 @@ class AdminRejectSubscriptionView(APIView):
 
         reason = (request.data.get("reason") or "").strip()
 
-        # ❌ Reject subscription
         subscription.reject(reason)
 
-        # 🔥 Only hide listings if NO other active subscription exists
         has_active = UserSubscription.objects.filter(
             user=subscription.user,
             status="approved",
@@ -205,6 +225,16 @@ class AdminRejectSubscriptionView(APIView):
             Listing.objects.filter(owner=subscription.user).update(
                 visibility_status=Listing.VisibilityStatus.INACTIVE
             )
+
+        create_notification(
+            user=subscription.user,
+            title="Subscription Rejected",
+            message=(
+                f'Your "{subscription.plan.name}" subscription request was rejected.'
+                + (f" Reason: {reason}" if reason else "")
+            ),
+            notification_type="subscription_rejected",
+        )
 
         return Response(
             {

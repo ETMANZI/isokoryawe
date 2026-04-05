@@ -1301,7 +1301,7 @@ export default function PublishListingPage() {
                 />
 
                 <p className="mt-2 text-xs text-slate-500">
-                  {t("publish.images_hint", { max: maxImages })}
+                  {t("publish.images_hin", { max: maxImages })}
                 </p>
 
                 {/* Image slots indicator */}

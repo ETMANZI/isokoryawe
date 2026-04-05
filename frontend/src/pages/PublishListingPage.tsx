@@ -1,16 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { api } from "../lib/api";
 import MapPicker from "../components/MapPicker";
+import { isAuthenticated } from "../lib/auth";
 
 type Category = {
   id: string | number;
   name: string;
+};
+
+type SubscriptionLimits = {
+  has_active_subscription: boolean;
+  current_plan: string | null;
+  max_images_per_listing: number;
+  max_listings: number;
+  can_post_business_ads: boolean;
+  subscription_end_date: string | null;
 };
 
 type ListingForm = {
@@ -95,6 +106,23 @@ const PRODUCT_TYPES = [
 
 export default function PublishListingPage() {
   const { t } = useTranslation();
+  const loggedIn = isAuthenticated();
+  
+  // Fetch subscription limits
+  const { data: limits, isLoading: limitsLoading } = useQuery<SubscriptionLimits>({
+    queryKey: ["subscription-limits"],
+    queryFn: async () => {
+      const response = await api.get("/subscriptions/my-subscription-limits/");
+      return response.data;
+    },
+    enabled: loggedIn,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const maxImages = limits?.max_images_per_listing || 1;
+  const canPostBusinessAds = limits?.can_post_business_ads || false;
+  const hasActiveSubscription = limits?.has_active_subscription || false;
+
   const {
     register,
     handleSubmit,
@@ -230,6 +258,15 @@ export default function PublishListingPage() {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
+    // Check image limit
+    if (images.length + files.length > maxImages) {
+      setError(t("publish.max_images_error", { max: maxImages }));
+      e.target.value = "";
+      return;
+    }
+
+    setError("");
+
     const newImages = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
@@ -245,11 +282,13 @@ export default function PublishListingPage() {
       if (imageToRemove) URL.revokeObjectURL(imageToRemove.preview);
       return prev.filter((_, index) => index !== indexToRemove);
     });
+    setError("");
   };
 
   const clearAllImages = () => {
     images.forEach((img) => URL.revokeObjectURL(img.preview));
     setImages([]);
+    setError("");
   };
 
   useEffect(() => {
@@ -271,6 +310,17 @@ export default function PublishListingPage() {
     try {
       setError("");
       setMessage("");
+
+      // Validate image limit before submission
+      if (images.length === 0) {
+        setError(t("publish.at_least_one_image"));
+        return;
+      }
+
+      if (images.length > maxImages) {
+        setError(t("publish.max_images_error", { max: maxImages }));
+        return;
+      }
 
       const formData = new FormData();
 
@@ -470,6 +520,23 @@ export default function PublishListingPage() {
     }
   };
 
+  // Show loading state while fetching subscription limits
+  if (limitsLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <PageContainer>
+          <div className="mx-auto max-w-4xl py-10">
+            <Card>
+              <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+              </div>
+            </Card>
+          </div>
+        </PageContainer>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
@@ -478,6 +545,39 @@ export default function PublishListingPage() {
             <h1 className="mb-6 text-3xl font-bold text-slate-900">
               {t("publish.title")}
             </h1>
+
+            {/* Subscription Info Banner */}
+            <div className={`mb-6 rounded-lg p-4 ${
+              hasActiveSubscription 
+                ? 'bg-green-50 border border-green-200' 
+                : 'bg-amber-50 border border-amber-200'
+            }`}>
+              <div className="flex items-start justify-between flex-wrap gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {hasActiveSubscription 
+                      ? t("publish.current_plan", { plan: limits?.current_plan })
+                      : t("publish.free_plan")}
+                  </p>
+                  <p className="text-sm mt-1">
+                    {t("publish.images_allowed", { count: maxImages })}
+                  </p>
+                  {limits?.subscription_end_date && (
+                    <p className="text-xs mt-1 text-slate-500">
+                      {t("publish.valid_until")}: {new Date(limits.subscription_end_date).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+                {!hasActiveSubscription && (
+                  <a
+                    href="/subscriptions"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+                  >
+                    {t("publish.upgrade_plan")}
+                  </a>
+                )}
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:grid-cols-2">
               <div>
@@ -523,7 +623,14 @@ export default function PublishListingPage() {
                 >
                   <option value="house">{t("publish.house")}</option>
                   <option value="parcel">{t("publish.parcel")}</option>
-                  <option value="business_ad">{t("publish.business_ad")}</option>
+                  <option 
+                    value="business_ad" 
+                    disabled={!canPostBusinessAds}
+                    className={!canPostBusinessAds ? 'text-slate-400' : ''}
+                  >
+                    {t("publish.business_ad")}
+                    {!canPostBusinessAds && ` (${t("publish.upgrade_required")})`}
+                  </option>
                   <option value="car">{t("publish.car")}</option>
                   <option value="clothes_product">{t("publish.clothes_product")}</option>
                   <option value="food_product">{t("publish.food_product")}</option>
@@ -1173,9 +1280,13 @@ export default function PublishListingPage() {
                 />
               </div>
 
+              {/* Updated Image Upload Section */}
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700">
                   {t("publish.images_label")}
+                  <span className="text-slate-500 ml-1">
+                    ({t("publish.max_images", { current: images.length, max: maxImages })})
+                  </span>
                 </label>
 
                 <input
@@ -1183,12 +1294,27 @@ export default function PublishListingPage() {
                   multiple
                   accept="image/*"
                   onChange={handleImagesChange}
-                  className="w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+                  disabled={images.length >= maxImages}
+                  className={`w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700 ${
+                    images.length >= maxImages ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 />
 
                 <p className="mt-2 text-xs text-slate-500">
-                  {t("publish.images_hint")}
+                  {t("publish.images_hint", { max: maxImages })}
                 </p>
+
+                {/* Image slots indicator */}
+                <div className="mt-3 flex gap-1">
+                  {Array.from({ length: maxImages }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={`flex-1 h-1 rounded-full transition ${
+                        index < images.length ? 'bg-green-500' : 'bg-slate-200'
+                      }`}
+                    />
+                  ))}
+                </div>
 
                 {images.length > 0 && (
                   <div className="mt-4">
@@ -1251,7 +1377,11 @@ export default function PublishListingPage() {
               {message && <p className="text-sm text-green-700 md:col-span-2">{message}</p>}
               {error && <p className="text-sm text-red-600 md:col-span-2">{error}</p>}
 
-              <Button type="submit" className="md:col-span-2" disabled={isSubmitting}>
+              <Button 
+                type="submit" 
+                className="md:col-span-2" 
+                disabled={isSubmitting || images.length === 0}
+              >
                 {isSubmitting ? t("publish.creating") : t("publish.submit_button")}
               </Button>
             </form>

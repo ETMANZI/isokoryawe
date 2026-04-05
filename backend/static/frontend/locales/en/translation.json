@@ -931,7 +931,8 @@
     "status_pending": "Pending",
     "status_rejected": "Rejected",
     "status_expired": "Expired",
-    "days":"Days"
+    "days":"Days",
+    "choose_plan":"Choose Plan"
   },
   "common": {
     "included": "Included",

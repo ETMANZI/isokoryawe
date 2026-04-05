@@ -933,7 +933,8 @@
     "status_pending": "Bitegereje",
     "status_rejected": "Byanzwe",
     "status_expired": "Byarangiye",
-    "days":"Iminsi"
+    "days":"Iminsi",
+    "choose_plan":"Hitamo Gahunda"
   },
   "common": {
     "included": "Birimo",

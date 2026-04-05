@@ -65,6 +65,16 @@ type Category = {
   slug: string;
 };
 
+type MySubscriptionResponse = {
+  has_subscription: boolean;
+  subscription: {
+    id: number;
+    status: string;
+    is_currently_active: boolean;
+    end_date?: string | null;
+  } | null;
+};
+
 const ITEMS_PER_PAGE = 12;
 const ANONYMOUS_INTEREST_KEY = "anonymous_interest_user_id";
 
@@ -204,8 +214,22 @@ export default function ListingsPage() {
     },
   });
 
+  const { data: mySubscription } = useQuery<MySubscriptionResponse>({
+    queryKey: ["my-subscription"],
+    queryFn: async () => (await api.get("/subscriptions/my-subscription/")).data,
+    enabled: loggedIn,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   const isAdmin =
     currentUser?.is_staff === true || currentUser?.is_superuser === true;
+
+  const canPublish =
+    !!loggedIn &&
+    !!mySubscription?.subscription &&
+    mySubscription.subscription.status === "approved" &&
+    !!mySubscription.subscription.is_currently_active;
 
   const hideMutation = useMutation({
     mutationFn: async (listingId: string) => {
@@ -304,12 +328,29 @@ export default function ListingsPage() {
           {t("listings.explore_text")}
         </p>
 
-        {loggedIn && (
+        {loggedIn && canPublish && (
           <Link
             to="/publish"
-            className="rounded-2xl bg-slate-400 px-5 py-3 text-white"
+            className="rounded-2xl bg-slate-400 px-5 py-3 text-white hover:bg-slate-500 transition-colors"
           >
             {t("listings.post_listing_button")}
+          </Link>
+        )}
+
+        {loggedIn && !canPublish && mySubscription?.subscription && (
+          <div className="rounded-2xl bg-amber-50 px-5 py-3 text-sm text-amber-700">
+            {mySubscription.subscription.status === "approved" && !mySubscription.subscription.is_currently_active
+              ? t("listings.subscription_expired")
+              : t("listings.subscription_required")}
+          </div>
+        )}
+
+        {loggedIn && !canPublish && !mySubscription?.subscription && (
+          <Link
+            to="/subscriptions"
+            className="rounded-2xl bg-amber-500 px-5 py-3 text-white hover:bg-amber-600 transition-colors"
+          >
+            {t("listings.subscribe_to_post")}
           </Link>
         )}
       </div>

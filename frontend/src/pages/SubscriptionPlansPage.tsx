@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
@@ -39,6 +40,7 @@ type MySubscriptionResponse = {
 };
 
 export default function SubscriptionPlansPage() {
+  const { t } = useTranslation();
   const loggedIn = isAuthenticated();
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -60,13 +62,13 @@ export default function SubscriptionPlansPage() {
     onSuccess: (data) => {
       setActionError(null);
       setActionMessage(
-        `Subscription request submitted successfully. Amount to pay: ${data.amount} ${data.currency}`
+        `${t("subscription.request_submitted")} ${t("subscription.amount_to_pay")}: ${data.amount} ${data.currency}`
       );
     },
     onError: (error: any) => {
       setActionMessage(null);
       setActionError(
-        error?.response?.data?.detail || "Failed to subscribe. Please try again."
+        error?.response?.data?.detail || t("subscription.failed_to_subscribe")
       );
     },
   });
@@ -86,17 +88,19 @@ export default function SubscriptionPlansPage() {
       <PageContainer>
         <div className="py-10">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">Subscription Plans</h1>
+            <h1 className="text-3xl font-bold text-slate-900">
+              {t("subscription.title")}
+            </h1>
             <p className="mt-2 max-w-2xl text-slate-600">
-              Choose a plan to publish listings, unlock business ads, and grow your reach.
+              {t("subscription.description")}
             </p>
           </div>
 
           {loggedIn && mySubscription?.listings_hidden && (
             <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Your listings are hidden due to an expired or inactive subscription.
+              {t("subscription.hidden_due_to_expiry")}
               {mySubscription.hidden_listings_count
-                ? ` Hidden listings: ${mySubscription.hidden_listings_count}.`
+                ? ` ${t("subscription.hidden_count")}: ${mySubscription.hidden_listings_count}.`
                 : ""}
             </div>
           )}
@@ -114,7 +118,7 @@ export default function SubscriptionPlansPage() {
               }`}
             >
               <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">
-                Current Subscription
+                {t("subscription.current_subscription")}
               </p>
 
               <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -124,22 +128,22 @@ export default function SubscriptionPlansPage() {
                   </h2>
 
                   <p className="mt-1 text-sm text-slate-600">
-                    Status:{" "}
+                    {t("subscription.status")}:{" "}
                     <span className="font-semibold">
-                      {currentSubscription.status}
+                      {t(`subscription.status_${currentSubscription.status}`)}
                     </span>
                   </p>
 
                   {currentSubscription.start_date && (
                     <p className="mt-1 text-sm text-slate-600">
-                      Started on:{" "}
+                      {t("subscription.started_on")}:{" "}
                       {new Date(currentSubscription.start_date).toLocaleDateString()}
                     </p>
                   )}
 
                   {currentSubscription.end_date && (
                     <p className="mt-1 text-sm text-slate-600">
-                      Ends on:{" "}
+                      {t("subscription.ends_on")}:{" "}
                       {new Date(currentSubscription.end_date).toLocaleDateString()}
                     </p>
                   )}
@@ -147,7 +151,9 @@ export default function SubscriptionPlansPage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
-                    <p className="text-sm text-slate-500">Listing Limit</p>
+                    <p className="text-sm text-slate-500">
+                      {t("subscription.listing_limit")}
+                    </p>
                     <p className="text-xl font-bold text-slate-900">
                       {currentSubscription.plan.max_listings}
                     </p>
@@ -158,7 +164,7 @@ export default function SubscriptionPlansPage() {
                       href="#plans"
                       className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700"
                     >
-                      Renew Now
+                      {t("subscription.renew_now")}
                     </a>
                   )}
                 </div>
@@ -200,10 +206,10 @@ export default function SubscriptionPlansPage() {
             <Card>
               <div className="py-12 text-center">
                 <h2 className="text-xl font-semibold text-slate-900">
-                  No subscription plans available
+                  {t("subscription.no_plans_available")}
                 </h2>
                 <p className="mt-2 text-slate-600">
-                  Please create active subscription plans from the admin panel.
+                  {t("subscription.no_plans_description")}
                 </p>
               </div>
             </Card>
@@ -225,7 +231,7 @@ export default function SubscriptionPlansPage() {
                   >
                     {isCurrentPlan && (
                       <div className="absolute right-3 top-3 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow">
-                        Current Plan
+                        {t("subscription.current_plan")}
                       </div>
                     )}
 
@@ -244,27 +250,37 @@ export default function SubscriptionPlansPage() {
                           {plan.currency} {plan.price}
                         </div>
                         <p className="mt-1 text-sm text-slate-500">
-                          {plan.billing_cycle} • {plan.duration_days} days
+                          {plan.billing_cycle} • {plan.duration_days} {t("subscription.days")}
                         </p>
                       </div>
 
                       <div className="mb-6 space-y-2 text-sm text-slate-600">
-                        <p>• Max listings: {plan.max_listings}</p>
                         <p>
-                          • Business ads:{" "}
-                          {plan.can_post_business_ads ? "Included" : "Not included"}
+                          • {t("subscription.max_listings")}: {plan.max_listings}
                         </p>
                         <p>
-                          • Featured listings:{" "}
-                          {plan.can_feature_listings ? "Included" : "Not included"}
+                          • {t("subscription.business_ads")}:{" "}
+                          {plan.can_post_business_ads
+                            ? t("subscription.included")
+                            : t("subscription.not_included")}
                         </p>
                         <p>
-                          • Advanced analytics:{" "}
-                          {plan.can_access_advanced_analytics ? "Included" : "Not included"}
+                          • {t("subscription.featured_listings")}:{" "}
+                          {plan.can_feature_listings
+                            ? t("subscription.included")
+                            : t("subscription.not_included")}
                         </p>
                         <p>
-                          • Priority support:{" "}
-                          {plan.priority_support ? "Included" : "Not included"}
+                          • {t("subscription.advanced_analytics")}:{" "}
+                          {plan.can_access_advanced_analytics
+                            ? t("subscription.included")
+                            : t("subscription.not_included")}
+                        </p>
+                        <p>
+                          • {t("subscription.priority_support")}:{" "}
+                          {plan.priority_support
+                            ? t("subscription.included")
+                            : t("subscription.not_included")}
                         </p>
                       </div>
 
@@ -272,16 +288,16 @@ export default function SubscriptionPlansPage() {
                         {!loggedIn ? (
                           <Link to="/login">
                             <Button className="w-full bg-slate-700">
-                              Login to Subscribe
+                              {t("subscription.login_to_subscribe")}
                             </Button>
                           </Link>
                         ) : isCurrentPlan ? (
                           <Button className="w-full bg-emerald-600" disabled>
-                            Current Plan
+                            {t("subscription.current_plan")}
                           </Button>
                         ) : isPending ? (
                           <Button className="w-full bg-amber-500" disabled>
-                            Pending Approval
+                            {t("subscription.pending_approval")}
                           </Button>
                         ) : (
                           <Button
@@ -294,10 +310,10 @@ export default function SubscriptionPlansPage() {
                             disabled={subscribeMutation.isPending}
                           >
                             {subscribeMutation.isPending
-                              ? "Processing..."
+                              ? t("subscription.processing")
                               : isExpired
-                              ? "Renew Plan"
-                              : "Choose Plan"}
+                              ? t("subscription.renew_plan")
+                              : t("subscription.choose_plan")}
                           </Button>
                         )}
                       </div>

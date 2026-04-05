@@ -47,7 +47,6 @@ function formatNotificationTime(value?: string) {
 }
 
 export default function Navbar() {
-  // const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
   const { t, i18n } = useTranslation();

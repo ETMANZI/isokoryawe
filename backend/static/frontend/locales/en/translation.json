@@ -902,5 +902,38 @@
   "copyright": "© {{year}} Market Hub. All rights reserved.",
   "privacy_policy": "Privacy Policy",
   "terms": "Terms"
-}
+},
+
+  "subscription": {
+    "title": "Subscription Plans",
+    "description": "Choose a plan to publish listings, unlock business ads, and grow your reach.",
+    "hidden_message": "Your listings are hidden due to expired subscription.",
+    "current": "Current Subscription",
+    "status": "Status",
+    "started_on": "Started on",
+    "ends_on": "Ends on",
+    "renew": "Renew Now",
+    "success": "Subscription request submitted successfully.",
+    "error": "Failed to subscribe.",
+    "no_plans": "No subscription plans available",
+    "no_plans_desc": "Please create plans from admin.",
+    "max_listings": "Max listings",
+    "business_ads": "Business ads",
+    "current_plan": "Current Plan",
+    "pending": "Pending Approval",
+    "choose": "Choose Plan",
+    "status_approved": "Approved",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
+    "status_expired": "Expired"
+  },
+  "common": {
+    "included": "Included",
+    "not_included": "Not included",
+    "processing": "Processing..."
+  },
+  "autho": {
+    "login_to_subscribe": "Login to Subscribe"
+  }
+
 }

@@ -904,5 +904,38 @@
   "copyright": "© {{year}} Market Hub. Uburenganzira bwose burakumwe.",
   "privacy_policy": "Politiki y'Ibanga",
   "terms": "Amategeko"
-}
+},
+
+  "subscription": {
+    "title": "Amashyirahamwe yo Kwiyandikisha",
+    "description": "Hitamo gahunda yo gutangaza ibicuruzwa no kwagura ibikorwa byawe.",
+    "hidden_message": "Ibyo watangaje byahishwe kubera ko gahunda yawe yarangiye.",
+    "current": "Gahunda Ukoresha",
+    "status": "Imiterere",
+    "started_on": "Yatangiye ku",
+    "ends_on": "Izarangira ku",
+    "renew": "Ongera Ubone Gahunda",
+    "success": "Gusaba gahunda byoherejwe neza.",
+    "error": "Ntibyakunze.",
+    "no_plans": "Nta gahunda zihari",
+    "no_plans_desc": "Ongeraho gahunda muri admin.",
+    "max_listings": "Umubare ntarengwa",
+    "business_ads": "Kwamamaza ibikorwa",
+    "current_plan": "Gahunda Yawe",
+    "pending": "Itegereje kwemezwa",
+    "choose": "Hitamo Gahunda",
+    "status_approved": "Byemejwe",
+    "status_pending": "Bitegereje",
+    "status_rejected": "Byanzwe",
+    "status_expired": "Byarangiye"
+  },
+  "common": {
+    "included": "Birimo",
+    "not_included": "Ntibirimo",
+    "processing": "Biri gukorwa..."
+  },
+  "autho": {
+    "login_to_subscribe": "Injira ubanze"
+  }
+  
 }

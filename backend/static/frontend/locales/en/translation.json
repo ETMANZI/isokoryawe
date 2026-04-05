@@ -331,6 +331,7 @@
     "upgrade_plan": "Upgrade Plan",
     "upgrade_required": "Upgrade required",
     "pending_approval":"Pending Approval"
+
 },
 
 "admin": {
@@ -961,7 +962,10 @@
     "growing_businesses": "Growing Business",
     "agencies_high_volume": "Agencies High Volume",
     "monthly": "Monthly",
-    "minutes": "Minutes"
+    "minutes": "Minutes",
+    "pending_approval":"Pending Approval",
+    "request_submitted":"Request Submitted",
+    "amount_to_pay":"Amount to pay"
   },
   "common": {
     "included": "Included",

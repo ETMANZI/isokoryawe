@@ -961,7 +961,9 @@
     "agencies_high_volume": "Ku bigo n’abacuruzi bafite ibicuruzwa byinshi",
     "monthly": "ku kwezi",
     "minutes": "iminota",
-    "pending_approval":"Ntibiremerwa"
+    "pending_approval":"Ntibiremerwa",
+    "request_submitted":"Ubusabe bwoherejwe neza",
+    "amount_to_pay":"Ingano mugomba kwishyura"
   },
   "common": {
     "included": "Birimo",

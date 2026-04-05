@@ -947,6 +947,7 @@
     "status_pending": "Bitegereje",
     "status_rejected": "Byanzwe",
     "status_expired": "Byarangiye",
+    "status_active":"Irakora",
     "days":"Iminsi",
     "choose_plan":"Hitamo Gahunda",
     "current_subscription":"Ifatabuzi rihari",

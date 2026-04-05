@@ -342,7 +342,6 @@ export default function SubscriptionPlansPage() {
                           <span>{t("subscription.advanced_analytics")}</span>
                         </div>
 
-                        {/* Priority Support */}
                         <div className="flex items-center gap-2">
                           {plan.priority_support ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />

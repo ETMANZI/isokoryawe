@@ -907,6 +907,11 @@
 },
 
   "subscription": {
+    "featured_listings": "Kwamamaza byihariye",
+    "advanced_analytics": "Isesengura rihanitse",
+    "priority_support": "Ubufasha bwihutirwa",
+    "included": "Birimo",
+    "not_included": "Ntibirimo",
     "title": "Amashyirahamwe yo Kwiyandikisha",
     "description": "Hitamo gahunda yo gutangaza ibicuruzwa no kwagura ibikorwa byawe.",
     "hidden_message": "Ibyo watangaje byahishwe kubera ko gahunda yawe yarangiye.",

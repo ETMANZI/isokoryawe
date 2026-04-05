@@ -905,6 +905,11 @@
 },
 
   "subscription": {
+    "featured_listings": "Featured listings",
+    "advanced_analytics": "Advanced analytics",
+    "priority_support": "Priority support",
+    "included": "Included",
+    "not_included": "Not included",
     "title": "Subscription Plans",
     "description": "Choose a plan to publish listings, unlock business ads, and grow your reach.",
     "hidden_message": "Your listings are hidden due to expired subscription.",

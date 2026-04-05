@@ -45,10 +45,10 @@ class SubscriptionPlan(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
-        if self.code == 'free':
+        if self.code == 'basic':
             self.max_images_per_listing = 1
             self.max_listings = 1
-        elif self.code == 'basic':
+        elif self.code == 'classic':
             self.max_images_per_listing = 2
             self.max_listings = 5
         elif self.code == 'premium':

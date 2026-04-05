@@ -932,7 +932,8 @@
     "status_rejected": "Rejected",
     "status_expired": "Expired",
     "days":"Days",
-    "choose_plan":"Choose Plan"
+    "choose_plan":"Choose Plan",
+    "current_subscription":"Current Subscription"
   },
   "common": {
     "included": "Included",

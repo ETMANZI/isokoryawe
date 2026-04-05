@@ -321,7 +321,7 @@ class Notification(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="notifications"
+        related_name="app_notifications"
     )
     title = models.CharField(max_length=255)
     message = models.TextField()

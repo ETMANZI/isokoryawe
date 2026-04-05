@@ -26,11 +26,7 @@ urlpatterns = [
     path("api/payments/", include("apps.payments.urls")),
     path("api/moderation/", include("apps.moderation.urls")),
     path("api/subscriptions/", include("apps.subscriptions.urls")),
-
-    # re_path(r"^(?!api/|admin/|static/|media/).*$", TemplateView.as_view(template_name="index.html")),
-        # path("locales/<str:lng>/translation.json", translation_file, name="translation-file"),
-
-    # ✅ UPDATE THIS LINE (ADD locales/)
+    path("api/notifications/", include("apps.notifications.urls")),
     re_path(r"^(?!api/|admin/|static/|media/|locales/).*$",TemplateView.as_view(template_name="index.html")),
 ]
 

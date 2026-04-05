@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { Bell } from "lucide-react";
 import { isAuthenticated, logoutUser, getAccessToken } from "../../lib/auth";
 import { api } from "../../lib/api";
 import AdMarquee from "./AdMarquee";
@@ -25,6 +26,26 @@ type AdItem = {
   contact_email?: string;
 };
 
+type NotificationItem = {
+  id: number;
+  title: string;
+  message: string;
+  notification_type: string;
+  is_read: boolean;
+  created_at: string;
+};
+
+function formatNotificationTime(value?: string) {
+  if (!value) return "";
+  return new Date(value).toLocaleString("en-RW", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,6 +54,7 @@ export default function Navbar() {
 
   const [loggedIn, setLoggedIn] = useState(isAuthenticated());
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   useEffect(() => {
     const syncAuth = () => setLoggedIn(isAuthenticated());
@@ -46,6 +68,7 @@ export default function Navbar() {
   useEffect(() => {
     setLoggedIn(isAuthenticated());
     setIsMobileMenuOpen(false);
+    setIsNotificationOpen(false);
   }, [location.pathname]);
 
   const { data: currentUser, isLoading: isLoadingCurrentUser } = useQuery<CurrentUser | null>({
@@ -87,21 +110,50 @@ export default function Navbar() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: notifications = [] } = useQuery<NotificationItem[]>({
+    queryKey: ["my-notifications"],
+    queryFn: async () => {
+      const response = await api.get("/notifications/my/");
+      return Array.isArray(response.data) ? response.data : response.data.results || [];
+    },
+    enabled: loggedIn,
+    refetchInterval: 30000,
+  });
+
+  const { data: unreadNotificationData } = useQuery<{ unread_count: number }>({
+    queryKey: ["my-unread-notification-count"],
+    queryFn: async () => (await api.get("/notifications/my/unread-count/")).data,
+    enabled: loggedIn,
+    refetchInterval: 30000,
+  });
+
+  const markNotificationReadMutation = useMutation({
+    mutationFn: async (notificationId: number) => {
+      await api.post(`/notifications/${notificationId}/read/`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-unread-notification-count"] });
+    },
+  });
+
+  const markAllNotificationsReadMutation = useMutation({
+    mutationFn: async () => {
+      await api.post("/notifications/read-all/");
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-unread-notification-count"] });
+    },
+  });
+
   const handleLogout = async () => {
     logoutUser();
     setLoggedIn(false);
-    queryClient.clear(); 
-
-  
-    window.location.href = "/listings";
-
-    queryClient.setQueryData(["navbar-current-user"], null);
-    queryClient.removeQueries({ queryKey: ["navbar-current-user"] });
-    queryClient.removeQueries({ queryKey: ["current_user"] });
-    queryClient.removeQueries({ queryKey: ["me"] });
+    queryClient.clear();
     localStorage.clear();
     sessionStorage.clear();
-    navigate("/listings", { replace: true });
+    window.location.href = "/listings";
   };
 
   const canModerate = !!loggedIn && !!(currentUser?.is_staff || currentUser?.is_superuser);
@@ -127,7 +179,10 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto max-w-screen-2xl px-4 md:px-6">
         <div className="hidden md:flex md:items-center md:justify-between md:py-4">
-          <Link to="/" className="text-2xl font-bold text-slate-800 transition-colors hover:text-slate-600">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-slate-800 transition-colors hover:text-slate-600"
+          >
             Market Hub
           </Link>
 
@@ -147,7 +202,8 @@ export default function Navbar() {
             ) : (
               <>
                 <span className="px-3 py-2 text-slate-600">
-                  {t("nav.hi")}, <span className="font-semibold text-slate-800">{displayName()}</span>
+                  {t("nav.hi")},{" "}
+                  <span className="font-semibold text-slate-800">{displayName()}</span>
                 </span>
 
                 <NavLink to="/publish">{t("nav.publish")}</NavLink>
@@ -156,6 +212,79 @@ export default function Navbar() {
                 <NavLink to="/subscriptions">{t("nav.subscriptions")}</NavLink>
 
                 {canModerate && <NavLink to="/admin/moderation">{t("nav.moderation")}</NavLink>}
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsNotificationOpen((prev) => !prev)}
+                    className="relative rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                    aria-label="Notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+
+                    {(unreadNotificationData?.unread_count || 0) > 0 && (
+                      <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+                        {unreadNotificationData?.unread_count}
+                      </span>
+                    )}
+                  </button>
+
+                  {isNotificationOpen && (
+                    <div className="absolute right-0 z-50 mt-2 w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                        <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
+                        <button
+                          type="button"
+                          onClick={() => markAllNotificationsReadMutation.mutate()}
+                          className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                        >
+                          Mark all as read
+                        </button>
+                      </div>
+
+                      <div className="max-h-[420px] overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-sm text-slate-500">
+                            No notifications yet.
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <button
+                              key={notification.id}
+                              type="button"
+                              onClick={() => {
+                                if (!notification.is_read) {
+                                  markNotificationReadMutation.mutate(notification.id);
+                                }
+                              }}
+                              className={`block w-full border-b border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50 ${
+                                notification.is_read ? "bg-white" : "bg-indigo-50/40"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {notification.title}
+                                  </p>
+                                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                                    {notification.message}
+                                  </p>
+                                  <p className="mt-2 text-[11px] text-slate-400">
+                                    {formatNotificationTime(notification.created_at)}
+                                  </p>
+                                </div>
+
+                                {!notification.is_read && (
+                                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-indigo-600" />
+                                )}
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <button
                   onClick={handleLogout}
@@ -178,6 +307,80 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <LanguageSwitcher changeLanguage={changeLanguage} mobile currentLang={i18n.language} />
 
+            {loggedIn && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsNotificationOpen((prev) => !prev)}
+                  className="relative rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+                  aria-label="Notifications"
+                >
+                  <Bell className="h-5 w-5" />
+                  {(unreadNotificationData?.unread_count || 0) > 0 && (
+                    <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+                      {unreadNotificationData?.unread_count}
+                    </span>
+                  )}
+                </button>
+
+                {isNotificationOpen && (
+                  <div className="absolute right-0 z-50 mt-2 w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                      <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
+                      <button
+                        type="button"
+                        onClick={() => markAllNotificationsReadMutation.mutate()}
+                        className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                      >
+                        Mark all as read
+                      </button>
+                    </div>
+
+                    <div className="max-h-[420px] overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-sm text-slate-500">
+                          No notifications yet.
+                        </div>
+                      ) : (
+                        notifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            type="button"
+                            onClick={() => {
+                              if (!notification.is_read) {
+                                markNotificationReadMutation.mutate(notification.id);
+                              }
+                            }}
+                            className={`block w-full border-b border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50 ${
+                              notification.is_read ? "bg-white" : "bg-indigo-50/40"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-slate-900">
+                                  {notification.title}
+                                </p>
+                                <p className="mt-1 text-xs leading-5 text-slate-600">
+                                  {notification.message}
+                                </p>
+                                <p className="mt-2 text-[11px] text-slate-400">
+                                  {formatNotificationTime(notification.created_at)}
+                                </p>
+                              </div>
+
+                              {!notification.is_read && (
+                                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-indigo-600" />
+                              )}
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <button
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
               className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
@@ -185,9 +388,19 @@ export default function Navbar() {
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -217,7 +430,8 @@ export default function Navbar() {
               ) : (
                 <>
                   <div className="px-3 py-2 text-slate-600">
-                    {t("nav.hi")}, <span className="font-semibold text-slate-800">{displayName()}</span>
+                    {t("nav.hi")},{" "}
+                    <span className="font-semibold text-slate-800">{displayName()}</span>
                   </div>
 
                   <MobileNavLink to="/publish" onClick={() => setIsMobileMenuOpen(false)}>
@@ -229,11 +443,9 @@ export default function Navbar() {
                   <MobileNavLink to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                     {t("nav.profile")}
                   </MobileNavLink>
-
                   <MobileNavLink to="/subscriptions" onClick={() => setIsMobileMenuOpen(false)}>
                     {t("nav.subscriptions")}
                   </MobileNavLink>
-
 
                   {canModerate && (
                     <MobileNavLink to="/admin/moderation" onClick={() => setIsMobileMenuOpen(false)}>

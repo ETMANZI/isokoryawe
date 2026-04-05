@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { CheckCircle, XCircle } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
@@ -254,34 +255,49 @@ export default function SubscriptionPlansPage() {
                         </p>
                       </div>
 
-                      <div className="mb-6 space-y-2 text-sm text-slate-600">
-                        <p>
-                          • {t("subscription.max_listings")}: {plan.max_listings}
-                        </p>
-                        <p>
-                          • {t("subscription.business_ads")}:{" "}
-                          {plan.can_post_business_ads
-                            ? t("subscription.included")
-                            : t("subscription.not_included")}
-                        </p>
-                        <p>
-                          • {t("subscription.featured_listings")}:{" "}
-                          {plan.can_feature_listings
-                            ? t("subscription.included")
-                            : t("subscription.not_included")}
-                        </p>
-                        <p>
-                          • {t("subscription.advanced_analytics")}:{" "}
-                          {plan.can_access_advanced_analytics
-                            ? t("subscription.included")
-                            : t("subscription.not_included")}
-                        </p>
-                        <p>
-                          • {t("subscription.priority_support")}:{" "}
-                          {plan.priority_support
-                            ? t("subscription.included")
-                            : t("subscription.not_included")}
-                        </p>
+                      <div className="mb-6 space-y-3 text-sm text-slate-700">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">
+                            {t("subscription.max_listings")}:
+                          </span>
+                          <span>{plan.max_listings}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {plan.can_post_business_ads ? (
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
+                          ) : (
+                            <XCircle className="h-4 w-4 shrink-0 text-red-500" />
+                          )}
+                          <span>{t("subscription.business_ads")}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {plan.can_feature_listings ? (
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
+                          ) : (
+                            <XCircle className="h-4 w-4 shrink-0 text-red-500" />
+                          )}
+                          <span>{t("subscription.featured_listings")}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {plan.can_access_advanced_analytics ? (
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
+                          ) : (
+                            <XCircle className="h-4 w-4 shrink-0 text-red-500" />
+                          )}
+                          <span>{t("subscription.advanced_analytics")}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {plan.priority_support ? (
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
+                          ) : (
+                            <XCircle className="h-4 w-4 shrink-0 text-red-500" />
+                          )}
+                          <span>{t("subscription.priority_support")}</span>
+                        </div>
                       </div>
 
                       <div className="mt-auto">

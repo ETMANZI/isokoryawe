@@ -165,16 +165,16 @@
   "submit_button": "Tangaza Ikigurishwa hanyuma ukomeze kwishyura",
   "payment_message": "Igurishwa ryakozwe neza. Igiciro cyo gutangaza: {{amount}} {{currency}}",
   "error_message": "Kutanga Ikigurishwa ntabwo bikunze.",
-    "max_images_error": "Gahunda yawe yemera amashusho {{max}} gusa. Kuraho amashusho cyangwa vugurura ubusabirizimu.",
-    "at_least_one_image": "Nyamuneka ongeraho byibuze shusho imwe.",
-    "max_images": "{{current}}/{{max}} amashusho",
-    "images_hin": "Urashobora gupakisha amashusho agera kuri {{max}}. Ushusho wa mbere nicyo kizaba ikiranga.",
+    "max_images_error": "Gahunda yawe yemera amafoto {{max}} gusa. Kuraho amafoto cyangwa vugurura ubusabirizimu.",
+    "at_least_one_image": "Nyamuneka ongeraho byibuze ifoto imwe.",
+    "max_images": "{{current}}/{{max}} amafoto",
+    "images_hin": "Urashobora gupakisha amafoto agera kuri {{max}}. Ifoto ya mbere niyo izaba igaragara imbere.",
     "current_plan": "Gahunda Urimo: {{plan}}",
     "free_plan": "Gahunda Y'ubuntu",
-    "images_allowed": "✓ amashusho {{count}} ku itangazwa",
-    "valid_until": "Imaraho",
-    "upgrade_plan": "Vugurura Gahunda",
-    "upgrade_required": "Vugurura ubusabirizimu"
+    "images_allowed": "✓ amafoto {{count}} kuri buri guikuruzwa",
+    "valid_until": "Irakozra kugeza",
+    "upgrade_plan": "Vugurura ifatabuguzi",
+    "upgrade_required": "Vugurura ifatabuguzi ryawe"
 },
 
   "listings": {

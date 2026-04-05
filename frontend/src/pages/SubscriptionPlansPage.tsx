@@ -41,6 +41,16 @@ type MySubscriptionResponse = {
   } | null;
 };
 
+// Helper function to get image limit by plan name (fallback)
+const getImageLimitByPlanName = (planName: string): number => {
+  const name = planName?.toLowerCase() || "";
+  if (name === "basic") return 1;
+  if (name === "classic") return 2;
+  if (name === "premium") return 3;
+  if (name === "business") return 4;
+  return 0;
+};
+
 export default function SubscriptionPlansPage() {
   const { t } = useTranslation();
   const loggedIn = isAuthenticated();
@@ -49,7 +59,11 @@ export default function SubscriptionPlansPage() {
 
   const { data: plans = [], isLoading } = useQuery<SubscriptionPlan[]>({
     queryKey: ["subscription-plans"],
-    queryFn: async () => (await api.get("/subscriptions/plans/")).data,
+    queryFn: async () => {
+      const response = await api.get("/subscriptions/plans/");
+      console.log("Plans API response:", response.data);
+      return response.data;
+    },
   });
 
   const { data: mySubscription, refetch } = useQuery<MySubscriptionResponse>({
@@ -86,10 +100,7 @@ export default function SubscriptionPlansPage() {
 
   const isPending = currentSubscription?.status === "pending";
 
-  // Check if user has an active subscription
   const hasActiveSubscription = currentSubscription?.is_currently_active === true;
-
-  // Check if user has ANY subscription (active, expired, or pending)
   const hasAnySubscription = !!currentSubscription;
 
   return (
@@ -178,7 +189,8 @@ export default function SubscriptionPlansPage() {
                       {t("subscription.max_images_per_listing")}
                     </p>
                     <p className="text-xl font-bold text-slate-900">
-                      {currentSubscription.plan.max_images_per_listing}
+                      {currentSubscription.plan.max_images_per_listing || 
+                        getImageLimitByPlanName(currentSubscription.plan.name)}
                     </p>
                   </div>
 
@@ -239,12 +251,13 @@ export default function SubscriptionPlansPage() {
           ) : (
             <div id="plans" className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               {plans.map((plan) => {
-                // Check if this specific plan is the user's current subscription
                 const hasThisSubscription = currentSubscription?.plan?.id === plan.id;
-                
                 const isCurrentActivePlan = hasThisSubscription && hasActiveSubscription;
                 const isCurrentExpiredPlan = hasThisSubscription && isExpired;
                 const isCurrentPendingPlan = hasThisSubscription && isPending;
+                
+                // Get image limit (from API or fallback)
+                const imageLimit = plan.max_images_per_listing || getImageLimitByPlanName(plan.name);
 
                 return (
                   <Card
@@ -295,7 +308,6 @@ export default function SubscriptionPlansPage() {
                       </div>
 
                       <div className="mb-6 space-y-3 text-sm text-slate-700">
-                        {/* Max Listings */}
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
                             {t("subscription.max_listings")}:
@@ -303,16 +315,14 @@ export default function SubscriptionPlansPage() {
                           <span className="font-semibold text-indigo-600">{plan.max_listings}</span>
                         </div>
 
-                        {/* Max Images Per Listing - Now properly displayed */}
                         <div className="flex items-center gap-2">
                           <ImageIcon className="h-4 w-4 shrink-0 text-indigo-500" />
                           <span className="font-medium">
                             {t("subscription.max_images_per_listing")}:
                           </span>
-                          <span className="font-semibold text-indigo-600">{plan.max_images_per_listing}</span>
+                          <span className="font-semibold text-indigo-600">{imageLimit}</span>
                         </div>
 
-                        {/* Business Ads */}
                         <div className="flex items-center gap-2">
                           {plan.can_post_business_ads ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
@@ -322,7 +332,6 @@ export default function SubscriptionPlansPage() {
                           <span>{t("subscription.business_ads")}</span>
                         </div>
 
-                        {/* Featured Listings */}
                         <div className="flex items-center gap-2">
                           {plan.can_feature_listings ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
@@ -332,7 +341,6 @@ export default function SubscriptionPlansPage() {
                           <span>{t("subscription.featured_listings")}</span>
                         </div>
 
-                        {/* Advanced Analytics */}
                         <div className="flex items-center gap-2">
                           {plan.can_access_advanced_analytics ? (
                             <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
@@ -404,7 +412,6 @@ export default function SubscriptionPlansPage() {
             </div>
           )}
 
-          {/* Show message for logged-in users without any subscription */}
           {loggedIn && !hasAnySubscription && !isLoading && plans.length > 0 && (
             <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-center">
               <p className="text-blue-800">

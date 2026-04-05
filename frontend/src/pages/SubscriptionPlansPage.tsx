@@ -86,6 +86,12 @@ export default function SubscriptionPlansPage() {
 
   const isPending = currentSubscription?.status === "pending";
 
+  // Check if user has an active subscription
+  const hasActiveSubscription = currentSubscription?.is_currently_active === true;
+
+  // Check if user has ANY subscription (active, expired, or pending)
+  const hasAnySubscription = !!currentSubscription;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
@@ -111,8 +117,10 @@ export default function SubscriptionPlansPage() {
           {loggedIn && currentSubscription && (
             <div
               className={`mb-8 rounded-3xl border p-5 shadow-sm ${
-                currentSubscription.status === "approved" && currentSubscription.is_currently_active
+                hasActiveSubscription
                   ? "border-emerald-200 bg-emerald-50"
+                  : isExpired
+                  ? "border-red-200 bg-red-50"
                   : currentSubscription.status === "pending"
                   ? "border-amber-200 bg-amber-50"
                   : currentSubscription.status === "rejected"
@@ -133,8 +141,10 @@ export default function SubscriptionPlansPage() {
                   <p className="mt-1 text-sm text-slate-600">
                     {t("subscription.status")}:{" "}
                     <span className="font-semibold">
-                      {currentSubscription.is_currently_active 
+                      {hasActiveSubscription 
                         ? t("subscription.status_active")
+                        : isExpired
+                        ? t("subscription.status_expired")
                         : t(`subscription.status_${currentSubscription.status}`)}
                     </span>
                   </p>
@@ -160,7 +170,7 @@ export default function SubscriptionPlansPage() {
                       {t("subscription.listing_limit")}
                     </p>
                     <p className="text-xl font-bold text-slate-900">
-                      {currentSubscription.plan.max_images_per_listing}
+                      {currentSubscription.plan.max_listings}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
@@ -172,7 +182,7 @@ export default function SubscriptionPlansPage() {
                     </p>
                   </div>
 
-                  {!currentSubscription.is_currently_active && (
+                  {isExpired && (
                     <a
                       href="#plans"
                       className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700"
@@ -229,22 +239,39 @@ export default function SubscriptionPlansPage() {
           ) : (
             <div id="plans" className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               {plans.map((plan) => {
-                const isCurrentPlan =
-                  currentSubscription?.plan?.id === plan.id &&
-                  currentSubscription?.is_currently_active;
+                // Check if this specific plan is the user's current subscription
+                const hasThisSubscription = currentSubscription?.plan?.id === plan.id;
+                
+                const isCurrentActivePlan = hasThisSubscription && hasActiveSubscription;
+                const isCurrentExpiredPlan = hasThisSubscription && isExpired;
+                const isCurrentPendingPlan = hasThisSubscription && isPending;
 
                 return (
                   <Card
                     key={plan.id}
                     className={`relative overflow-hidden border-2 ${
-                      isCurrentPlan
+                      isCurrentActivePlan
                         ? "border-emerald-500 bg-emerald-50/40 shadow-lg"
+                        : isCurrentExpiredPlan
+                        ? "border-red-500 bg-red-50/40 shadow-lg"
                         : "border-slate-200"
                     }`}
                   >
-                    {isCurrentPlan && (
+                    {isCurrentActivePlan && (
                       <div className="absolute right-3 top-3 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow">
                         {t("subscription.current_plan")}
+                      </div>
+                    )}
+
+                    {isCurrentExpiredPlan && (
+                      <div className="absolute right-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow">
+                        {t("subscription.expired")}
+                      </div>
+                    )}
+
+                    {isCurrentPendingPlan && (
+                      <div className="absolute right-3 top-3 rounded-full bg-amber-600 px-3 py-1 text-xs font-semibold text-white shadow">
+                        {t("subscription.pending")}
                       </div>
                     )}
 
@@ -327,13 +354,27 @@ export default function SubscriptionPlansPage() {
                               {t("subscription.login_to_subscribe")}
                             </Button>
                           </Link>
-                        ) : isCurrentPlan ? (
+                        ) : isCurrentActivePlan ? (
                           <Button className="w-full bg-emerald-600" disabled>
                             {t("subscription.current_plan")}
                           </Button>
-                        ) : isPending ? (
+                        ) : isCurrentPendingPlan ? (
                           <Button className="w-full bg-amber-500" disabled>
                             {t("subscription.pending_approval")}
+                          </Button>
+                        ) : isCurrentExpiredPlan ? (
+                          <Button
+                            className="w-full bg-indigo-600"
+                            onClick={() => {
+                              setActionMessage(null);
+                              setActionError(null);
+                              subscribeMutation.mutate(plan.id);
+                            }}
+                            disabled={subscribeMutation.isPending}
+                          >
+                            {subscribeMutation.isPending
+                              ? t("subscription.processing")
+                              : t("subscription.renew_plan")}
                           </Button>
                         ) : (
                           <Button
@@ -355,6 +396,18 @@ export default function SubscriptionPlansPage() {
                   </Card>
                 );
               })}
+            </div>
+          )}
+
+          {/* Show message for logged-in users without any subscription */}
+          {loggedIn && !hasAnySubscription && !isLoading && plans.length > 0 && (
+            <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-center">
+              <p className="text-blue-800">
+                {t("subscription.no_subscription_yet")}
+              </p>
+              <p className="text-sm text-blue-600 mt-1">
+                {t("subscription.choose_plan_to_start")}
+              </p>
             </div>
           )}
         </div>

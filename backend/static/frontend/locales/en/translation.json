@@ -329,7 +329,8 @@
     "images_allowed": "✓ {{count}} image(s) per listing",
     "valid_until": "Valid until",
     "upgrade_plan": "Upgrade Plan",
-    "upgrade_required": "Upgrade required"
+    "upgrade_required": "Upgrade required",
+    "pending_approval":"Pending Approval"
 },
 
 "admin": {

@@ -960,7 +960,8 @@
     "growing_businesses": "Ku bucuruzi buri gukura",
     "agencies_high_volume": "Ku bigo n’abacuruzi bafite ibicuruzwa byinshi",
     "monthly": "ku kwezi",
-    "minutes": "iminota"
+    "minutes": "iminota",
+    "pending_approval":"Ntibiremerwa"
   },
   "common": {
     "included": "Birimo",

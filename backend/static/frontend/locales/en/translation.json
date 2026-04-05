@@ -933,7 +933,8 @@
     "status_expired": "Expired",
     "days":"Days",
     "choose_plan":"Choose Plan",
-    "current_subscription":"Current Subscription"
+    "current_subscription":"Current Subscription",
+    "listing_limit":"Listings Limits"
   },
   "common": {
     "included": "Included",

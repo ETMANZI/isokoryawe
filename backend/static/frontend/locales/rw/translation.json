@@ -935,7 +935,8 @@
     "status_expired": "Byarangiye",
     "days":"Iminsi",
     "choose_plan":"Hitamo Gahunda",
-    "current_subscription":"Ifatabuzi rihari"
+    "current_subscription":"Ifatabuzi rihari",
+    "listing_limit":"Ibicuruzwa Ntarengwa"
   },
   "common": {
     "included": "Birimo",

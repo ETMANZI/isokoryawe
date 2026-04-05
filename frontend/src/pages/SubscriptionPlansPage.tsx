@@ -175,7 +175,7 @@ export default function SubscriptionPlansPage() {
                   </div>
                   <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
                     <p className="text-sm text-slate-500">
-                      {t("subscription.image_limit")}
+                      {t("subscription.max_images_per_listing")}
                     </p>
                     <p className="text-xl font-bold text-slate-900">
                       {currentSubscription.plan.max_images_per_listing}

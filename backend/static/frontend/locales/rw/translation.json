@@ -221,7 +221,10 @@
     "no_image": "Nta Shusho",
     "previous": "Ibibanjirije",
     "next": "Ibikurikira",
-    "category": "Icyiciro"
+    "category": "Icyiciro",
+    "subscription_expired": "Ubusabirizimu bwawe bwarangiye. Nyamukira kugira ngo ushobore gushyiraho ibitangazwa bishya.",
+    "subscription_required": "Ubusabirizimu bukora burakenewe kugira ngo ushobore gushyiraho ibitangazwa.",
+    "subscribe_to_post": "Iyandikishe Kugira Ngo Ushyireho"
   },
 
   "auth": {

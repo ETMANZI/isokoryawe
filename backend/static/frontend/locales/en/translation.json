@@ -68,7 +68,13 @@
     "no_image": "No Image",
     "previous": "Previous",
     "next": "Next",
-    "category": "Category"
+    "category": "Category",
+
+    "subscription_expired": "Your subscription has expired. Please renew to post new listings.",
+    "subscription_required": "An active subscription is required to post listings.",
+    "subscribe_to_post": "Subscribe to Post"
+  
+
   },
 
   "auth": {

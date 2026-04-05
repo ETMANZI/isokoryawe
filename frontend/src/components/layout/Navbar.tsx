@@ -230,6 +230,11 @@ export default function Navbar() {
                     {t("nav.profile")}
                   </MobileNavLink>
 
+                  <MobileNavLink to="/subscriptions" onClick={() => setIsMobileMenuOpen(false)}>
+                    {t("nav.subscriptions")}
+                  </MobileNavLink>
+
+
                   {canModerate && (
                     <MobileNavLink to="/admin/moderation" onClick={() => setIsMobileMenuOpen(false)}>
                       {t("nav.moderation")}

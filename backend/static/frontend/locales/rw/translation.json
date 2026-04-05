@@ -936,7 +936,17 @@
     "days":"Iminsi",
     "choose_plan":"Hitamo Gahunda",
     "current_subscription":"Ifatabuzi rihari",
-    "listing_limit":"Ibicuruzwa Ntarengwa"
+    "listing_limit":"Ibicuruzwa Ntarengwa",
+    "free": "Ubuntu",
+    "basic": "Bisanzwe",
+    "premium": "Bihambaye",
+    "business": "Ubucuruzi",
+    "starter_plan": "Gahunda itangiriro ku bakoresha bashya",
+    "regular_sellers": "Ku bacuruzi basanzwe",
+    "growing_businesses": "Ku bucuruzi buri gukura",
+    "agencies_high_volume": "Ku bigo n’abacuruzi bafite ibicuruzwa byinshi",
+    "monthly": "ku kwezi",
+    "minutes": "iminota"
   },
   "common": {
     "included": "Birimo",

@@ -35,6 +35,16 @@ type NotificationItem = {
   created_at: string;
 };
 
+type MySubscriptionResponse = {
+  has_subscription: boolean;
+  subscription: {
+    id: number;
+    status: string;
+    is_currently_active: boolean;
+    end_date?: string | null;
+  } | null;
+};
+
 function formatNotificationTime(value?: string) {
   if (!value) return "";
   return new Date(value).toLocaleString("en-RW", {
@@ -93,6 +103,14 @@ export default function Navbar() {
     enabled: loggedIn,
     staleTime: 5 * 60 * 1000,
     retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: mySubscription } = useQuery<MySubscriptionResponse>({
+    queryKey: ["my-subscription"],
+    queryFn: async () => (await api.get("/subscriptions/my-subscription/")).data,
+    enabled: loggedIn,
+    staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
@@ -157,6 +175,12 @@ export default function Navbar() {
 
   const canModerate = !!loggedIn && !!(currentUser?.is_staff || currentUser?.is_superuser);
 
+  const canPublish =
+    !!loggedIn &&
+    !!mySubscription?.subscription &&
+    mySubscription.subscription.status === "approved" &&
+    !!mySubscription.subscription.is_currently_active;
+
   const displayName = () => {
     if (isLoadingCurrentUser) return "...";
 
@@ -205,7 +229,7 @@ export default function Navbar() {
                   <span className="font-semibold text-slate-800">{displayName()}</span>
                 </span>
 
-                <NavLink to="/publish">{t("nav.publish")}</NavLink>
+                {canPublish && <NavLink to="/publish">{t("nav.publish")}</NavLink>}
                 <NavLink to="/dashboard">{t("nav.dashboard")}</NavLink>
                 <NavLink to="/profile">{t("nav.profile")}</NavLink>
                 <NavLink to="/subscriptions">{t("nav.subscriptions")}</NavLink>
@@ -433,9 +457,11 @@ export default function Navbar() {
                     <span className="font-semibold text-slate-800">{displayName()}</span>
                   </div>
 
-                  <MobileNavLink to="/publish" onClick={() => setIsMobileMenuOpen(false)}>
-                    {t("nav.publish")}
-                  </MobileNavLink>
+                  {canPublish && (
+                    <MobileNavLink to="/publish" onClick={() => setIsMobileMenuOpen(false)}>
+                      {t("nav.publish")}
+                    </MobileNavLink>
+                  )}
                   <MobileNavLink to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                     {t("nav.dashboard")}
                   </MobileNavLink>

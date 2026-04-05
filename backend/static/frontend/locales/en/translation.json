@@ -934,7 +934,17 @@
     "days":"Days",
     "choose_plan":"Choose Plan",
     "current_subscription":"Current Subscription",
-    "listing_limit":"Listings Limits"
+    "listing_limit":"Listings Limits",
+    "free": "Free",
+    "basic": "Basic",
+    "premium": "Premium",
+    "business": "Business",
+    "starter_plan": "Starter Paln",
+    "regular_sellers": "Regular Seller",
+    "growing_businesses": "Growing Business",
+    "agencies_high_volume": "Agencies High Volume",
+    "monthly": "Monthly",
+    "minutes": "Minutes"
   },
   "common": {
     "included": "Included",

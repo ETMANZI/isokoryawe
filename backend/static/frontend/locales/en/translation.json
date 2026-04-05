@@ -967,7 +967,8 @@
     "pending_approval":"Pending Approval",
     "request_submitted":"Request Submitted",
     "amount_to_pay":"Amount to pay",
-    "max_images_per_listing":"Image(s) Per listing"
+    "max_images_per_listing":"Image(s) Per listing",
+    "processing":"Processing"
   },
   "common": {
     "included": "Included",

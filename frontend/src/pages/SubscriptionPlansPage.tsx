@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import PageContainer from "../components/layout/PageContainer";
@@ -37,6 +38,8 @@ type MySubscriptionResponse = {
 
 export default function SubscriptionPlansPage() {
   const loggedIn = isAuthenticated();
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const { data: plans = [], isLoading } = useQuery<SubscriptionPlan[]>({
     queryKey: ["subscription-plans"],
@@ -53,14 +56,16 @@ export default function SubscriptionPlansPage() {
     mutationFn: async (planId: number) =>
       (await api.post("/subscriptions/subscribe/", { plan_id: planId })).data,
     onSuccess: (data) => {
-      alert(
+      setActionError(null);
+      setActionMessage(
         `Subscription created successfully. Amount to pay: ${data.amount} ${data.currency}`
       );
     },
     onError: (error: any) => {
-      const msg =
-        error?.response?.data?.detail || "Failed to subscribe. Please try again.";
-      alert(msg);
+      setActionMessage(null);
+      setActionError(
+        error?.response?.data?.detail || "Failed to subscribe. Please try again."
+      );
     },
   });
 
@@ -111,6 +116,18 @@ export default function SubscriptionPlansPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          )}
+
+          {actionMessage && (
+            <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              {actionMessage}
+            </div>
+          )}
+
+          {actionError && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {actionError}
             </div>
           )}
 
@@ -226,7 +243,11 @@ export default function SubscriptionPlansPage() {
                         ) : (
                           <Button
                             className="w-full bg-indigo-600"
-                            onClick={() => subscribeMutation.mutate(plan.id)}
+                            onClick={() => {
+                              setActionMessage(null);
+                              setActionError(null);
+                              subscribeMutation.mutate(plan.id);
+                            }}
                             disabled={subscribeMutation.isPending}
                           >
                             {subscribeMutation.isPending

@@ -47,16 +47,16 @@ class SubscriptionPlan(models.Model):
     def save(self, *args, **kwargs):
         if self.code == 'basic':
             self.max_images_per_listing = 1
-            self.max_listings = 1
+            self.max_listings = 2
         elif self.code == 'classic':
             self.max_images_per_listing = 2
-            self.max_listings = 2
+            self.max_listings = 3
         elif self.code == 'premium':
             self.max_images_per_listing = 3
-            self.max_listings = 2
+            self.max_listings = 4
         elif self.code == 'business':
             self.max_images_per_listing = 4
-            self.max_listings = 3
+            self.max_listings = 5
         
         super().save(*args, **kwargs)
 

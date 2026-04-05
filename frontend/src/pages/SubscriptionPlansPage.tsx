@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Image } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
@@ -19,6 +19,7 @@ type SubscriptionPlan = {
   billing_cycle: string;
   duration_days: number;
   max_listings: number;
+  max_images_per_listing: number;
   can_post_business_ads: boolean;
   can_feature_listings: boolean;
   can_access_advanced_analytics: boolean;
@@ -51,7 +52,7 @@ export default function SubscriptionPlansPage() {
     queryFn: async () => (await api.get("/subscriptions/plans/")).data,
   });
 
-  const { data: mySubscription } = useQuery<MySubscriptionResponse>({
+  const { data: mySubscription, refetch } = useQuery<MySubscriptionResponse>({
     queryKey: ["my-subscription"],
     queryFn: async () => (await api.get("/subscriptions/my-subscription/")).data,
     enabled: loggedIn,
@@ -65,6 +66,7 @@ export default function SubscriptionPlansPage() {
       setActionMessage(
         `${t("subscription.request_submitted")} ${t("subscription.amount_to_pay")}: ${data.amount} ${data.currency}`
       );
+      refetch();
     },
     onError: (error: any) => {
       setActionMessage(null);
@@ -109,7 +111,7 @@ export default function SubscriptionPlansPage() {
           {loggedIn && currentSubscription && (
             <div
               className={`mb-8 rounded-3xl border p-5 shadow-sm ${
-                currentSubscription.status === "approved"
+                currentSubscription.status === "approved" && currentSubscription.is_currently_active
                   ? "border-emerald-200 bg-emerald-50"
                   : currentSubscription.status === "pending"
                   ? "border-amber-200 bg-amber-50"
@@ -131,7 +133,9 @@ export default function SubscriptionPlansPage() {
                   <p className="mt-1 text-sm text-slate-600">
                     {t("subscription.status")}:{" "}
                     <span className="font-semibold">
-                      {t(`subscription.status_${currentSubscription.status}`)}
+                      {currentSubscription.is_currently_active 
+                        ? t("subscription.status_active")
+                        : t(`subscription.status_${currentSubscription.status}`)}
                     </span>
                   </p>
 
@@ -159,8 +163,16 @@ export default function SubscriptionPlansPage() {
                       {currentSubscription.plan.max_listings}
                     </p>
                   </div>
+                  <div className="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
+                    <p className="text-sm text-slate-500">
+                      {t("subscription.image_limit")}
+                    </p>
+                    <p className="text-xl font-bold text-slate-900">
+                      {currentSubscription.plan.max_images_per_listing}
+                    </p>
+                  </div>
 
-                  {isExpired && (
+                  {!currentSubscription.is_currently_active && (
                     <a
                       href="#plans"
                       className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700"
@@ -260,7 +272,15 @@ export default function SubscriptionPlansPage() {
                           <span className="font-medium">
                             {t("subscription.max_listings")}:
                           </span>
-                          <span>{plan.max_listings}</span>
+                          <span className="font-semibold text-indigo-600">{plan.max_listings}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Image className="h-4 w-4 shrink-0 text-indigo-500" />
+                          <span className="font-medium">
+                            {t("subscription.max_images_per_listing")}:
+                          </span>
+                          <span className="font-semibold text-indigo-600">{plan.max_images_per_listing}</span>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -327,8 +347,6 @@ export default function SubscriptionPlansPage() {
                           >
                             {subscribeMutation.isPending
                               ? t("subscription.processing")
-                              : isExpired
-                              ? t("subscription.renew_plan")
                               : t("subscription.choose_plan")}
                           </Button>
                         )}

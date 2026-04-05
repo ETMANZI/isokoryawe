@@ -50,13 +50,13 @@ class SubscriptionPlan(models.Model):
             self.max_listings = 1
         elif self.code == 'classic':
             self.max_images_per_listing = 2
-            self.max_listings = 5
+            self.max_listings = 2
         elif self.code == 'premium':
             self.max_images_per_listing = 3
-            self.max_listings = 15
+            self.max_listings = 2
         elif self.code == 'business':
             self.max_images_per_listing = 4
-            self.max_listings = 50
+            self.max_listings = 3
         
         super().save(*args, **kwargs)
 

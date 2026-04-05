@@ -190,15 +190,25 @@ class AdminRejectSubscriptionView(APIView):
 
         reason = (request.data.get("reason") or "").strip()
 
+        # ❌ Reject subscription
         subscription.reject(reason)
 
-        Listing.objects.filter(owner=subscription.user).update(
-            visibility_status=Listing.VisibilityStatus.INACTIVE
-        )
+        # 🔥 Only hide listings if NO other active subscription exists
+        has_active = UserSubscription.objects.filter(
+            user=subscription.user,
+            status="approved",
+            is_active=True,
+            end_date__gt=timezone.now(),
+        ).exists()
+
+        if not has_active:
+            Listing.objects.filter(owner=subscription.user).update(
+                visibility_status=Listing.VisibilityStatus.INACTIVE
+            )
 
         return Response(
             {
-                "message": "Subscription rejected. All listings have been hidden.",
+                "message": "Subscription rejected successfully.",
                 "reason": reason or "Rejected by admin",
             }
         )

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -6,9 +6,7 @@ import {
   PlusCircle,
   LayoutDashboard,
   CreditCard,
-//   Settings,
   HelpCircle,
-//   MapPin,
   Camera,
   MessageCircle,
   Bell,
@@ -21,6 +19,7 @@ import {
   Printer,
   Phone,
   MessageCircle as WhatsAppIcon,
+  X,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
@@ -30,11 +29,13 @@ type GuideSection = {
   title: string;
   icon: React.ReactNode;
   content: React.ReactNode;
+  searchKeywords: string[];
 };
 
 export default function UserGuidePage() {
   const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState("getting-started");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const phoneNumber = "+250 788 263 338";
   const whatsappUrl = "https://wa.me/250788263338";
@@ -45,6 +46,7 @@ export default function UserGuidePage() {
       id: "getting-started",
       title: t("guide.getting_started.title"),
       icon: <HelpCircle size={20} />,
+      searchKeywords: ["getting started", "register", "account", "sign up", "create account", "welcome"],
       content: (
         <div className="space-y-6">
           <div>
@@ -94,6 +96,7 @@ export default function UserGuidePage() {
       id: "posting-listing",
       title: t("guide.posting_listing.title"),
       icon: <PlusCircle size={20} />,
+      searchKeywords: ["post", "listing", "publish", "sell", "ad", "create listing", "upload images"],
       content: (
         <div className="space-y-6">
           <p className="text-slate-600 leading-relaxed">
@@ -152,6 +155,7 @@ export default function UserGuidePage() {
       id: "subscriptions",
       title: t("guide.subscriptions.title"),
       icon: <CreditCard size={20} />,
+      searchKeywords: ["subscription", "plan", "pay", "upgrade", "basic", "premium", "price", "payment"],
       content: (
         <div className="space-y-6">
           <p className="text-slate-600 leading-relaxed">
@@ -206,6 +210,7 @@ export default function UserGuidePage() {
       id: "dashboard",
       title: t("guide.dashboard.title"),
       icon: <LayoutDashboard size={20} />,
+      searchKeywords: ["dashboard", "analytics", "statistics", "manage", "listings", "messages", "notifications"],
       content: (
         <div className="space-y-6">
           <p className="text-slate-600 leading-relaxed">
@@ -257,6 +262,7 @@ export default function UserGuidePage() {
       id: "safety",
       title: t("guide.safety.title"),
       icon: <Shield size={20} />,
+      searchKeywords: ["safety", "security", "scam", "warning", "protect", "fraud"],
       content: (
         <div className="space-y-6">
           <div className="bg-red-50 rounded-xl p-4 border border-red-200">
@@ -299,6 +305,7 @@ export default function UserGuidePage() {
       id: "faq",
       title: t("guide.faq.title"),
       icon: <HelpCircle size={20} />,
+      searchKeywords: ["faq", "question", "help", "support", "how to", "problem"],
       content: (
         <div className="space-y-4">
           <div className="border-b border-slate-200 pb-3">
@@ -346,6 +353,31 @@ export default function UserGuidePage() {
     },
   ];
 
+  // Filter sections based on search query
+  const filteredSections = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return sections;
+    }
+    const query = searchQuery.toLowerCase().trim();
+    return sections.filter(
+      (section) =>
+        section.title.toLowerCase().includes(query) ||
+        section.searchKeywords.some((keyword) => keyword.toLowerCase().includes(query))
+    );
+  }, [searchQuery]);
+
+  // Auto-select first filtered section if current active section is not in filtered results
+  const displayedActiveSection = useMemo(() => {
+    if (filteredSections.some((s) => s.id === activeSection)) {
+      return activeSection;
+    }
+    return filteredSections[0]?.id || "getting-started";
+  }, [filteredSections, activeSection]);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
@@ -360,46 +392,76 @@ export default function UserGuidePage() {
             </p>
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar with Clear Button */}
           <div className="max-w-md mx-auto mb-8">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("guide.search_placeholder")}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full pl-10 pr-10 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
+            
+            {/* Search Results Count */}
+            {searchQuery && (
+              <p className="text-xs text-slate-500 mt-2 text-center">
+                Found {filteredSections.length} {filteredSections.length === 1 ? "result" : "results"} for "{searchQuery}"
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar Navigation */}
+            {/* Sidebar Navigation - Filtered */}
             <div className="lg:w-64 shrink-0">
               <Card className="sticky top-28">
                 <nav className="space-y-1">
-                  {sections.map((section) => (
+                  {filteredSections.map((section) => (
                     <button
                       key={section.id}
                       onClick={() => setActiveSection(section.id)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left transition ${
-                        activeSection === section.id
+                        displayedActiveSection === section.id
                           ? "bg-indigo-50 text-indigo-700 font-medium"
                           : "text-slate-600 hover:bg-slate-100"
                       }`}
                     >
-                      <span className={activeSection === section.id ? "text-indigo-600" : "text-slate-400"}>
+                      <span className={displayedActiveSection === section.id ? "text-indigo-600" : "text-slate-400"}>
                         {section.icon}
                       </span>
                       <span className="flex-1 text-sm">{section.title}</span>
                       <ChevronRight
                         size={16}
                         className={`${
-                          activeSection === section.id ? "text-indigo-600" : "text-slate-400"
+                          displayedActiveSection === section.id ? "text-indigo-600" : "text-slate-400"
                         }`}
                       />
                     </button>
                   ))}
                 </nav>
+
+                {/* No Results Message */}
+                {filteredSections.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500 text-sm">No results found for "{searchQuery}"</p>
+                    <button
+                      onClick={clearSearch}
+                      className="mt-2 text-indigo-600 text-sm hover:underline"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                )}
 
                 {/* Contact Support Section with Call and WhatsApp */}
                 <div className="mt-6 pt-6 border-t border-slate-200">
@@ -437,20 +499,20 @@ export default function UserGuidePage() {
               </Card>
             </div>
 
-            {/* Main Content */}
+            {/* Main Content - Shows selected section */}
             <div className="flex-1">
               <Card>
                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
                   <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                    {sections.find((s) => s.id === activeSection)?.icon}
+                    {sections.find((s) => s.id === displayedActiveSection)?.icon}
                   </div>
                   <h2 className="text-xl font-bold text-slate-900">
-                    {sections.find((s) => s.id === activeSection)?.title}
+                    {sections.find((s) => s.id === displayedActiveSection)?.title}
                   </h2>
                 </div>
 
                 <div className="prose prose-slate max-w-none">
-                  {sections.find((s) => s.id === activeSection)?.content}
+                  {sections.find((s) => s.id === displayedActiveSection)?.content}
                 </div>
 
                 {/* Download PDF Button */}

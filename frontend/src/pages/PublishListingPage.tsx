@@ -15,9 +15,24 @@ type Category = {
   name: string;
 };
 
+// type SubscriptionLimits = {
+//   has_active_subscription: boolean;
+//   current_plan: string | null;
+//   max_images_per_listing: number;
+//   max_listings: number;
+//   can_post_business_ads: boolean;
+//   subscription_end_date: string | null;
+// };
 type SubscriptionLimits = {
   has_active_subscription: boolean;
-  current_plan: string | null;
+  current_plan: {
+    id: number;
+    name: string;
+    code: string;
+    max_images_per_listing: number;
+    max_listings: number;
+    can_post_business_ads: boolean;
+  } | null;
   max_images_per_listing: number;
   max_listings: number;
   can_post_business_ads: boolean;
@@ -122,6 +137,11 @@ export default function PublishListingPage() {
   const maxImages = limits?.max_images_per_listing || 1;
   const canPostBusinessAds = limits?.can_post_business_ads || false;
   const hasActiveSubscription = limits?.has_active_subscription || false;
+
+
+  const currentPlanName = limits?.current_plan?.name || null;
+ 
+
 
   const {
     register,
@@ -556,7 +576,7 @@ export default function PublishListingPage() {
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
                     {hasActiveSubscription 
-                      ? t("publish.current_plan", { plan: limits?.current_plan })
+                      ? t("publish.current_plan", { plan: currentPlanName })
                       : t("publish.free_plan")}
                   </p>
                   <p className="text-sm mt-1">

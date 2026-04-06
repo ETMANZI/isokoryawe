@@ -64,7 +64,7 @@ export default function Footer() {
             {t("footer.privacy_policy")}
           </Link>
           <Link to="/terms" className="text-sm text-slate-500 hover:text-slate-700">
-            {t("footer.terms_of_service")}
+            {t("register.terms_of_service")}
           </Link>
           </div>
         </div>

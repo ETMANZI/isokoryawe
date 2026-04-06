@@ -144,10 +144,10 @@ export default function AdminFeedbackPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">
-              {t("admin.feedback.title")}
+              {t("adminn.feedback.title")}
             </h1>
             <p className="text-slate-600">
-              {t("admin.feedback.subtitle")}
+              {t("adminn.feedback.subtitle")}
             </p>
           </div>
 
@@ -156,27 +156,27 @@ export default function AdminFeedbackPage() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
               <div className="rounded-xl bg-white p-4 shadow-sm border border-slate-200">
                 <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
-                <p className="text-sm text-slate-500">{t("admin.feedback.total")}</p>
+                <p className="text-sm text-slate-500">{t("adminn.feedback.total")}</p>
               </div>
               <div className="rounded-xl bg-yellow-50 p-4 shadow-sm border border-yellow-200">
                 <p className="text-2xl font-bold text-yellow-700">{stats.avg_rating}</p>
-                <p className="text-sm text-yellow-600">{t("admin.feedback.avg_rating")}</p>
+                <p className="text-sm text-yellow-600">{t("adminn.feedback.avg_rating")}</p>
               </div>
               <div className="rounded-xl bg-green-50 p-4 shadow-sm border border-green-200">
                 <p className="text-2xl font-bold text-green-700">
                   {stats.rating_distribution?.["5_star"] || 0}
                 </p>
-                <p className="text-sm text-green-600">{t("admin.feedback.five_star")}</p>
+                <p className="text-sm text-green-600">{t("adminn.feedback.five_star")}</p>
               </div>
               <div className="rounded-xl bg-blue-50 p-4 shadow-sm border border-blue-200">
                 <p className="text-2xl font-bold text-blue-700">{feedbacks.length}</p>
-                <p className="text-sm text-blue-600">{t("admin.feedback.showing")}</p>
+                <p className="text-sm text-blue-600">{t("adminn.feedback.showing")}</p>
               </div>
               <div className="rounded-xl bg-purple-50 p-4 shadow-sm border border-purple-200">
                 <p className="text-2xl font-bold text-purple-700">
                   {stats.last_7_days || 0}
                 </p>
-                <p className="text-sm text-purple-600">{t("admin.feedback.last_7_days")}</p>
+                <p className="text-sm text-purple-600">{t("adminn.feedback.last_7_days")}</p>
               </div>
             </div>
           )}
@@ -189,7 +189,7 @@ export default function AdminFeedbackPage() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
               >
                 <Filter size={16} />
-                {t("admin.feedback.filters")}
+                {t("adminn.feedback.filters")}
               </button>
               {(subjectFilter || minRating > 0) && (
                 <button
@@ -197,7 +197,7 @@ export default function AdminFeedbackPage() {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
                 >
                   <X size={16} />
-                  {t("admin.feedback.clear_filters")}
+                  {t("adminn.feedback.clear_filters")}
                 </button>
               )}
             </div>
@@ -206,13 +206,13 @@ export default function AdminFeedbackPage() {
                 onClick={exportToCSV}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
               >
-                <Download size={16} /> {t("admin.feedback.export_csv")}
+                <Download size={16} /> {t("adminn.feedback.export_csv")}
               </button>
               <button
                 onClick={() => refetch()}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
               >
-                <RefreshCw size={16} /> {t("admin.feedback.refresh")}
+                <RefreshCw size={16} /> {t("adminn.feedback.refresh")}
               </button>
             </div>
           </div>
@@ -223,14 +223,14 @@ export default function AdminFeedbackPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t("admin.feedback.subject")}
+                    {t("adminn.feedback.subject")}
                   </label>
                   <select
                     value={subjectFilter}
                     onChange={(e) => setSubjectFilter(e.target.value)}
                     className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="">{t("admin.feedback.all_subjects")}</option>
+                    <option value="">{t("adminn.feedback.all_subjects")}</option>
                     <option value="bug">Bug Report</option>
                     <option value="feature">Feature Request</option>
                     <option value="improvement">Improvement</option>
@@ -240,19 +240,19 @@ export default function AdminFeedbackPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t("admin.feedback.min_rating")}
+                    {t("adminn.feedback.min_rating")}
                   </label>
                   <select
                     value={minRating}
                     onChange={(e) => setMinRating(Number(e.target.value))}
                     className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="0">{t("admin.feedback.all_ratings")}</option>
-                    <option value="1">1+ {t("admin.feedback.stars")}</option>
-                    <option value="2">2+ {t("admin.feedback.stars")}</option>
-                    <option value="3">3+ {t("admin.feedback.stars")}</option>
-                    <option value="4">4+ {t("admin.feedback.stars")}</option>
-                    <option value="5">5 {t("admin.feedback.stars")}</option>
+                    <option value="0">{t("adminn.feedback.all_ratings")}</option>
+                    <option value="1">1+ {t("adminn.feedback.stars")}</option>
+                    <option value="2">2+ {t("adminn.feedback.stars")}</option>
+                    <option value="3">3+ {t("adminn.feedback.stars")}</option>
+                    <option value="4">4+ {t("adminn.feedback.stars")}</option>
+                    <option value="5">5 {t("adminn.feedback.stars")}</option>
                   </select>
                 </div>
               </div>
@@ -268,7 +268,7 @@ export default function AdminFeedbackPage() {
             <Card>
               <div className="py-12 text-center">
                 <MessageSquare size={48} className="mx-auto text-slate-400 mb-3" />
-                <p className="text-slate-500">{t("admin.feedback.no_feedback")}</p>
+                <p className="text-slate-500">{t("adminn.feedback.no_feedback")}</p>
               </div>
             </Card>
           ) : (
@@ -339,7 +339,7 @@ export default function AdminFeedbackPage() {
               >
                 <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
                   <h3 className="text-xl font-bold text-slate-900">
-                    {t("admin.feedback.feedback_details")}
+                    {t("adminn.feedback.feedback_details")}
                   </h3>
                   <button
                     onClick={() => setSelectedFeedback(null)}
@@ -351,37 +351,37 @@ export default function AdminFeedbackPage() {
                 <div className="p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-slate-500">{t("admin.feedback.name")}</p>
+                      <p className="text-sm text-slate-500">{t("adminn.feedback.name")}</p>
                       <p className="font-medium">{selectedFeedback.name}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">{t("admin.feedback.email")}</p>
+                      <p className="text-sm text-slate-500">{t("adminn.feedback.email")}</p>
                       <p className="font-medium">{selectedFeedback.email}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">{t("admin.feedback.rating")}</p>
+                      <p className="text-sm text-slate-500">{t("adminn.feedback.rating")}</p>
                       <div className="mt-1">{getRatingStars(selectedFeedback.rating)}</div>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">{t("admin.feedback.subject")}</p>
+                      <p className="text-sm text-slate-500">{t("adminn.feedback.subject")}</p>
                       <p className="font-medium">{getSubjectLabel(selectedFeedback.subject)}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">{t("admin.feedback.date")}</p>
+                      <p className="text-sm text-slate-500">{t("adminn.feedback.date")}</p>
                       <p className="font-medium">
                         {new Date(selectedFeedback.created_at).toLocaleString()}
                       </p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500">{t("admin.feedback.message")}</p>
+                    <p className="text-sm text-slate-500">{t("adminn.feedback.message")}</p>
                     <p className="mt-1 text-slate-700 whitespace-pre-wrap">
                       {selectedFeedback.message}
                     </p>
                   </div>
                   {selectedFeedback.page_url && (
                     <div>
-                      <p className="text-sm text-slate-500">{t("admin.feedback.page_url")}</p>
+                      <p className="text-sm text-slate-500">{t("adminn.feedback.page_url")}</p>
                       <p className="text-sm text-indigo-600 break-all">{selectedFeedback.page_url}</p>
                     </div>
                   )}
@@ -395,7 +395,7 @@ export default function AdminFeedbackPage() {
                       }}
                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                     >
-                      {t("admin.feedback.delete")}
+                      {t("adminn.feedback.delete")}
                     </button>
                   </div>
                 </div>

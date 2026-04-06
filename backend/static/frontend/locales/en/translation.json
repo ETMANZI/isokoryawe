@@ -1218,7 +1218,39 @@
     "success_message": "Thank you for your valuable feedback! We truly appreciate your input.",
     "error_message": "Failed to send feedback. Please try again.",
     "footer_note": "Your feedback is anonymous unless you provide your contact information. We value your privacy."
+  },
+
+  
+  "adminn": {
+    "feedback": {
+      "title": "Feedback Management",
+      "subtitle": "View and manage all user feedback submissions",
+      "filters": "Filters",
+      "export_csv": "Export CSV",
+      "refresh": "Refresh",
+      "no_feedback": "No feedback yet",
+      "total": "Total Feedbacks",
+      "avg_rating": "Avg Rating",
+      "five_star": "5 Star Ratings",
+      "showing": "Showing",
+      "last_7_days": "Last 7 Days",
+      "clear_filters": "Clear Filters",
+      "subject": "Subject",
+      "all_subjects": "All Subjects",
+      "min_rating": "Min Rating",
+      "all_ratings": "All Ratings",
+      "stars": "Stars",
+      "feedback_details": "Feedback Details",
+      "name": "Name",
+      "email": "Email",
+      "rating": "Rating",
+      "date": "Date",
+      "message": "Message",
+      "page_url": "Page URL",
+      "delete": "Delete Feedback"
+    }
   }
+
 
  
 

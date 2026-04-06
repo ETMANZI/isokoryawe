@@ -1215,7 +1215,39 @@
     "success_message": "Urakoze cyane kubitekerezo byawe! Twabishimiye cyane.",
     "error_message": "Kohereza ibitekerezo byananiwe. Ongera ugerageze.",
     "footer_note": "Ibitekerezo byawe ntibyitirirwa keretse utanze amakuru yawe. Dukomeza kubungabunga ibanga ryawe."
+  },
+
+
+  "adminn": {
+    "feedback": {
+      "title": "Gucunga Ibitekerezo",
+      "subtitle": "Reba ugacunga ibitekerezo byose by'abakoresha",
+      "filters": "Ibyo Ukurikira",
+      "export_csv": "Kurura CSV",
+      "refresh": "Vugurura",
+      "no_feedback": "Nta bitekerezo",
+      "total": "Ibitekerezo Byose",
+      "avg_rating": "Impuzandengo",
+      "five_star": "Inyenyeri 5",
+      "showing": "Birebwa",
+      "last_7_days": "Iminsi 7 Ishize",
+      "clear_filters": "Kuraho Ibyo Ukurikira",
+      "subject": "Intego",
+      "all_subjects": "Intego Zose",
+      "min_rating": "Ibibanza Bikesha",
+      "all_ratings": "Ibibanza Byose",
+      "stars": "Inyenyeri",
+      "feedback_details": "Iby'Igitekerezo",
+      "name": "Izina",
+      "email": "Imeri",
+      "rating": "Ijanisha",
+      "date": "Itariki",
+      "message": "Ubutumwa",
+      "page_url": "URL y'urupapuro",
+      "delete": "Siba Igitekerezo"
+    }
   }
+
 
 
   

@@ -155,32 +155,63 @@ export default function UserGuidePage() {
       id: "subscriptions",
       title: t("guide.subscriptions.title"),
       icon: <CreditCard size={20} />,
-      searchKeywords: ["subscription", "plan", "pay", "upgrade", "basic", "premium", "price", "payment"],
+      searchKeywords: ["subscription", "plan", "pay", "upgrade", "basic", "classic", "premium", "business", "price", "payment"],
       content: (
         <div className="space-y-6">
           <p className="text-slate-600 leading-relaxed">
             {t("guide.subscriptions.description")}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border border-slate-200 rounded-xl p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Basic Plan */}
+            <div className="border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
               <h4 className="font-bold text-slate-800 mb-2">{t("guide.subscriptions.basic")}</h4>
               <p className="text-2xl font-bold text-indigo-600">5,000 RWF</p>
               <p className="text-sm text-slate-500 mt-1">{t("guide.subscriptions.basic_desc")}</p>
               <ul className="mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">✓ 2 {t("guide.subscriptions.listings")}</li>
-                <li className="flex items-center gap-2">✓ 2 {t("guide.subscriptions.images")}</li>
+                <li className="flex items-center gap-2">✓ 1 {t("guide.subscriptions.images")}</li>
               </ul>
             </div>
-            <div className="border border-slate-200 rounded-xl p-4">
+
+            {/* Classic Plan */}
+            <div className="border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
+              <h4 className="font-bold text-slate-800 mb-2">{t("guide.subscriptions.classic")}</h4>
+              <p className="text-2xl font-bold text-indigo-600">10,000 RWF</p>
+              <p className="text-sm text-slate-500 mt-1">{t("guide.subscriptions.classic_desc")}</p>
+              <ul className="mt-3 space-y-1 text-sm">
+                <li className="flex items-center gap-2">✓ 3 {t("guide.subscriptions.listings")}</li>
+                <li className="flex items-center gap-2">✓ 2 {t("guide.subscriptions.images")}</li>
+                <li className="flex items-center gap-2">✓ {t("guide.subscriptions.business_ads")}</li>
+              </ul>
+            </div>
+
+            {/* Premium Plan */}
+            <div className="border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
               <h4 className="font-bold text-slate-800 mb-2">{t("guide.subscriptions.premium")}</h4>
               <p className="text-2xl font-bold text-indigo-600">20,000 RWF</p>
               <p className="text-sm text-slate-500 mt-1">{t("guide.subscriptions.premium_desc")}</p>
               <ul className="mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">✓ 4 {t("guide.subscriptions.listings")}</li>
+                <li className="flex items-center gap-2">✓ 3 {t("guide.subscriptions.images")}</li>
+                <li className="flex items-center gap-2">✓ {t("guide.subscriptions.business_ads")}</li>
+                <li className="flex items-center gap-2">✓ {t("guide.subscriptions.analytics")}</li>
+              </ul>
+            </div>
+
+            {/* Business Plan */}
+            <div className="border border-slate-200 rounded-xl p-4 hover:shadow-md transition bg-gradient-to-br from-indigo-50 to-purple-50">
+              <h4 className="font-bold text-indigo-800 mb-2">{t("guide.subscriptions.business")}</h4>
+              <p className="text-2xl font-bold text-indigo-600">30,000 RWF</p>
+              <p className="text-sm text-slate-500 mt-1">{t("guide.subscriptions.business_desc")}</p>
+              <ul className="mt-3 space-y-1 text-sm">
+                <li className="flex items-center gap-2">✓ 5 {t("guide.subscriptions.listings")}</li>
                 <li className="flex items-center gap-2">✓ 4 {t("guide.subscriptions.images")}</li>
                 <li className="flex items-center gap-2">✓ {t("guide.subscriptions.business_ads")}</li>
+                <li className="flex items-center gap-2">✓ {t("guide.subscriptions.analytics")}</li>
+                <li className="flex items-center gap-2">✓ {t("guide.subscriptions.priority_support")}</li>
               </ul>
+              <div className="mt-2 text-xs text-indigo-600 font-semibold">⭐ Most Popular</div>
             </div>
           </div>
 

@@ -12,6 +12,7 @@ import {
   Building2,
   ExternalLink,
   MessageCircle,
+  Headphones,
 } from "lucide-react";
 import Card from "../ui/Card";
 import { isAuthenticated } from "../../lib/auth";
@@ -33,9 +34,9 @@ export default function RightSidebar() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingPartners, setLoadingPartners] = useState(true);
 
-  const phoneNumber = "+250788263338";
-  const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\+/g, "").replace(/\s/g, "")}`;
-  const telUrl = `tel:${phoneNumber.replace(/\s/g, "")}`;
+  const phoneNumber = "+250 788 263 338";
+  const whatsappUrl = `https://wa.me/250788263338`;
+  const telUrl = `tel:+250788263338`;
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -207,61 +208,71 @@ export default function RightSidebar() {
 
       {/* Safety Tips Card */}
       <Card>
-        <h3 className="text-base font-semibold text-slate-900">{t("sidebar.safety_tips")}</h3>
-
-        <div className="mt-4 space-y-3 text-sm text-slate-600">
-          <div className="flex items-start gap-2">
-            <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
-            <p>{t("sidebar.safety_tip_1")}</p>
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-amber-50 p-3 text-amber-700">
+            <ShieldCheck size={18} />
           </div>
-
-          <div className="flex items-start gap-2">
-            <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
-            <p>{t("sidebar.safety_tip_2")}</p>
-          </div>
-
-          <div className="flex items-start gap-2">
-            <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
-            <p>{t("sidebar.safety_tip_3")}</p>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-slate-900">{t("sidebar.safety_tips")}</h3>
+            <div className="mt-3 space-y-2 text-sm text-slate-600">
+              <div className="flex items-start gap-2">
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-amber-600" />
+                <p>{t("sidebar.safety_tip_1")}</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-amber-600" />
+                <p>{t("sidebar.safety_tip_2")}</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-amber-600" />
+                <p>{t("sidebar.safety_tip_3")}</p>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
 
-      {/* Need Help Card - Updated with Call and WhatsApp buttons */}
+      {/* Need Help Card - Redesigned */}
       <Card>
-        <h3 className="text-base font-semibold text-slate-900">{t("sidebar.need_help")}</h3>
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-indigo-50 p-3 text-indigo-700">
+            <Headphones size={18} />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-slate-900">{t("sidebar.need_help")}</h3>
+            <p className="mt-1 text-sm text-slate-500">{t("sidebar.support_text")}</p>
 
-        <div className="mt-4 space-y-3">
-          {/* Call Button */}
-          <a
-            href={telUrl}
-            className="flex items-center justify-between rounded-2xl bg-green-600 px-4 py-3 text-white transition hover:bg-green-700"
-          >
-            <div className="flex items-center gap-3">
-              <Phone size={18} />
-              <span className="text-sm font-medium">{t("sidebar.call_now")}</span>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {/* Call Button */}
+              <a
+                href={telUrl}
+                className="group flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 transition hover:border-green-300 hover:bg-green-50"
+              >
+                <div className="rounded-full bg-green-100 p-2 text-green-600 transition group-hover:bg-green-600 group-hover:text-white">
+                  <Phone size={20} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-slate-800">{t("sidebar.call_now")}</p>
+                  <p className="text-xs text-slate-500">{phoneNumber}</p>
+                </div>
+              </a>
+
+              {/* WhatsApp Button */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 transition hover:border-green-300 hover:bg-green-50"
+              >
+                <div className="rounded-full bg-[#25D366] p-2 text-white transition group-hover:bg-[#20b859]">
+                  <MessageCircle size={20} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-slate-800">{t("sidebar.whatsapp")}</p>
+                  <p className="text-xs text-slate-500">{phoneNumber}</p>
+                </div>
+              </a>
             </div>
-            <span className="text-xs opacity-90">{phoneNumber}</span>
-          </a>
-
-          {/* WhatsApp Button */}
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between rounded-2xl bg-[#25D366] px-4 py-3 text-white transition hover:bg-[#20b859]"
-          >
-            <div className="flex items-center gap-3">
-              <MessageCircle size={18} />
-              <span className="text-sm font-medium">{t("sidebar.whatsapp")}</span>
-            </div>
-            <span className="text-xs opacity-90">{phoneNumber}</span>
-          </a>
-
-          {/* Support Text */}
-          <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <BadgeHelp size={16} className="text-slate-500" />
-            <span className="text-sm text-slate-600">{t("sidebar.support_text")}</span>
           </div>
         </div>
       </Card>

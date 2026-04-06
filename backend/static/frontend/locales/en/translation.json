@@ -110,7 +110,9 @@
   "safety_tip_2": "Meet in a safe place when inspecting property or vehicles.",
   "safety_tip_3": "Avoid sending money before confirming the listing is genuine.",
   "need_help": "Need Help?",
-  "support_text": "Support available for posting and account setup"
+  "support_text": "Support available for posting and account setup",
+  "call_now": "Call Now",
+  "whatsapp": "WhatsApp"
 },
 "login": {
   "welcome_back": "Welcome back",

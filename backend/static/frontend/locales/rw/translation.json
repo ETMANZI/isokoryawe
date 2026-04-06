@@ -966,7 +966,9 @@
     "request_submitted":"Ubusabe bwoherejwe neza",
     "amount_to_pay":"Ingano mugomba kwishyura",
     "max_images_per_listing":"Amafoto kuri buri gicuruzwa",
-    "processing":"..."
+    "processing":"...",
+    "call_now": "Terefona",
+    "whatsapp": "WhatsApp"
   },
   "common": {
     "included": "Birimo",

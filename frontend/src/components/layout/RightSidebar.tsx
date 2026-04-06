@@ -11,6 +11,7 @@ import {
   Handshake,
   Building2,
   ExternalLink,
+  MessageCircle,
 } from "lucide-react";
 import Card from "../ui/Card";
 import { isAuthenticated } from "../../lib/auth";
@@ -31,6 +32,10 @@ export default function RightSidebar() {
 
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingPartners, setLoadingPartners] = useState(true);
+
+  const phoneNumber = "+250788263338";
+  const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\+/g, "").replace(/\s/g, "")}`;
+  const telUrl = `tel:${phoneNumber.replace(/\s/g, "")}`;
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -222,19 +227,41 @@ export default function RightSidebar() {
         </div>
       </Card>
 
-      {/* Need Help Card */}
+      {/* Need Help Card - Updated with Call and WhatsApp buttons */}
       <Card>
         <h3 className="text-base font-semibold text-slate-900">{t("sidebar.need_help")}</h3>
 
-        <div className="mt-4 space-y-3 text-sm text-slate-600">
-          <div className="flex items-center gap-2">
-            <Phone size={15} className="text-slate-500" />
-            <span>+250 788 263 338</span>
-          </div>
+        <div className="mt-4 space-y-3">
+          {/* Call Button */}
+          <a
+            href={telUrl}
+            className="flex items-center justify-between rounded-2xl bg-green-600 px-4 py-3 text-white transition hover:bg-green-700"
+          >
+            <div className="flex items-center gap-3">
+              <Phone size={18} />
+              <span className="text-sm font-medium">{t("sidebar.call_now")}</span>
+            </div>
+            <span className="text-xs opacity-90">{phoneNumber}</span>
+          </a>
 
-          <div className="flex items-center gap-2">
-            <BadgeHelp size={15} className="text-slate-500" />
-            <span>{t("sidebar.support_text")}</span>
+          {/* WhatsApp Button */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between rounded-2xl bg-[#25D366] px-4 py-3 text-white transition hover:bg-[#20b859]"
+          >
+            <div className="flex items-center gap-3">
+              <MessageCircle size={18} />
+              <span className="text-sm font-medium">{t("sidebar.whatsapp")}</span>
+            </div>
+            <span className="text-xs opacity-90">{phoneNumber}</span>
+          </a>
+
+          {/* Support Text */}
+          <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <BadgeHelp size={16} className="text-slate-500" />
+            <span className="text-sm text-slate-600">{t("sidebar.support_text")}</span>
           </div>
         </div>
       </Card>

@@ -1079,7 +1079,103 @@
       "title": "Contact Us",
       "content": "If you have any questions about these Terms, please contact us at: "
     }
+  },
+
+
+
+
+
+
+  "guide": {
+    "title": "User Guide",
+    "subtitle": "Everything you need to know about using Market Hub",
+    "search_placeholder": "Search guides...",
+    "screenshot_placeholder": "Screenshot Preview",
+    "registration_screenshot_hint": "Screenshot: Registration form",
+    "publish_screenshot_hint": "Screenshot: Publish listing form",
+    "subscription_screenshot_hint": "Screenshot: Subscription plans",
+    "need_help": "Need Help?",
+    "contact_support": "Contact Support",
+    "print_guide": "Print Guide",
+    "download_pdf": "Download PDF",
+    "feedback_text": "Was this guide helpful?",
+    "feedback_link": "Send feedback",
+    
+    "getting_started": {
+      "title": "Getting Started",
+      "welcome": "Welcome to Market Hub!",
+      "description": "Market Hub is Rwanda's premier online marketplace for properties, vehicles, and products. This guide will help you get started.",
+      "account_creation": "Creating Your Account",
+      "step1": "Click on 'Register' in the top navigation bar",
+      "step2": "Fill in your personal information (name, email, phone)",
+      "step3": "Create a secure password",
+      "step4": "Verify your email address and login"
+    },
+    
+    "posting_listing": {
+      "title": "Posting a Listing",
+      "description": "Learn how to create and publish effective listings that attract buyers.",
+      "image_guidelines": "Image Guidelines",
+      "image_tip1": "Use high-quality, well-lit photos (minimum 800x600 pixels)",
+      "image_tip2": "Show different angles - front, back, sides, and interior",
+      "image_tip3": "Avoid watermarks or text overlays on images",
+      "listing_tips": "Tips for Better Listings",
+      "tip1": "Write clear, descriptive titles (e.g., '3-Bedroom House in Kacyiru')",
+      "tip2": "Include detailed specifications and condition",
+      "tip3": "Set competitive prices based on market research"
+    },
+    
+    "subscriptions": {
+      "title": "Subscriptions",
+      "description": "Choose the right subscription plan for your needs.",
+      "basic": "Basic Plan",
+      "basic_desc": "For occasional sellers",
+      "premium": "Premium Plan",
+      "premium_desc": "For professional sellers",
+      "listings": "listings",
+      "images": "images per listing",
+      "business_ads": "Business ads"
+    },
+    
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Manage all your listings and account activity from one place.",
+      "manage_listings": "Manage Listings",
+      "manage_listings_desc": "Edit, hide, or delete your listings",
+      "analytics": "Analytics",
+      "analytics_desc": "Track views and interested buyers",
+      "notifications": "Notifications",
+      "notifications_desc": "Stay updated on listing activity",
+      "messages": "Messages",
+      "messages_desc": "Communicate with potential buyers"
+    },
+    
+    "safety": {
+      "title": "Safety Tips",
+      "safety_tips": "Important Safety Guidelines",
+      "tip1": "Always meet in public, well-lit places",
+      "tip2": "Verify product condition before payment",
+      "tip3": "Never share personal financial information",
+      "tip4": "Use our secure messaging system",
+      "scam_warning": "⚠️ Scam Alert",
+      "scam_message": "Market Hub never asks for your password or payment outside our platform. Report suspicious users immediately."
+    },
+    
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How long does it take for my listing to be approved?",
+      "a1": "Listings are typically approved within 24 hours. Premium subscribers get priority approval.",
+      "q2": "Can I edit my listing after it's published?",
+      "a2": "Yes! You can edit your listing anytime from your dashboard.",
+      "q3": "How do I upgrade my subscription?",
+      "a3": "Go to the Subscriptions page and choose your desired plan.",
+      "q4": "What happens when my subscription expires?",
+      "a4": "Your listings will be hidden until you renew your subscription.",
+      "q5": "How do I contact a seller?",
+      "a5": "Use the 'Contact Seller' button on any listing to send a message."
+    }
   }
+
  
 
 }

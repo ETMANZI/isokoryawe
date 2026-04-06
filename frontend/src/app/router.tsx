@@ -16,6 +16,7 @@ import PromoBannerAdminPage from "../pages/PromoBannerAdminPage";
 import SubscriptionPlansPage from "../pages/SubscriptionPlansPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
 import TermsPage from "../pages/TermsPage";
+import UserGuidePage from "../pages/UserGuidePage";
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +36,8 @@ export const router = createBrowserRouter([
       { path: "/subscriptions", element: <SubscriptionPlansPage />},
       { path: "/privacy", element: <PrivacyPolicyPage />},
       { path: "/terms", element: <TermsPage />},
+      { path: "/guide", element: <UserGuidePage />},
+      
     ],
   },
 

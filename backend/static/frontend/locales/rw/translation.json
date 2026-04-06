@@ -1079,7 +1079,102 @@
       "title": "Twandikire",
       "content": "Niba ubaza ikibazo kijyanye n'aya mategeko, twandikire kuri: "
     }
+  },
+
+
+
+
+
+  "guide": {
+    "title": "Ubuyobozi bw'Umukoresha",
+    "subtitle": "Ibyose ugomba kumenya kuri Market Hub",
+    "search_placeholder": "Shakisha ubuyobozi...",
+    "screenshot_placeholder": "Amashusho y'Icyitegererezo",
+    "registration_screenshot_hint": "Amashusho: Ifishi yo kwiyandikisha",
+    "publish_screenshot_hint": "Amashusho: Ifishi yo gutangaza",
+    "subscription_screenshot_hint": "Amashusho: Gahunda z'ubusabirizimu",
+    "need_help": "Ukeneye Ubufasha?",
+    "contact_support": "Twandikire",
+    "print_guide": "Capa Ubu buyobozi",
+    "download_pdf": "Kurura PDF",
+    "feedback_text": "Ubu buyobozi burakugirira akamaro?",
+    "feedback_link": "Ohereza igitekerezo",
+    
+    "getting_started": {
+      "title": "Uko Utangira",
+      "welcome": "Murakaza neza kuri Market Hub!",
+      "description": "Market Hub ni urubuga rwambere mu Rwanda rwo gushaka no kugurisha ibyubaka, imodoka, n'ibicuruzwa. Ubu buyobozi buzakugirira akamaro.",
+      "account_creation": "Kurema Konti Yawe",
+      "step1": "Kanda 'Iyandikishe' hejuru y'urubuga",
+      "step2": "Andika amakuru yawe (izina, imeri, numero ya terefone)",
+      "step3": "Kora ijambobanga rikomeye",
+      "step4": "Emera imeri yawe hanyuma uyinjire"
+    },
+    
+    "posting_listing": {
+      "title": "Gutangaza Igitangazwa",
+      "description": "Menya uko ukora ibitangazwa bikurura abaguzi.",
+      "image_guidelines": "Amabwiriza y'Amashusho",
+      "image_tip1": "Koresha amashusho meza (byibuze 800x600 pixels)",
+      "image_tip2": "Kora amashusho mu nzira zitandukanye",
+      "image_tip3": "Ntugire ibyo wandika kuri mashusho",
+      "listing_tips": "Inama z'Itangazwa Riza",
+      "tip1": "Andika imitwe isobanutse neza",
+      "tip2": "Shyiramo ibyangombwa byuzuye",
+      "tip3": "Shyira ibiciro bihuye n'isoko"
+    },
+    
+    "subscriptions": {
+      "title": "Ubusabirizimu",
+      "description": "Hitamo gahunda iboneye kubyo ukeneye.",
+      "basic": "Gahunda Y'ibanze",
+      "basic_desc": "Kubagurisha rimwe na rimwe",
+      "premium": "Gahunda Y'ikirenga",
+      "premium_desc": "Kubagurisha buri gihe",
+      "listings": "ibitangazwa",
+      "images": "amashusho ku itangazwa",
+      "business_ads": "Matangazo y'ubucuruzi"
+    },
+    
+    "dashboard": {
+      "title": "Akazu k'Imikorere",
+      "description": "Kanda ibitangazwa byawe byose hamwe n'ibikorwa kuri konti yawe.",
+      "manage_listings": "Gucunga Ibitangazwa",
+      "manage_listings_desc": "Hindura, hisha, cyangwa ukureho ibitangazwa",
+      "analytics": "Ibibarwa",
+      "analytics_desc": "Kurikirana abarebye n'abashishikariwe",
+      "notifications": "Imenyesha",
+      "notifications_desc": "Komeza umenye ibikorwa ku itangazwa",
+      "messages": "Ubutumwa",
+      "messages_desc": "Kuvugana nabashobora kugura"
+    },
+    
+    "safety": {
+      "title": "Inama z'Umutekano",
+      "safety_tips": "Amabwiriza y'Umutekano",
+      "tip1": "Hura ahantu h'umutekano, hari urumuri",
+      "tip2": "Emeza ibicuruzwa mbere y'ishyura",
+      "tip3": "Ntugere amakuru y'amafaranga yawe",
+      "tip4": "Koresha ubutumwa bwacu bukiranrirwa",
+      "scam_warning": "⚠️ Urukuzi",
+      "scam_message": "Market Hub ntabwo isaba ijambobanga cyangwa amafaranga hanze y'urubuga. Menyesha ako kanya abakoresha bakekwa."
+    },
+    
+    "faq": {
+      "title": "Ibibazo Bikunze Kubazwa",
+      "q1": "Itangazwa rimara igihe kingana iki ryoherejwe?",
+      "a1": "Ibitangazwa byemerwa mu masaha 24. Abaguzi ba Premium bemerwa ako kanya.",
+      "q2": "Nshobora guhindura itangazwa ryanjye nyuma yo gutangaza?",
+      "a2": "Yego! Urashobora guhindura itangazwa iki gihe cyose muri dashboard yawe.",
+      "q3": "Nakora nte ngo vugurura ubusabirizimu?",
+      "a3": "Jya ku rubuga rw'ubusabirizimu hanywe uhitamo gahunda ushaka.",
+      "q4": "Bigenda bite iyo ubusabirizimu bwanjye burangiye?",
+      "a4": "Ibitangazwa byawe bizahishwa kugeza ubusabirizimu bwawe buvuguruwe.",
+      "q5": "Nakora nte kuvugana n'umugurisha?",
+      "a5": "Kanda 'Twandikire Umugurisha' kuri buri tangazwa."
+    }
   }
+
 
 
   

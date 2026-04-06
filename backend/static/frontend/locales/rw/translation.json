@@ -978,6 +978,109 @@
   },
   "autho": {
     "login_to_subscribe": "Injira ubanze"
+  },
+
+
+  "privacy": {
+    "title": "Amabwiriza y'Ibanga",
+    "last_updated": "Iheruka Gukorwa",
+    "introduction": {
+      "title": "Intangiriro",
+      "content": "Murakaza neza kuri Market Hub. Tubaha agaciro ibanga ryanyu kandi twiyemeje kurinda amakuru yanyu. Aya mabwiriza asobanura uko dukusanya, dukoresha, kandi turinda amakuru anyu mugihe mukoresha urubuga rwacu."
+    },
+    "information_collected": {
+      "title": "Amakuru Tukusanya",
+      "content": "Turashobora gukusanya amakuru akurikira:",
+      "item_1": "Amakuru y'irangamuntu (izina, imeri, numero ya terefone)",
+      "item_2": "Amakuru y'ibitangazwa (iby'umutungo, amashusho, ibiciro)",
+      "item_3": "Amakuru y'ishyura (amateka yo kwishyura, iby'ubusabirizimu)",
+      "item_4": "Amakuru ya tekinike (IP aderesi, ubwoko bwa browseri, amakuru y'igikoresho)"
+    },
+    "how_we_use": {
+      "title": "Uko Dukoresha Amakuru",
+      "content": "Dukoresha amakuru anyu mu:",
+      "item_1": "Gushyiraho no gucunga konti yanyu",
+      "item_2": "Gutunganya ibitangazwa byanyu n'ishyura",
+      "item_3": "Kubavuza ku birebana na konti cyangwa ibitangazwa byanyu",
+      "item_4": "Gutezimbere serivisi zacu n'uburambe bwanyu"
+    },
+    "information_sharing": {
+      "title": "Gusangira Amakuru",
+      "content": "Ntidukwirakwiza amakuru yanyu. Turashobora gusangira amakuru anyu n'abatanga serivisi badufasha mugikorwa cy'urubuga rwacu, mugihe bahaye icyemezo cyo kubika aya makuru mu ibanga."
+    },
+    "data_security": {
+      "title": "Umutekano w'Amakuru",
+      "content": "Dushyiraho ingamba zikwiye zo kurinda amakuru yanyu kugirango atagirwaho nabi, arahindurwa, aragaragarizwa, cyangwa aratangazwa. Ndetse n'ibyo, nta buryo bwo kwimura amakuru kuri interineti bukingira 100%."
+    },
+    "cookies": {
+      "title": "Kuki",
+      "content": "Dukoresha kuki n'ikoranabuhanga nk'iryo mu gukurikirana ibikorwa kurubuga rwacu no kubika amakuru amwe. Urashobora kubwira browseri yawe kwanga kuki zose cyangwa kukumenyesha iyo kuki itumwe itumwe."
+    },
+    "your_rights": {
+      "title": "Uburenganzira Bwanyu",
+      "content": "Ukurikije aho uri, ushobora kugira uburenganzira bwo:",
+      "item_1": "Kubona amakuru yawe",
+      "item_2": "Gukosora amakuru yawe",
+      "item_3": "Gusaba ko amakuru yawe akurwaho"
+    },
+    "contact_us": {
+      "title": "Twandikire",
+      "content": "Niba ubaza ikibazo kijyanye n'aya mabwiriza, twandikire kuri: "
+    }
+  },
+  "terms": {
+    "title": "Amategeko n'Amabwiriza",
+    "last_updated": "Iheruka Gukorwa",
+    "acceptance": {
+      "title": "Kwemera Amategeko",
+      "content": "Mukoresha Market Hub, urabaye wemeye kugendera kuri aya mategeko. Niba utemera igice icyo aricyo cyose, ntugomba gukoresha serivisi zacu."
+    },
+    "eligibility": {
+      "title": "Ibishobora Kugirango Ukoreshe",
+      "content": "Ugomba kuba ufite byibuze imyaka 18 kugirango ukoreshe urubuga rwacu. Ukoresheje Market Hub, uremeza ko ubu buzira ntakindi."
+    },
+    "listings": {
+      "title": "Amabwiriza y'Itangazwa",
+      "content": "Mugitangaza kurubuga rwacu, uremeza ko:",
+      "item_1": "Amakuru yose watanze ari ukuri",
+      "item_2": "Ufite cyangwa uburenganzira bwo kugurisha ikintu/umutungo",
+      "item_3": "Ibitangazwa ntibirimo ibintu bitemewe",
+      "item_4": "Ntuzatangaza ibitangazwa bisa cyangwa bigomeka"
+    },
+    "user_accounts": {
+      "title": "Konti Z'abakoresha",
+      "content": "Ushinzwe kubika amakuru ya konti yawe mu ibanga no gukora ibikorwa byose bikorwa kuri konti yawe. Menyesha ako kanya niba hari ukoresha konti yawe utemewe."
+    },
+    "prohibited_conduct": {
+      "title": "Ibyo Ubuze gukora",
+      "content": "Uremeye ko utabikora:",
+      "item_1": "Guhinyura amategeko cyangwa amabwiriza",
+      "item_2": "Guhinyura uburenganzira bw'ubwenge",
+      "item_3": "Kutanga ibitangazwa bitari ibyo, bigomeka, cyangwa bidafite ishingiro",
+      "item_4": "Guhohotera, kubuza abandi gukoresha, cyangwa kubabaza abandi bakoresha"
+    },
+    "payments": {
+      "title": "Ishyura n'Ubusabirizimu",
+      "content": "Amafaranga y'ubusabirizimu arishyurwa hatangiriye buri kwezi cyangwa buri mwaka. Amafaranga yishyuwe ntayasubizwa keretse hatanzwe ubundi. Tufite uburenganzira bwo guhindura ibiciro dukomeje kubamenyesha."
+    },
+    "termination": {
+      "title": "Guhagarika Serivisi",
+      "content": "Turashobora guhagarika konti yawe ako kanya, tutabanje kubaburira, niba hari ibyo mukoze binyuranyije n'aya mategeko cyangwa bibangamira abandi bakoresha cyangwa urubuga rwacu."
+    },
+    "disclaimer": {
+      "title": "Inyemezabwo",
+      "content": "Urubuga rwacu rutangwa 'nk'uko ruri' nta kindi. Ntidushobora kwemeza ko ibitangazwa ari iby'ukuri, byuzuye, cyangwa biherutse. Ntiturihishwa ibyo abakoresha bagurisha cyangwa bagura."
+    },
+    "changes": {
+      "title": "Amahinduka y'amategeko",
+      "content": "Tufite uburenganzira bwo guhindura aya mategeko igihe icyo aricyo cyose. Tuzabamenyesha amahinduka akomeye binyuze kuri imeri cyangwa kurubuga rwacu. Ugukomeza gukoresha urubuga bivuze ko wemeye amahinduka."
+    },
+    "contact_us": {
+      "title": "Twandikire",
+      "content": "Niba ubaza ikibazo kijyanye n'aya mategeko, twandikire kuri: "
+    }
   }
+
+
   
 }

@@ -60,8 +60,12 @@ export default function Footer() {
         <div className="mt-8 border-t border-slate-200 pt-4 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
           <p>{t("footer.copyright", { year: new Date().getFullYear() })}</p>
           <div className="flex gap-4 mt-2 md:mt-0">
-            <Link to="#" className="hover:text-slate-700">{t("footer.privacy_policy")}</Link>
-            <Link to="#" className="hover:text-slate-700">{t("footer.terms")}</Link>
+          <Link to="/privacy" className="text-sm text-slate-500 hover:text-slate-700">
+            {t("footer.privacy_policy")}
+          </Link>
+          <Link to="/terms" className="text-sm text-slate-500 hover:text-slate-700">
+            {t("footer.terms_of_service")}
+          </Link>
           </div>
         </div>
       </div>

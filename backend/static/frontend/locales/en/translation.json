@@ -979,6 +979,107 @@
   },
   "autho": {
     "login_to_subscribe": "Login to Subscribe"
+  },
+
+  "privacy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last Updated",
+    "introduction": {
+      "title": "Introduction",
+      "content": "Welcome to Market Hub. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our platform."
+    },
+    "information_collected": {
+      "title": "Information We Collect",
+      "content": "We may collect the following types of information:",
+      "item_1": "Personal identification information (name, email address, phone number)",
+      "item_2": "Listing information (property details, photos, pricing)",
+      "item_3": "Transaction information (payment history, subscription details)",
+      "item_4": "Technical data (IP address, browser type, device information)"
+    },
+    "how_we_use": {
+      "title": "How We Use Your Information",
+      "content": "We use your information to:",
+      "item_1": "Create and manage your account",
+      "item_2": "Process your listings and payments",
+      "item_3": "Communicate with you about your account or listings",
+      "item_4": "Improve our services and user experience"
+    },
+    "information_sharing": {
+      "title": "Information Sharing",
+      "content": "We do not sell your personal information. We may share your information with service providers who assist us in operating our platform, conducting our business, or serving our users, as long as those parties agree to keep this information confidential."
+    },
+    "data_security": {
+      "title": "Data Security",
+      "content": "We implement appropriate security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure."
+    },
+    "cookies": {
+      "title": "Cookies",
+      "content": "We use cookies and similar tracking technologies to track activity on our platform and store certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent."
+    },
+    "your_rights": {
+      "title": "Your Rights",
+      "content": "Depending on your location, you may have the right to:",
+      "item_1": "Access and receive a copy of your personal data",
+      "item_2": "Correct or update your personal data",
+      "item_3": "Request deletion of your personal data"
+    },
+    "contact_us": {
+      "title": "Contact Us",
+      "content": "If you have any questions about this Privacy Policy, please contact us at: "
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "last_updated": "Last Updated",
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "content": "By accessing or using Market Hub, you agree to be bound by these Terms of Service. If you disagree with any part of these terms, you may not access our services."
+    },
+    "eligibility": {
+      "title": "Eligibility",
+      "content": "You must be at least 18 years old to use our platform. By using Market Hub, you represent and warrant that you meet this eligibility requirement."
+    },
+    "listings": {
+      "title": "Listing Guidelines",
+      "content": "When posting listings on our platform, you agree that:",
+      "item_1": "All information provided is accurate and truthful",
+      "item_2": "You own or have permission to sell the item/property",
+      "item_3": "Listings do not contain illegal or prohibited content",
+      "item_4": "You will not post duplicate or misleading listings"
+    },
+    "user_accounts": {
+      "title": "User Accounts",
+      "content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. Notify us immediately of any unauthorized use of your account."
+    },
+    "prohibited_conduct": {
+      "title": "Prohibited Conduct",
+      "content": "You agree not to:",
+      "item_1": "Violate any laws or regulations",
+      "item_2": "Infringe on intellectual property rights",
+      "item_3": "Post false, misleading, or fraudulent listings",
+      "item_4": "Harass, abuse, or harm other users"
+    },
+    "payments": {
+      "title": "Payments and Subscriptions",
+      "content": "Subscription fees are billed in advance on a monthly or yearly basis. All payments are non-refundable unless otherwise specified. We reserve the right to change our pricing with notice."
+    },
+    "termination": {
+      "title": "Termination",
+      "content": "We may terminate or suspend your account immediately, without prior notice, for conduct that violates these Terms or is harmful to other users or our platform."
+    },
+    "disclaimer": {
+      "title": "Disclaimer of Warranties",
+      "content": "Our platform is provided 'as is' without warranties of any kind. We do not guarantee that listings are accurate, complete, or current. We are not responsible for transactions between users."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "content": "We reserve the right to modify these terms at any time. We will notify you of any material changes via email or through our platform. Your continued use of the platform constitutes acceptance of the modified terms."
+    },
+    "contact_us": {
+      "title": "Contact Us",
+      "content": "If you have any questions about these Terms, please contact us at: "
+    }
   }
+ 
 
 }

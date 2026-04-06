@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Star,
   Eye,
+  BookOpen,
 } from "lucide-react";
 import Card from "../ui/Card";
 import { isAuthenticated } from "../../lib/auth";
@@ -249,6 +250,34 @@ export default function RightSidebar() {
           <div className="flex items-start gap-2">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
             <p>{t("sidebar.safety_tip_3")}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* User Guide Card */}
+      <Card>
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-sky-50 p-3 text-sky-700">
+            <BookOpen size={18} />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-slate-900">{t("sidebar.user_guide")}</h3>
+            <p className="mt-1 text-xs text-slate-500">{t("sidebar.user_guide_text")}</p>
+
+            <div className="mt-3">
+              <Link
+                to="/guide"
+                className="flex items-center justify-between rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 transition hover:bg-sky-100"
+              >
+                <div className="flex items-center gap-2">
+                  <BookOpen size={16} className="text-sky-600" />
+                  <span className="text-sm font-medium text-sky-700">
+                    {t("sidebar.read_guide")}
+                  </span>
+                </div>
+                <span className="text-xs text-sky-500">→</span>
+              </Link>
+            </div>
           </div>
         </div>
       </Card>

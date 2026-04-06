@@ -9,7 +9,7 @@ import {
   Minimize2,
   Maximize2,
   Trash2,
-  HelpCircle
+  // HelpCircle
 } from 'lucide-react';
 import { api } from '../../lib/api';
 

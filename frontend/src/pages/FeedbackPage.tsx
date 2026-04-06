@@ -8,7 +8,7 @@ import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { api } from "../lib/api";
-import { isAuthenticated } from "../lib/auth";
+// import { isAuthenticated } from "../lib/auth";
 
 type FeedbackFormData = {
   name: string;
@@ -21,7 +21,7 @@ type FeedbackFormData = {
 
 export default function FeedbackPage() {
   const { t } = useTranslation();
-  const loggedIn = isAuthenticated();
+//   const loggedIn = isAuthenticated();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [submitSuccess, setSubmitSuccess] = useState(false);

@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Bell, Sparkles, Crown, TrendingUp, Zap } from "lucide-react";
+import { Bell, Sparkles, Crown, Zap } from "lucide-react";
 import { isAuthenticated, logoutUser, getAccessToken } from "../../lib/auth";
 import { api } from "../../lib/api";
 import AdMarquee from "./AdMarquee";

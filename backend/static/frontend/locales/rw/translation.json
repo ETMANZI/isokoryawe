@@ -166,7 +166,7 @@
   "submit_button": "Tangaza Ikigurishwa hanyuma ukomeze kwishyura",
   "payment_message": "Igurishwa ryakozwe neza. Igiciro cyo gutangaza: {{amount}} {{currency}}",
   "error_message": "Kutanga Ikigurishwa ntabwo bikunze.",
-    "max_images_error": "Gahunda yawe yemera amafoto {{max}} gusa. Kuraho amafoto cyangwa vugurura ubusabirizimu.",
+    "max_images_error": "Gahunda yawe yemera amafoto {{max}} gusa. Kuraho amafoto cyangwa vugurura Ifatabuguzi.",
     "at_least_one_image": "Nyamuneka ongeraho byibuze ifoto imwe.",
     "max_images": "{{current}}/{{max}} amafoto",
     "images_hin": "Urashobora gupakisha amafoto agera kuri {{max}}. Ifoto ya mbere niyo izaba igaragara imbere.",
@@ -234,7 +234,7 @@
     "next": "Ibikurikira",
     "category": "Icyiciro",
     "subscription_expired": "Ifatabuguzi ryawe ryangiye. Bugurure kugira ngo ushobore gushyiraho ibicuruzwa bishya.",
-    "subscription_required": "Ubusabirizimu bukora burakenewe kugira ngo ushobore gushyiraho ibicuruzwa.",
+    "subscription_required": "Ifatabuguzi bukora burakenewe kugira ngo ushobore gushyiraho ibicuruzwa.",
     "subscribe_to_post": "Iyandikishe Kugira Ngo Ushyireho Ibicuruzwa"
 
   },
@@ -994,7 +994,7 @@
       "content": "Turashobora gukusanya amakuru akurikira:",
       "item_1": "Amakuru y'irangamuntu (izina, imeri, numero ya terefone)",
       "item_2": "Amakuru y'ibitangazwa (iby'umutungo, amashusho, ibiciro)",
-      "item_3": "Amakuru y'ishyura (amateka yo kwishyura, iby'ubusabirizimu)",
+      "item_3": "Amakuru y'ishyura (amateka yo kwishyura, iby'Ifatabuguzi)",
       "item_4": "Amakuru ya tekinike (IP aderesi, ubwoko bwa browseri, amakuru y'igikoresho)"
     },
     "how_we_use": {
@@ -1061,8 +1061,8 @@
       "item_4": "Guhohotera, kubuza abandi gukoresha, cyangwa kubabaza abandi bakoresha"
     },
     "payments": {
-      "title": "Ishyura n'Ubusabirizimu",
-      "content": "Amafaranga y'ubusabirizimu arishyurwa hatangiriye buri kwezi cyangwa buri mwaka. Amafaranga yishyuwe ntayasubizwa keretse hatanzwe ubundi. Tufite uburenganzira bwo guhindura ibiciro dukomeje kubamenyesha."
+      "title": "Ishyura n'Ifatabuguzi",
+      "content": "Amafaranga y'ifatabuguzi arishyurwa hatangiriye buri kwezi cyangwa buri mwaka. Amafaranga yishyuwe ntayasubizwa keretse hatanzwe ubundi. Tufite uburenganzira bwo guhindura ibiciro dukomeje kubamenyesha."
     },
     "termination": {
       "title": "Guhagarika Serivisi",
@@ -1093,7 +1093,7 @@
     "screenshot_placeholder": "Amashusho y'Icyitegererezo",
     "registration_screenshot_hint": "Amashusho: Ifishi yo kwiyandikisha",
     "publish_screenshot_hint": "Amashusho: Ifishi yo gutangaza",
-    "subscription_screenshot_hint": "Amashusho: Gahunda z'ubusabirizimu",
+    "subscription_screenshot_hint": "Amashusho: Gahunda z'ifatabuguzi",
     "need_help": "Ukeneye Ubufasha?",
     "contact_support": "Twandikire",
     "print_guide": "Capa Ubu buyobozi",
@@ -1126,7 +1126,7 @@
     },
     
     "subscriptions": {
-      "title": "Ubusabirizimu",
+      "title": "Ifatabuguzi",
       "description": "Hitamo gahunda iboneye kubyo ukeneye.",
       "basic": "Gahunda Y'ibanze",
       "basic_desc": "Kubagurisha rimwe na rimwe",
@@ -1167,10 +1167,10 @@
       "a1": "Ibitangazwa byemerwa mu masaha 24. Abaguzi ba Premium bemerwa ako kanya.",
       "q2": "Nshobora guhindura itangazwa ryanjye nyuma yo gutangaza?",
       "a2": "Yego! Urashobora guhindura itangazwa iki gihe cyose muri dashboard yawe.",
-      "q3": "Nakora nte ngo vugurura ubusabirizimu?",
-      "a3": "Jya ku rubuga rw'ubusabirizimu hanywe uhitamo gahunda ushaka.",
-      "q4": "Bigenda bite iyo ubusabirizimu bwanjye burangiye?",
-      "a4": "Ibitangazwa byawe bizahishwa kugeza ubusabirizimu bwawe buvuguruwe.",
+      "q3": "Nakora nte ngo vugurura ifatabuguzi?",
+      "a3": "Jya ku rubuga rw'ifatabuguzi hanywe uhitamo gahunda ushaka.",
+      "q4": "Bigenda bite iyo ifatabuguzi bwanjye burangiye?",
+      "a4": "Ibitangazwa byawe bizahishwa kugeza ifatabuguzi bwawe buvuguruwe.",
       "q5": "Nakora nte kuvugana n'umugurisha?",
       "a5": "Kanda 'Twandikire Umugurisha' kuri buri tangazwa."
     }

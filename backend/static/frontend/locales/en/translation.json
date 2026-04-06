@@ -1182,6 +1182,42 @@
       "q5": "How do I contact a seller?",
       "a5": "Use the 'Contact Seller' button on any listing to send a message."
     }
+  },
+
+  "feedback": {
+    "title": "Share Your Feedback",
+    "subtitle": "Help us improve Market Hub by sharing your thoughts and suggestions",
+    "rating": "Your Rating",
+    "rating_required": "Please select a rating",
+    "very_bad": "Very Bad",
+    "bad": "Bad",
+    "average": "Average",
+    "good": "Good",
+    "excellent": "Excellent",
+    "name": "Full Name",
+    "name_placeholder": "Enter your full name",
+    "name_required": "Name is required",
+    "email": "Email Address",
+    "email_placeholder": "your@email.com",
+    "email_required": "Email is required",
+    "email_invalid": "Please enter a valid email address",
+    "subject": "Subject",
+    "select_subject": "Select a subject",
+    "subject_bug": "🐛 Bug Report",
+    "subject_feature": "💡 Feature Request",
+    "subject_improvement": "📈 Improvement Suggestion",
+    "subject_question": "❓ Question",
+    "subject_other": "📝 Other",
+    "subject_required": "Subject is required",
+    "message": "Your Message",
+    "message_placeholder": "Please share your feedback in detail...",
+    "message_required": "Message is required",
+    "message_hint": "Your feedback helps us make Market Hub better for everyone",
+    "submit": "Send Feedback",
+    "sending": "Sending...",
+    "success_message": "Thank you for your valuable feedback! We truly appreciate your input.",
+    "error_message": "Failed to send feedback. Please try again.",
+    "footer_note": "Your feedback is anonymous unless you provide your contact information. We value your privacy."
   }
 
  

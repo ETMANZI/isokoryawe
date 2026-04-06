@@ -1180,8 +1180,42 @@
       "q5": "Nakora nte kuvugana n'umugurisha?",
       "a5": "Kanda 'Hamagara' kuri buri gikuruzwa. Hariho numero z'ucuruza"
     }
+  },
+  "feedback": {
+    "title": "Tangira Igitekerezo",
+    "subtitle": "Dufashe kunoza Market Hub utanga ibitekerezo byawe",
+    "rating": "Ijanisha Ryawe",
+    "rating_required": "Hitamo ijanisha",
+    "very_bad": "Mubi Cyane",
+    "bad": "Mubi",
+    "average": "Rugero",
+    "good": "Ryiza",
+    "excellent": "Ryiza Cyane",
+    "name": "Izina Ryose",
+    "name_placeholder": "Andika izina ryawe ryose",
+    "name_required": "Izina rirakenewe",
+    "email": "Aderesi ya Imeli",
+    "email_placeholder": "your@email.com",
+    "email_required": "Imeli irakenewe",
+    "email_invalid": "Andika imeli ikora",
+    "subject": "Intego",
+    "select_subject": "Hitamo intego",
+    "subject_bug": "🐛 Inkeke",
+    "subject_feature": "💡 Ikintu Gishya",
+    "subject_improvement": "📈 Icyifuzo cy'Iterambere",
+    "subject_question": "❓ Ikibazo",
+    "subject_other": "📝 Ikindi",
+    "subject_required": "Intego irakenewe",
+    "message": "Ubutumwa Bwawe",
+    "message_placeholder": "Tanga ibitekerezo byawe mu buryo burambuye...",
+    "message_required": "Ubutumwa burakenewe",
+    "message_hint": "Ibitekerezo byawe bidufasha kunoza Market Hub kuri buri wese",
+    "submit": "Ohereza Igitekerezo",
+    "sending": "Biherekezwa...",
+    "success_message": "Urakoze cyane kubitekerezo byawe! Twabishimiye cyane.",
+    "error_message": "Kohereza ibitekerezo byananiwe. Ongera ugerageze.",
+    "footer_note": "Ibitekerezo byawe ntibyitirirwa keretse utanze amakuru yawe. Dukomeza kubungabunga ibanga ryawe."
   }
-
 
 
   

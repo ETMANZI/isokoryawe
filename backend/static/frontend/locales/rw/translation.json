@@ -281,7 +281,10 @@
   "feedback": "Ibitekerezo",
   "feedback_text": "Tangira ibitekerezo byawe",
   "give_feedback": "Tangira Igitekerezo",
-  "view_feedback": "Reba Ibitekerezo"
+  "view_feedback": "Reba Ibitekerezo",
+  "user_guide": "Ubuyobozi",
+  "user_guide_text": "Menya uko ukoresha Market Hub",
+  "read_guide": "Soma Ubuyobozi"
     },
 "login": {
   "welcome_back": "Murakaza neza",

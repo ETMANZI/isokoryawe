@@ -1140,7 +1140,13 @@
       "premium_desc": "Kubagurisha buri gihe",
       "listings": "ibitangazwa",
       "images": "amashusho ku itangazwa",
-      "business_ads": "Matangazo y'ubucuruzi"
+      "business_ads": "Matangazo y'ubucuruzi",
+      "classic": "Gahunda ya Classic",
+      "classic_desc": "Kubucuruzi bukura",
+      "business": "Gahunda ya Business",
+      "business_desc": "Kubigozi n'abagurisha benshi",
+      "analytics": "Ibaruwa rihanitse",
+      "priority_support": "Ubufasha bwihuse"
     },
     
     "dashboard": {

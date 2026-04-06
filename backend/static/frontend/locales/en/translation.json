@@ -1142,7 +1142,14 @@
       "premium_desc": "For professional sellers",
       "listings": "listings",
       "images": "images per listing",
-      "business_ads": "Business ads"
+      "business_ads": "Business ads",
+      "classic": "Classic Plan",
+      "classic_desc": "For growing businesses",
+      "business": "Business Plan",
+      "business_desc": "For agencies and high-volume sellers",
+      "analytics": "Advanced analytics",
+      "priority_support": "Priority support"
+      
     },
     
     "dashboard": {

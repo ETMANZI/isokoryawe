@@ -12,7 +12,6 @@ import {
   Tag,
   Trash2,
   Users,
-  Phone,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
@@ -26,6 +25,7 @@ type ListingImage = {
 };
 
 type ModerationListing = {
+
   id: string;
   title: string;
   listing_type: string;
@@ -117,7 +117,6 @@ type AdminSubscriptionRequest = {
   user: number;
   user_name: string;
   user_email: string;
-  user_phone?: string;
   status: string;
   rejection_reason?: string;
   requested_at?: string;
@@ -402,20 +401,12 @@ export default function AdminModerationPage() {
   const [dailyBreakdownPage, setDailyBreakdownPage] = useState(1);
   const [monthlyPerformancePage, setMonthlyPerformancePage] = useState(1);
 
-  // Subscription pagination states
-  const [subscriptionPage, setSubscriptionPage] = useState(1);
-  const [paymentPage, setPaymentPage] = useState(1);
-  const [subscriptionRequestsData, setSubscriptionRequestsData] = useState<AdminSubscriptionRequest[]>([]);
-  const [subscriptionPaymentsData, setSubscriptionPaymentsData] = useState<SubscriptionPaymentItem[]>([]);
-  const [subscriptionPagination, setSubscriptionPagination] = useState<any>(null);
-  const [paymentPagination, setPaymentPagination] = useState<any>(null);
-  const SUBSCRIPTIONS_PER_PAGE = 10;
-  const PAYMENTS_PER_PAGE = 10;
 
   const [subscriptionRejectingId, setSubscriptionRejectingId] = useState<number | null>(null);
   const [subscriptionRejectReason, setSubscriptionRejectReason] = useState("");
   const [subscriptionActionError, setSubscriptionActionError] = useState("");
   const [subscriptionActionSuccess, setSubscriptionActionSuccess] = useState("");
+
 
   const RECENT_DAILY_PER_PAGE = 7;
   const DAILY_BREAKDOWN_PER_PAGE = 10;
@@ -486,50 +477,29 @@ export default function AdminModerationPage() {
     },
   });
 
-  // Updated subscription requests query with pagination
-  const { isLoading: isLoadingSubscriptionRequests, refetch: refetchSubscriptionRequests } = useQuery({
-    queryKey: ["admin-subscription-requests", subscriptionPage],
+
+
+  const { data: subscriptionRequests = [], isLoading: isLoadingSubscriptionRequests } = useQuery<AdminSubscriptionRequest[]>({
+    queryKey: ["admin-subscription-requests"],
     queryFn: async () => {
-      const res = await api.get(`/subscriptions/admin/requests/?page=${subscriptionPage}&page_size=${SUBSCRIPTIONS_PER_PAGE}`);
-      const data = res.data;
-      setSubscriptionRequestsData(Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []));
-      setSubscriptionPagination({
-        current_page: data.current_page || subscriptionPage,
-        total_pages: data.total_pages || Math.ceil((data.total || 0) / SUBSCRIPTIONS_PER_PAGE),
-        total: data.total || 0,
-        has_next: data.has_next || false,
-        has_previous: data.has_previous || false,
-        start_index: data.start_index || ((subscriptionPage - 1) * SUBSCRIPTIONS_PER_PAGE + 1),
-        end_index: data.end_index || Math.min(subscriptionPage * SUBSCRIPTIONS_PER_PAGE, data.total || 0),
-      });
-      return data;
+      const res = await api.get("/subscriptions/admin/requests/");
+      return Array.isArray(res.data) ? res.data : res.data.results || [];
     },
     enabled: activeTab === "subscriptions",
   });
 
-  // Updated subscription payments query with pagination
-  const { isLoading: isLoadingSubscriptionPayments, refetch: refetchSubscriptionPayments } = useQuery({
-    queryKey: ["admin-subscription-payments", paymentPage],
+  const { data: subscriptionPayments = [], isLoading: isLoadingSubscriptionPayments } = useQuery<SubscriptionPaymentItem[]>({
+    queryKey: ["admin-subscription-payments"],
     queryFn: async () => {
-      const res = await api.get(`/subscriptions/admin/payments/?page=${paymentPage}&page_size=${PAYMENTS_PER_PAGE}`);
-      const data = res.data;
-      setSubscriptionPaymentsData(Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []));
-      setPaymentPagination({
-        current_page: data.current_page || paymentPage,
-        total_pages: data.total_pages || Math.ceil((data.total || 0) / PAYMENTS_PER_PAGE),
-        total: data.total || 0,
-        has_next: data.has_next || false,
-        has_previous: data.has_previous || false,
-        start_index: data.start_index || ((paymentPage - 1) * PAYMENTS_PER_PAGE + 1),
-        end_index: data.end_index || Math.min(paymentPage * PAYMENTS_PER_PAGE, data.total || 0),
-      });
-      return data;
+      const res = await api.get("/subscriptions/admin/payments/");
+      return Array.isArray(res.data) ? res.data : res.data.results || [];
     },
     enabled: activeTab === "subscriptions",
   });
 
-  const subscriptionRequests = subscriptionRequestsData;
-  const subscriptionPayments = subscriptionPaymentsData;
+
+
+
 
   const rejectMutation = useMutation({
     mutationFn: async ({
@@ -662,6 +632,8 @@ export default function AdminModerationPage() {
     },
   });
 
+
+
   const approveSubscriptionMutation = useMutation({
     mutationFn: async (subscriptionId: number) => {
       await api.post(`/subscriptions/admin/requests/${subscriptionId}/approve/`);
@@ -671,7 +643,6 @@ export default function AdminModerationPage() {
       setSubscriptionActionSuccess("Subscription approved successfully.");
       await queryClient.invalidateQueries({ queryKey: ["admin-subscription-requests"] });
       await queryClient.invalidateQueries({ queryKey: ["my-subscription"] });
-      refetchSubscriptionRequests();
     },
     onError: (err: any) => {
       setSubscriptionActionSuccess("");
@@ -692,7 +663,6 @@ export default function AdminModerationPage() {
       setSubscriptionActionSuccess("Subscription rejected successfully.");
       await queryClient.invalidateQueries({ queryKey: ["admin-subscription-requests"] });
       await queryClient.invalidateQueries({ queryKey: ["my-subscription"] });
-      refetchSubscriptionRequests();
     },
     onError: (err: any) => {
       setSubscriptionActionSuccess("");
@@ -701,6 +671,10 @@ export default function AdminModerationPage() {
       );
     },
   });
+
+
+
+
 
   const togglePartnerStatusMutation = useMutation({
     mutationFn: async (partner: Partner) => {
@@ -2977,451 +2951,285 @@ export default function AdminModerationPage() {
           )}
 
 
- {activeTab === "subscriptions" && (
-            <>
-              <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Subscription Requests</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  Review subscription requests, approve or reject them, and monitor payment history.
-                </p>
-              </div>
+{activeTab === "subscriptions" && (
+  <>
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-slate-900">Subscription Requests</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Review subscription requests, approve or reject them, and monitor payment history.
+      </p>
+    </div>
 
-              {subscriptionActionError && (
-                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {subscriptionActionError}
-                </div>
-              )}
+    {subscriptionActionError && (
+      <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {subscriptionActionError}
+      </div>
+    )}
 
-              {subscriptionActionSuccess && (
-                <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                  {subscriptionActionSuccess}
-                </div>
-              )}
+    {subscriptionActionSuccess && (
+      <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        {subscriptionActionSuccess}
+      </div>
+    )}
 
-              {isLoadingSubscriptionRequests ? (
-                <p className="text-slate-600">Loading subscription requests...</p>
-              ) : subscriptionRequests.length === 0 ? (
-                <Card>
-                  <div className="py-10 text-center">
-                    <h3 className="text-xl font-semibold text-slate-900">No subscription requests found</h3>
-                    <p className="mt-2 text-slate-600">All requests will appear here once users subscribe.</p>
-                  </div>
-                </Card>
-              ) : (
-                <>
-                  <div className="space-y-5">
-                    {subscriptionRequests.map((item) => {
-                      const isRejectingThis = subscriptionRejectingId === item.id;
+    {isLoadingSubscriptionRequests ? (
+      <p className="text-slate-600">Loading subscription requests...</p>
+    ) : subscriptionRequests.length === 0 ? (
+      <Card>
+        <div className="py-10 text-center">
+          <h3 className="text-xl font-semibold text-slate-900">No subscription requests found</h3>
+          <p className="mt-2 text-slate-600">All requests will appear here once users subscribe.</p>
+        </div>
+      </Card>
+    ) : (
+      <div className="space-y-5">
+        {subscriptionRequests.map((item) => {
+          const isRejectingThis = subscriptionRejectingId === item.id;
 
-                      return (
-                        <Card key={item.id}>
-                          <div className="flex flex-col gap-5 lg:flex-row">
-                            <div className="flex-1">
-                              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                <div>
-                                  <h3 className="text-xl font-bold text-slate-900">
-                                    {item.user_name}
-                                  </h3>
-                                  <p className="mt-1 text-sm text-slate-500">{item.user_email}</p>
-                                  {item.user_phone && (
-                                    <div className="mt-1 flex items-center gap-2 flex-wrap">
-                                      <Phone size={14} className="text-slate-400" />
-                                      <p className="text-sm text-slate-500">{item.user_phone}</p>
-                                      <a
-                                        href={`tel:${item.user_phone}`}
-                                        className="text-xs text-indigo-600 hover:underline"
-                                      >
-                                        Call
-                                      </a>
-                                      <a
-                                        href={`https://wa.me/${item.user_phone.replace(/[^\d]/g, "")}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-green-600 hover:underline"
-                                      >
-                                        WhatsApp
-                                      </a>
-                                    </div>
-                                  )}
-                                </div>
+          return (
+            <Card key={item.id}>
+              <div className="flex flex-col gap-5 lg:flex-row">
+                <div className="flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900">
+                        {item.user_name}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-500">{item.user_email}</p>
+                    </div>
 
-                                <div className="flex flex-wrap gap-2">
-                                  <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-100">
-                                    {item.plan.name}
-                                  </span>
-                                  <span
-                                    className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
-                                      item.status === "approved"
-                                        ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                                        : item.status === "rejected"
-                                        ? "bg-red-50 text-red-700 ring-red-100"
-                                        : "bg-amber-50 text-amber-700 ring-amber-100"
-                                    }`}
-                                  >
-                                    {item.status}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Price
-                                  </p>
-                                  <p className="mt-1 text-sm font-medium text-slate-700">
-                                    {item.plan.currency} {formatNumber(item.plan.price)}
-                                  </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Listing Limit
-                                  </p>
-                                  <p className="mt-1 text-sm font-medium text-slate-700">
-                                    {item.plan.max_listings}
-                                  </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Used Listings
-                                  </p>
-                                  <p className="mt-1 text-sm font-medium text-slate-700">
-                                    {item.usage?.used_listings ?? 0}
-                                  </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Remaining
-                                  </p>
-                                  <p className="mt-1 text-sm font-medium text-slate-700">
-                                    {item.usage?.remaining_listings ?? 0}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Requested At
-                                  </p>
-                                  <p className="mt-1 text-sm text-slate-700">
-                                    {formatDate(item.requested_at)}
-                                  </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Start Date
-                                  </p>
-                                  <p className="mt-1 text-sm text-slate-700">
-                                    {formatDate(item.start_date || undefined)}
-                                  </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    End Date
-                                  </p>
-                                  <p className="mt-1 text-sm text-slate-700">
-                                    {formatDate(item.end_date || undefined)}
-                                  </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                    Latest Payment
-                                  </p>
-                                  <p className="mt-1 text-sm text-slate-700">
-                                    {item.latest_payment
-                                      ? `${item.latest_payment.currency} ${formatNumber(item.latest_payment.amount)} • ${item.latest_payment.status}`
-                                      : "No payment"}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {item.rejection_reason && (
-                                <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                                  <p className="text-xs font-semibold uppercase tracking-wide text-red-500">
-                                    Rejection Reason
-                                  </p>
-                                  <p className="mt-1 text-sm text-red-700">{item.rejection_reason}</p>
-                                </div>
-                              )}
-
-                              {isRejectingThis && (
-                                <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                                  <label className="mb-2 block text-sm font-medium text-slate-700">
-                                    Reject Reason
-                                  </label>
-
-                                  <textarea
-                                    value={subscriptionRejectReason}
-                                    onChange={(e) => setSubscriptionRejectReason(e.target.value)}
-                                    placeholder="Why is this subscription being rejected?"
-                                    className="min-h-24 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
-                                  />
-
-                                  <div className="mt-3 flex flex-wrap gap-3">
-                                    <Button
-                                      className="bg-red-600"
-                                      onClick={() =>
-                                        rejectSubscriptionMutation.mutate({
-                                          subscriptionId: item.id,
-                                          reason: subscriptionRejectReason.trim() || "Rejected by admin",
-                                        })
-                                      }
-                                      disabled={rejectSubscriptionMutation.isPending}
-                                    >
-                                      {rejectSubscriptionMutation.isPending ? "Rejecting..." : "Confirm Reject"}
-                                    </Button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setSubscriptionRejectingId(null);
-                                        setSubscriptionRejectReason("");
-                                      }}
-                                      className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="flex w-full shrink-0 flex-row gap-3 lg:w-[180px] lg:flex-col">
-                              <Button
-                                className="flex-1 bg-green-600"
-                                onClick={() => approveSubscriptionMutation.mutate(item.id)}
-                                disabled={
-                                  approveSubscriptionMutation.isPending || item.status === "approved"
-                                }
-                              >
-                                {approveSubscriptionMutation.isPending ? "Approving..." : "Approve"}
-                              </Button>
-
-                              {!isRejectingThis && (
-                                <Button
-                                  className="flex-1 bg-red-600"
-                                  onClick={() => {
-                                    setSubscriptionRejectingId(item.id);
-                                    setSubscriptionRejectReason("");
-                                  }}
-                                  disabled={item.status === "rejected"}
-                                >
-                                  Reject
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </Card>
-                      );
-                    })}
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-100">
+                        {item.plan.name}
+                      </span>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+                          item.status === "approved"
+                            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                            : item.status === "rejected"
+                            ? "bg-red-50 text-red-700 ring-red-100"
+                            : "bg-amber-50 text-amber-700 ring-amber-100"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Pagination for Subscription Requests */}
-                  {subscriptionPagination && subscriptionPagination.total_pages > 1 && (
-                    <div className="mt-6 flex items-center justify-between flex-wrap gap-4">
-                      <p className="text-sm text-slate-500">
-                        Showing {subscriptionPagination.start_index} - {subscriptionPagination.end_index} of {subscriptionPagination.total} requests
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Price
                       </p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setSubscriptionPage(subscriptionPagination.current_page - 1)}
-                          disabled={!subscriptionPagination.has_previous}
-                          className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.plan.currency} {formatNumber(item.plan.price)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Listing Limit
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.plan.max_listings}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Used Listings
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.usage?.used_listings ?? 0}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Remaining
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-700">
+                        {item.usage?.remaining_listings ?? 0}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Requested At
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {formatDate(item.requested_at)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Start Date
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {formatDate(item.start_date || undefined)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        End Date
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {formatDate(item.end_date || undefined)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Latest Payment
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {item.latest_payment
+                          ? `${item.latest_payment.currency} ${formatNumber(item.latest_payment.amount)} • ${item.latest_payment.status}`
+                          : "No payment"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {item.rejection_reason && (
+                    <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-red-500">
+                        Rejection Reason
+                      </p>
+                      <p className="mt-1 text-sm text-red-700">{item.rejection_reason}</p>
+                    </div>
+                  )}
+
+                  {isRejectingThis && (
+                    <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Reject Reason
+                      </label>
+
+                      <textarea
+                        value={subscriptionRejectReason}
+                        onChange={(e) => setSubscriptionRejectReason(e.target.value)}
+                        placeholder="Why is this subscription being rejected?"
+                        className="min-h-24 w-full rounded-2xl border border-slate-300 bg-white p-3 outline-none focus:border-slate-700"
+                      />
+
+                      <div className="mt-3 flex flex-wrap gap-3">
+                        <Button
+                          className="bg-red-600"
+                          onClick={() =>
+                            rejectSubscriptionMutation.mutate({
+                              subscriptionId: item.id,
+                              reason: subscriptionRejectReason.trim() || "Rejected by admin",
+                            })
+                          }
+                          disabled={rejectSubscriptionMutation.isPending}
                         >
-                          Previous
-                        </button>
-                        
-                        <div className="flex gap-1">
-                          {Array.from({ length: Math.min(5, subscriptionPagination.total_pages) }, (_, i) => {
-                            let pageNum;
-                            const current = subscriptionPagination.current_page;
-                            const total = subscriptionPagination.total_pages;
-                            
-                            if (total <= 5) {
-                              pageNum = i + 1;
-                            } else if (current <= 3) {
-                              pageNum = i + 1;
-                              if (i === 4) pageNum = '...';
-                            } else if (current >= total - 2) {
-                              pageNum = total - 4 + i;
-                              if (i === 0 && pageNum > 1) pageNum = '...';
-                            } else {
-                              if (i === 0) pageNum = '...';
-                              else if (i === 1) pageNum = current - 1;
-                              else if (i === 2) pageNum = current;
-                              else if (i === 3) pageNum = current + 1;
-                              else pageNum = '...';
-                            }
-                            
-                            if (pageNum === '...') {
-                              return (
-                                <span key={i} className="px-3 py-2 text-sm text-slate-500">...</span>
-                              );
-                            }
-                            
-                            return (
-                              <button
-                                key={i}
-                                onClick={() => setSubscriptionPage(Number(pageNum))}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                                  subscriptionPagination.current_page === pageNum
-                                    ? "bg-indigo-600 text-white"
-                                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-                                }`}
-                              >
-                                {pageNum}
-                              </button>
-                            );
-                          })}
-                        </div>
-                        
+                          {rejectSubscriptionMutation.isPending ? "Rejecting..." : "Confirm Reject"}
+                        </Button>
+
                         <button
-                          onClick={() => setSubscriptionPage(subscriptionPagination.current_page + 1)}
-                          disabled={!subscriptionPagination.has_next}
-                          className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                          type="button"
+                          onClick={() => {
+                            setSubscriptionRejectingId(null);
+                            setSubscriptionRejectReason("");
+                          }}
+                          className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                         >
-                          Next
+                          Cancel
                         </button>
                       </div>
                     </div>
                   )}
-                </>
-              )}
+                </div>
 
-              <div className="mt-10">
-                <h2 className="text-2xl font-semibold text-slate-900">Payment History</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  Review all recorded subscription payments.
-                </p>
+                <div className="flex w-full shrink-0 flex-row gap-3 lg:w-[180px] lg:flex-col">
+                  <Button
+                    className="flex-1 bg-green-600"
+                    onClick={() => approveSubscriptionMutation.mutate(item.id)}
+                    disabled={
+                      approveSubscriptionMutation.isPending || item.status === "approved"
+                    }
+                  >
+                    {approveSubscriptionMutation.isPending ? "Approving..." : "Approve"}
+                  </Button>
+
+                  {!isRejectingThis && (
+                    <Button
+                      className="flex-1 bg-red-600"
+                      onClick={() => {
+                        setSubscriptionRejectingId(item.id);
+                        setSubscriptionRejectReason("");
+                      }}
+                      disabled={item.status === "rejected"}
+                    >
+                      Reject
+                    </Button>
+                  )}
+                </div>
               </div>
+            </Card>
+          );
+        })}
+      </div>
+    )}
 
-              <div className="mt-4">
-                {isLoadingSubscriptionPayments ? (
-                  <p className="text-slate-600">Loading payment history...</p>
-                ) : subscriptionPayments.length === 0 ? (
-                  <Card>
-                    <div className="py-10 text-center">
-                      <h3 className="text-xl font-semibold text-slate-900">No payments found</h3>
-                      <p className="mt-2 text-slate-600">Subscription payments will appear here.</p>
-                    </div>
-                  </Card>
-                ) : (
-                  <>
-                    <Card>
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-200">
-                          <thead>
-                            <tr className="bg-slate-50 text-left">
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Payment ID</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Subscription</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Amount</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Status</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Method</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Transaction ID</th>
-                              <th className="px-4 py-3 text-sm font-semibold text-slate-700">Paid At</th>
-                              </tr>
-                              </thead>
-                            </table>
-                          
-                          <tbody className="divide-y divide-slate-100">
-                            {subscriptionPayments.map((payment) => (
-                              <tr key={payment.id} className="hover:bg-slate-50">
-                                <td className="px-4 py-4 text-sm text-slate-700">{payment.id}</td>
-                                <td className="px-4 py-4 text-sm text-slate-700">{payment.subscription}</td>
-                                <td className="px-4 py-4 text-sm font-medium text-slate-900">
-                                  {payment.currency} {formatNumber(payment.amount)}
-                                </td>
-                                <td className="px-4 py-4 text-sm text-slate-700">{payment.status}</td>
-                                <td className="px-4 py-4 text-sm text-slate-700">{payment.payment_method || "-"}</td>
-                                <td className="px-4 py-4 text-sm text-slate-700">{payment.transaction_id || "-"}</td>
-                                <td className="px-4 py-4 text-sm text-slate-700">{formatDate(payment.paid_at || undefined)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </Card>
+    <div className="mt-10">
+      <h2 className="text-2xl font-semibold text-slate-900">Payment History</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Review all recorded subscription payments.
+      </p>
+    </div>
 
-                    {/* Pagination for Payment History */}
-                    {paymentPagination && paymentPagination.total_pages > 1 && (
-                      <div className="mt-6 flex items-center justify-between flex-wrap gap-4">
-                        <p className="text-sm text-slate-500">
-                          Showing {paymentPagination.start_index} - {paymentPagination.end_index} of {paymentPagination.total} payments
-                        </p>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setPaymentPage(paymentPagination.current_page - 1)}
-                            disabled={!paymentPagination.has_previous}
-                            className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                          >
-                            Previous
-                          </button>
-                          
-                          <div className="flex gap-1">
-                            {Array.from({ length: Math.min(5, paymentPagination.total_pages) }, (_, i) => {
-                              let pageNum;
-                              const current = paymentPagination.current_page;
-                              const total = paymentPagination.total_pages;
-                              
-                              if (total <= 5) {
-                                pageNum = i + 1;
-                              } else if (current <= 3) {
-                                pageNum = i + 1;
-                                if (i === 4) pageNum = '...';
-                              } else if (current >= total - 2) {
-                                pageNum = total - 4 + i;
-                                if (i === 0 && pageNum > 1) pageNum = '...';
-                              } else {
-                                if (i === 0) pageNum = '...';
-                                else if (i === 1) pageNum = current - 1;
-                                else if (i === 2) pageNum = current;
-                                else if (i === 3) pageNum = current + 1;
-                                else pageNum = '...';
-                              }
-                              
-                              if (pageNum === '...') {
-                                return (
-                                  <span key={i} className="px-3 py-2 text-sm text-slate-500">...</span>
-                                );
-                              }
-                              
-                              return (
-                                <button
-                                  key={i}
-                                  onClick={() => setPaymentPage(Number(pageNum))}
-                                  className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                                    paymentPagination.current_page === pageNum
-                                      ? "bg-indigo-600 text-white"
-                                      : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-                                  }`}
-                                >
-                                  {pageNum}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          
-                          <button
-                            onClick={() => setPaymentPage(paymentPagination.current_page + 1)}
-                            disabled={!paymentPagination.has_next}
-                            className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                          >
-                            Next
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </>
-          )}
+    <div className="mt-4">
+      {isLoadingSubscriptionPayments ? (
+        <p className="text-slate-600">Loading payment history...</p>
+      ) : subscriptionPayments.length === 0 ? (
+        <Card>
+          <div className="py-10 text-center">
+            <h3 className="text-xl font-semibold text-slate-900">No payments found</h3>
+            <p className="mt-2 text-slate-600">Subscription payments will appear here.</p>
+          </div>
+        </Card>
+      ) : (
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead>
+                <tr className="bg-slate-50 text-left">
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Payment ID</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Subscription</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Amount</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Status</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Method</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Transaction ID</th>
+                  <th className="px-4 py-3 text-sm font-semibold text-slate-700">Paid At</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {subscriptionPayments.map((payment) => (
+                  <tr key={payment.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.id}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.subscription}</td>
+                    <td className="px-4 py-4 text-sm font-medium text-slate-900">
+                      {payment.currency} {formatNumber(payment.amount)}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.status}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.payment_method || "-"}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{payment.transaction_id || "-"}</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">{formatDate(payment.paid_at || undefined)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  </>
+)}
 
 
 

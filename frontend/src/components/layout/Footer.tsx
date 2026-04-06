@@ -61,7 +61,7 @@ export default function Footer() {
           <p>{t("footer.copyright", { year: new Date().getFullYear() })}</p>
           <div className="flex gap-4 mt-2 md:mt-0">
 
-          <Link to="/guide" className="">
+          <Link to="/guide" className="text-sm text-slate-500 hover:text-slate-700">
             {t("nav.user_guide")}
           </Link>
           <Link to="/privacy" className="text-sm text-slate-500 hover:text-slate-700">

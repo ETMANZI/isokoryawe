@@ -10,7 +10,9 @@
     "moderation": "Moderation",
     "hi": "Hi",
     "account": "Account",
-    "subscriptions":"Subscriptions"
+    "subscriptions":"Subscriptions",
+    "user_guide":"Guide"
+
   },
 
   "listings": {

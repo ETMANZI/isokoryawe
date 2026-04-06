@@ -114,7 +114,11 @@
   "need_help": "Need Help?",
   "support_text": "Support available for posting and account setup",
   "call_now": "Call Now",
-  "whatsapp": "WhatsApp"
+  "whatsapp": "WhatsApp",
+  "feedback": "Feedback",
+  "feedback_text": "Share your thoughts with us",
+  "give_feedback": "Give Feedback",
+  "view_feedback": "View All Feedback"
 },
 "login": {
   "welcome_back": "Welcome back",

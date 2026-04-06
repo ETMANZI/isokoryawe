@@ -276,7 +276,11 @@
   "need_help": "Ukeneye Ubufasha?",
   "support_text": "Ubufasha burahari mu gutangaza no gushyiraho konti",
   "call_now": "Hamagara",
-  "whatsapp": "WhatsApp"
+  "whatsapp": "WhatsApp",
+  "feedback": "Ibitekerezo",
+  "feedback_text": "Tangira ibitekerezo byawe",
+  "give_feedback": "Tangira Igitekerezo",
+  "view_feedback": "Reba Ibitekerezo"
     },
 "login": {
   "welcome_back": "Murakaza neza",

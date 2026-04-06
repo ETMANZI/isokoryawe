@@ -1089,6 +1089,8 @@
 
 
   "guide": {
+    "call_now": "Call Now",
+    "whatsapp": "WhatsApp",
     "title": "User Guide",
     "subtitle": "Everything you need to know about using Market Hub",
     "search_placeholder": "Search guides...",

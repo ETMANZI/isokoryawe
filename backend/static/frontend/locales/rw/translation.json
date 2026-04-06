@@ -1087,6 +1087,8 @@
 
 
   "guide": {
+    "call_now": "Hamagara",
+    "whatsapp": "WhatsApp",
     "title": "Ubuyobozi bw'Umukoresha",
     "subtitle": "Ibyose ugomba kumenya kuri Market Hub",
     "search_placeholder": "Shakisha ubuyobozi...",
@@ -1119,7 +1121,7 @@
       "image_tip1": "Koresha amashusho meza (byibuze 800x600 pixels)",
       "image_tip2": "Kora amashusho mu nzira zitandukanye",
       "image_tip3": "Ntugire ibyo wandika kuri mashusho",
-      "listing_tips": "Inama z'Itangazwa Riza",
+      "listing_tips": "Inama z'Itangazwa ryiza",
       "tip1": "Andika imitwe isobanutse neza",
       "tip2": "Shyiramo ibyangombwa byuzuye",
       "tip3": "Shyira ibiciro bihuye n'isoko"

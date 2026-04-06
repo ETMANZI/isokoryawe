@@ -19,6 +19,8 @@ import {
   FileText,
   Download,
   Printer,
+  Phone,
+  MessageCircle as WhatsAppIcon,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
@@ -33,6 +35,10 @@ type GuideSection = {
 export default function UserGuidePage() {
   const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState("getting-started");
+
+  const phoneNumber = "+250 788 263 338";
+  const whatsappUrl = "https://wa.me/250788263338";
+  const telUrl = "tel:+250788263338";
 
   const sections: GuideSection[] = [
     {
@@ -395,17 +401,37 @@ export default function UserGuidePage() {
                   ))}
                 </nav>
 
+                {/* Contact Support Section with Call and WhatsApp */}
                 <div className="mt-6 pt-6 border-t border-slate-200">
-                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-4 text-center">
-                    <p className="text-white text-sm font-medium mb-2">
+                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-4">
+                    <p className="text-white text-sm font-medium mb-3 text-center">
                       {t("guide.need_help")}
                     </p>
+                    
+                    {/* Call Button */}
                     <a
-                      href="/contact"
-                      className="inline-block bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition"
+                      href={telUrl}
+                      className="flex items-center justify-center gap-2 w-full bg-white text-indigo-600 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-50 transition mb-2"
                     >
-                      {t("guide.contact_support")}
+                      <Phone size={16} />
+                      {t("guide.call_now")}
                     </a>
+                    
+                    {/* WhatsApp Button */}
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[#20b859] transition"
+                    >
+                      <WhatsAppIcon size={16} />
+                      {t("guide.whatsapp")}
+                    </a>
+                    
+                    {/* Phone Number Display */}
+                    <p className="text-white/70 text-xs text-center mt-3">
+                      {phoneNumber}
+                    </p>
                   </div>
                 </div>
               </Card>

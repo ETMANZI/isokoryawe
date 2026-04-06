@@ -145,7 +145,7 @@ export default function RegisterPage() {
 
                 <Link to="/login">
                   <Button
-                    variant="outline"
+                    // variant="outline"
                     className="flex w-full items-center justify-center gap-2 sm:w-auto"
                   >
                     {t("register.already_have_account")}

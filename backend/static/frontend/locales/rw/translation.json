@@ -273,7 +273,9 @@
   "safety_tip_2": "Hura ahantu hatekanye iyo urebye umutungo cyangwa imodoka.",
   "safety_tip_3": "Wirinde kohereza amafaranga mbere y'uko wemeza ko igurishwa ari ukuri.",
   "need_help": "Ukeneye Ubufasha?",
-  "support_text": "Ubufasha burahari mu gutangaza no gushyiraho konti"
+  "support_text": "Ubufasha burahari mu gutangaza no gushyiraho konti",
+  "call_now": "Terefona",
+  "whatsapp": "WhatsApp"
     },
 "login": {
   "welcome_back": "Murakaza neza",
@@ -966,9 +968,8 @@
     "request_submitted":"Ubusabe bwoherejwe neza",
     "amount_to_pay":"Ingano mugomba kwishyura",
     "max_images_per_listing":"Amafoto kuri buri gicuruzwa",
-    "processing":"...",
-    "call_now": "Terefona",
-    "whatsapp": "WhatsApp"
+    "processing":"..."
+
   },
   "common": {
     "included": "Birimo",

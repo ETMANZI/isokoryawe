@@ -1165,16 +1165,16 @@
     
     "faq": {
       "title": "Ibibazo Bikunze Kubazwa",
-      "q1": "Itangazwa rimara igihe kingana iki ryoherejwe?",
-      "a1": "Ibitangazwa byemerwa mu masaha 24. Abaguzi ba Premium bemerwa ako kanya.",
-      "q2": "Nshobora guhindura itangazwa ryanjye nyuma yo gutangaza?",
-      "a2": "Yego! Urashobora guhindura itangazwa iki gihe cyose muri dashboard yawe.",
-      "q3": "Nakora nte ngo vugurura ifatabuguzi?",
-      "a3": "Jya ku rubuga rw'ifatabuguzi hanywe uhitamo gahunda ushaka.",
-      "q4": "Bigenda bite iyo ifatabuguzi bwanjye burangiye?",
-      "a4": "Ibitangazwa byawe bizahishwa kugeza ifatabuguzi bwawe buvuguruwe.",
+      "q1": "Igikuruzwa rimara igihe kingana iki ryoherejwe?",
+      "a1": "Igicuruzwa byemerwa mu minota 15 umaze kwishyura. Abaguzi ba Premium na Business bemerwa ako kanya nyuma yo kwishyura",
+      "q2": "Nshobora guhindura igicuruzwa cyanjye nyuma yo gutangaza?",
+      "a2": "Oya! Ntushobora guhindura igicuruzwa wamaze gutangaza. Ariko wasaba ubufasha, bigakorwa",
+      "q3": "Nakora nte ngo mvugurura ifatabuguzi?",
+      "a3": "Jya ku rubuga rw'ifatabuguzi uhitamo gahunda ushaka.",
+      "q4": "Bigenda bite iyo ifatabuguzi ryanjye ryarangiye?",
+      "a4": "Ibicuruzwa byawe bizahishwa kugeza ifatabuguzi bwawe rivuguruwe.",
       "q5": "Nakora nte kuvugana n'umugurisha?",
-      "a5": "Kanda 'Twandikire Umugurisha' kuri buri tangazwa."
+      "a5": "Kanda 'Hamagara' kuri buri gikuruzwa. Hariho numero z'ucuruza"
     }
   }
 

@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
 from .models import Feedback
 from .serializers import FeedbackSerializer, AdminFeedbackSerializer
+from rest_framework.response import Response
 
 class CreateFeedbackView(generics.CreateAPIView):
     """Create new feedback -任何人都可以提交"""

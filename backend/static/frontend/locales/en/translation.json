@@ -977,7 +977,9 @@
     "request_submitted":"Request Submitted",
     "amount_to_pay":"Amount to pay",
     "max_images_per_listing":"Image(s) Per listing",
-    "processing":"Processing"
+    "processing":"Processing",
+    "no_subscription_yet":"No subscription yet",
+    "choose_plan_to_start":"Choose plan to start"
   },
   "common": {
     "included": "Included",

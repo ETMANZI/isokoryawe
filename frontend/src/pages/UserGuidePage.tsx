@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -36,6 +36,7 @@ export default function UserGuidePage() {
   const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState("getting-started");
   const [searchQuery, setSearchQuery] = useState("");
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const phoneNumber = "+250 788 263 338";
   const whatsappUrl = "https://wa.me/250788263338";
@@ -409,6 +410,196 @@ export default function UserGuidePage() {
     setSearchQuery("");
   };
 
+  // Handle Print - prints only the guide content
+  const handlePrint = () => {
+    const printContent = contentRef.current?.cloneNode(true) as HTMLElement;
+    if (!printContent) return;
+
+    const originalTitle = document.title;
+    document.title = t("guide.title") + " - Market Hub";
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${t("guide.title")} - Market Hub</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                line-height: 1.6;
+                color: #1e293b;
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 40px 20px;
+              }
+              h1 { color: #0f172a; font-size: 28px; margin-bottom: 20px; }
+              h2 { color: #1e293b; font-size: 22px; margin-top: 30px; margin-bottom: 15px; }
+              h3 { color: #334155; font-size: 18px; margin-top: 20px; margin-bottom: 10px; }
+              h4 { color: #475569; font-size: 16px; margin-top: 15px; margin-bottom: 8px; }
+              p { margin-bottom: 12px; }
+              ul, ol { margin-bottom: 15px; padding-left: 25px; }
+              li { margin-bottom: 5px; }
+              .bg-blue-50, .bg-amber-50, .bg-green-50, .bg-red-50, .bg-slate-50 { 
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 16px;
+                margin: 16px 0;
+              }
+              .border-2 { border: 1px solid #e2e8f0; }
+              .rounded-xl { border-radius: 12px; }
+              .grid { display: grid; gap: 16px; }
+              .grid-cols-1 { grid-template-columns: 1fr; }
+              @media (min-width: 768px) {
+                .md\\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+                .md\\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+              }
+              .text-center { text-align: center; }
+              .font-bold { font-weight: 700; }
+              .text-2xl { font-size: 24px; }
+              .text-indigo-600 { color: #4f46e5; }
+              .text-slate-500 { color: #64748b; }
+              .text-slate-600 { color: #475569; }
+              .text-slate-700 { color: #334155; }
+              .text-slate-800 { color: #1e293b; }
+              .mt-2 { margin-top: 8px; }
+              .mt-3 { margin-top: 12px; }
+              .mb-2 { margin-bottom: 8px; }
+              .mb-3 { margin-bottom: 12px; }
+              .mb-4 { margin-bottom: 16px; }
+              .space-y-4 > * + * { margin-top: 16px; }
+              .space-y-6 > * + * { margin-top: 24px; }
+              .flex { display: flex; }
+              .items-center { align-items: center; }
+              .gap-2 { gap: 8px; }
+              .gap-3 { gap: 12px; }
+              .break-all { word-break: break-all; }
+              .print-header { margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; }
+              .print-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; }
+              @media print {
+                body { margin: 0; padding: 20px; }
+                .no-print { display: none; }
+                .page-break { page-break-before: always; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="print-header">
+              <h1>${t("guide.title")}</h1>
+              <p>${t("guide.subtitle")}</p>
+            </div>
+            ${printContent.outerHTML}
+            <div class="print-footer">
+              <p>Market Hub - ${new Date().toLocaleDateString()}</p>
+              <p>${t("guide.print_footer")}</p>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+      printWindow.close();
+    }
+    document.title = originalTitle;
+  };
+
+  // Handle Download as PDF
+  const handleDownload = () => {
+    const content = contentRef.current?.cloneNode(true) as HTMLElement;
+    if (!content) return;
+
+    const styles = `
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          line-height: 1.6;
+          color: #1e293b;
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 40px 20px;
+        }
+        h1 { color: #0f172a; font-size: 28px; margin-bottom: 20px; }
+        h2 { color: #1e293b; font-size: 22px; margin-top: 30px; margin-bottom: 15px; }
+        h3 { color: #334155; font-size: 18px; margin-top: 20px; margin-bottom: 10px; }
+        h4 { color: #475569; font-size: 16px; margin-top: 15px; margin-bottom: 8px; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin-bottom: 15px; padding-left: 25px; }
+        li { margin-bottom: 5px; }
+        .bg-blue-50, .bg-amber-50, .bg-green-50, .bg-red-50, .bg-slate-50 { 
+          background-color: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 16px;
+          margin: 16px 0;
+        }
+        .border-2 { border: 1px solid #e2e8f0; }
+        .rounded-xl { border-radius: 12px; }
+        .grid { display: grid; gap: 16px; }
+        .grid-cols-1 { grid-template-columns: 1fr; }
+        @media (min-width: 768px) {
+          .md\\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+          .md\\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .text-2xl { font-size: 24px; }
+        .text-indigo-600 { color: #4f46e5; }
+        .text-slate-500 { color: #64748b; }
+        .text-slate-600 { color: #475569; }
+        .text-slate-700 { color: #334155; }
+        .text-slate-800 { color: #1e293b; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .space-y-4 > * + * { margin-top: 16px; }
+        .space-y-6 > * + * { margin-top: 24px; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .break-all { word-break: break-all; }
+        .print-header { margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; }
+        .print-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; }
+      </style>
+    `;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>${t("guide.title")} - Market Hub</title>
+          ${styles}
+        </head>
+        <body>
+          <div class="print-header">
+            <h1>${t("guide.title")}</h1>
+            <p>${t("guide.subtitle")}</p>
+          </div>
+          ${content.outerHTML}
+          <div class="print-footer">
+            <p>Market Hub - ${new Date().toLocaleDateString()}</p>
+            <p>${t("guide.print_footer")}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `market-hub-user-guide-${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
@@ -532,37 +723,40 @@ export default function UserGuidePage() {
 
             {/* Main Content - Shows selected section */}
             <div className="flex-1">
-              <Card>
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-                  <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                    {sections.find((s) => s.id === displayedActiveSection)?.icon}
+              <div ref={contentRef}>
+                <Card>
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                      {sections.find((s) => s.id === displayedActiveSection)?.icon}
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {sections.find((s) => s.id === displayedActiveSection)?.title}
+                    </h2>
                   </div>
-                  <h2 className="text-xl font-bold text-slate-900">
-                    {sections.find((s) => s.id === displayedActiveSection)?.title}
-                  </h2>
-                </div>
 
-                <div className="prose prose-slate max-w-none">
-                  {sections.find((s) => s.id === displayedActiveSection)?.content}
-                </div>
+                  <div className="prose prose-slate max-w-none">
+                    {sections.find((s) => s.id === displayedActiveSection)?.content}
+                  </div>
+                </Card>
+              </div>
 
-                {/* Download PDF Button */}
-                <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
-                  <button
-                    onClick={() => window.print()}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition"
-                  >
-                    <Printer size={16} />
-                    {t("guide.print_guide")}
-                  </button>
-                  <button
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-300 rounded-lg hover:bg-indigo-50 transition"
-                  >
-                    <Download size={16} />
-                    {t("guide.download_pdf")}
-                  </button>
-                </div>
-              </Card>
+              {/* Download PDF Button */}
+              <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition"
+                >
+                  <Printer size={16} />
+                  {t("guide.print_guide")}
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-300 rounded-lg hover:bg-indigo-50 transition"
+                >
+                  <Download size={16} />
+                  {t("guide.download_pdf")}
+                </button>
+              </div>
 
               {/* Feedback Section */}
               <div className="mt-6 text-center">

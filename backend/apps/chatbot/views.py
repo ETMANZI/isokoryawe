@@ -32,21 +32,17 @@ class ChatbotView(APIView):
         if not message:
             return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Get or create session
         session = self.get_or_create_session(request)
         
-        # Save user message
         ChatMessage.objects.create(
             session=session,
             role='user',
             content=message
         )
         
-        # Get intent and response
         intent = get_intent(message)
         response_text = get_response(intent)
         
-        # Save assistant response
         assistant_message = ChatMessage.objects.create(
             session=session,
             role='assistant',
@@ -54,7 +50,6 @@ class ChatbotView(APIView):
             intent=intent
         )
         
-        # Get conversation history (last 10 messages)
         history = ChatMessage.objects.filter(session=session).order_by('-created_at')[:10]
         
         return Response({

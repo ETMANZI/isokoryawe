@@ -59,6 +59,117 @@ function formatNotificationTime(value?: string) {
   });
 }
 
+// NavLink component - moved outside
+function NavLink({
+  to,
+  children,
+  variant = "default",
+}: {
+  to: string;
+  children: ReactNode;
+  variant?: "default" | "primary";
+}) {
+  if (variant === "primary") {
+    return (
+      <Link
+        to={to}
+        className="rounded-lg bg-slate-300 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-600"
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      to={to}
+      className="rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+    >
+      {children}
+    </Link>
+  );
+}
+
+// MobileNavLink component - moved outside
+function MobileNavLink({
+  to,
+  children,
+  onClick,
+}: {
+  to: string;
+  children: ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className="rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+    >
+      {children}
+    </Link>
+  );
+}
+
+// LanguageSwitcher component - moved outside
+function LanguageSwitcher({
+  changeLanguage,
+  mobile = false,
+  currentLang,
+}: {
+  changeLanguage: (lng: "en" | "rw") => void;
+  mobile?: boolean;
+  currentLang: string;
+}) {
+  if (mobile) {
+    return (
+      <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
+        <button
+          onClick={() => changeLanguage("en")}
+          className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+            currentLang === "en" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
+          }`}
+          aria-label="Switch to English"
+        >
+          EN
+        </button>
+        <button
+          onClick={() => changeLanguage("rw")}
+          className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+            currentLang === "rw" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
+          }`}
+          aria-label="Switch to Kinyarwanda"
+        >
+          RW
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ml-4 flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
+      <button
+        onClick={() => changeLanguage("en")}
+        className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+          currentLang === "en" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
+        }`}
+        aria-label="Switch to English"
+      >
+        English
+      </button>
+      <button
+        onClick={() => changeLanguage("rw")}
+        className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+          currentLang === "rw" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
+        }`}
+        aria-label="Switch to Kinyarwanda"
+      >
+        Kinyarwanda
+      </button>
+    </div>
+  );
+}
+
 export default function Navbar() {
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -549,113 +660,5 @@ export default function Navbar() {
 
       <AdMarquee ads={ads} speed="slow" />
     </header>
-  );
-}
-
-function NavLink({
-  to,
-  children,
-  variant = "default",
-}: {
-  to: string;
-  children: ReactNode;
-  variant?: "default" | "primary";
-}) {
-  if (variant === "primary") {
-    return (
-      <Link
-        to={to}
-        className="rounded-lg bg-slate-300 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-600"
-      >
-        {children}
-      </Link>
-    );
-  }
-
-  return (
-    <Link
-      to={to}
-      className="rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-    >
-      {children}
-    </Link>
-  );
-}
-
-function MobileNavLink({
-  to,
-  children,
-  onClick,
-}: {
-  to: string;
-  children: ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className="rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-    >
-      {children}
-    </Link>
-  );
-}
-
-function LanguageSwitcher({
-  changeLanguage,
-  mobile = false,
-  currentLang,
-}: {
-  changeLanguage: (lng: "en" | "rw") => void;
-  mobile?: boolean;
-  currentLang: string;
-}) {
-  if (mobile) {
-    return (
-      <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
-        <button
-          onClick={() => changeLanguage("en")}
-          className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-            currentLang === "en" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
-          }`}
-          aria-label="Switch to English"
-        >
-          EN
-        </button>
-        <button
-          onClick={() => changeLanguage("rw")}
-          className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-            currentLang === "rw" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
-          }`}
-          aria-label="Switch to Kinyarwanda"
-        >
-          RW
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="ml-4 flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
-      <button
-        onClick={() => changeLanguage("en")}
-        className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-          currentLang === "en" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
-        }`}
-        aria-label="Switch to English"
-      >
-        English
-      </button>
-      <button
-        onClick={() => changeLanguage("rw")}
-        className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-          currentLang === "rw" ? "bg-slate-300 text-white" : "text-slate-600 hover:bg-slate-100"
-        }`}
-        aria-label="Switch to Kinyarwanda"
-      >
-        Kinyarwanda
-      </button>
-    </div>
   );
 }

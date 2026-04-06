@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Bell } from "lucide-react";
+import { Bell, Sparkles, Crown, TrendingUp, Zap } from "lucide-react";
 import { isAuthenticated, logoutUser, getAccessToken } from "../../lib/auth";
 import { api } from "../../lib/api";
 import AdMarquee from "./AdMarquee";
@@ -42,6 +42,9 @@ type MySubscriptionResponse = {
     status: string;
     is_currently_active: boolean;
     end_date?: string | null;
+    plan?: {
+      name: string;
+    };
   } | null;
 };
 
@@ -181,6 +184,9 @@ export default function Navbar() {
     mySubscription.subscription.status === "approved" &&
     !!mySubscription.subscription.is_currently_active;
 
+  const hasActiveSubscription = !!mySubscription?.subscription?.is_currently_active;
+  const subscriptionPlanName = mySubscription?.subscription?.plan?.name;
+
   const displayName = () => {
     if (isLoadingCurrentUser) return "...";
 
@@ -232,7 +238,32 @@ export default function Navbar() {
                 {canPublish && <NavLink to="/publish">{t("nav.publish")}</NavLink>}
                 <NavLink to="/dashboard">{t("nav.dashboard")}</NavLink>
                 <NavLink to="/profile">{t("nav.profile")}</NavLink>
-                <NavLink to="/subscriptions">{t("nav.subscriptions")}</NavLink>
+
+                {/* Attractive Subscription Button */}
+                {!hasActiveSubscription ? (
+                  <Link
+                    to="/subscriptions"
+                    className="group relative ml-2 overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-5 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-100 transition-opacity duration-300 group-hover:opacity-0"></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                    <span className="relative flex items-center gap-2">
+                      <Sparkles size={16} className="animate-pulse" />
+                      {t("nav.subscribe_now")}
+                      <Zap size={14} className="animate-pulse" />
+                    </span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/subscriptions"
+                    className="group rounded-full border-2 border-emerald-500 bg-emerald-50 px-5 py-1.5 text-sm font-medium text-emerald-700 transition-all duration-300 hover:bg-emerald-100"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Crown size={16} className="text-amber-500" />
+                      {subscriptionPlanName || t("nav.subscriptions")}
+                    </span>
+                  </Link>
+                )}
 
                 {canModerate && <NavLink to="/admin/moderation">{t("nav.moderation")}</NavLink>}
 
@@ -468,9 +499,31 @@ export default function Navbar() {
                   <MobileNavLink to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                     {t("nav.profile")}
                   </MobileNavLink>
-                  <MobileNavLink to="/subscriptions" onClick={() => setIsMobileMenuOpen(false)}>
-                    {t("nav.subscriptions")}
-                  </MobileNavLink>
+
+                  {/* Mobile Subscription Button */}
+                  {!hasActiveSubscription ? (
+                    <Link
+                      to="/subscriptions"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="mx-3 my-1 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-md"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <Sparkles size={16} />
+                        {t("nav.subscribe_now")}
+                      </span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/subscriptions"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="mx-3 my-1 rounded-full border-2 border-emerald-500 bg-emerald-50 px-4 py-2 text-center text-sm font-medium text-emerald-700"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <Crown size={16} className="text-amber-500" />
+                        {subscriptionPlanName || t("nav.subscriptions")}
+                      </span>
+                    </Link>
+                  )}
 
                   {canModerate && (
                     <MobileNavLink to="/admin/moderation" onClick={() => setIsMobileMenuOpen(false)}>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import {
   PlusCircle,
   LayoutDashboard,
@@ -12,6 +13,8 @@ import {
   Building2,
   ExternalLink,
   MessageCircle,
+  Star,
+  Eye,
 } from "lucide-react";
 import Card from "../ui/Card";
 import { isAuthenticated } from "../../lib/auth";
@@ -26,8 +29,14 @@ type Partner = {
   is_active?: boolean;
 };
 
+type CurrentUser = {
+  id: number;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+};
+
 export default function RightSidebar() {
-  const { t } = useTranslation(); // Fixed: was incorrectly using useState
+  const { t } = useTranslation();
   const loggedIn = isAuthenticated();
 
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -37,6 +46,22 @@ export default function RightSidebar() {
   const phoneNumber = "+250788263338";
   const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\+/g, "")}`;
   const telUrl = `tel:${phoneNumber}`;
+
+  // Fetch current user to check if admin
+  const { data: currentUser } = useQuery<CurrentUser>({
+    queryKey: ["current-user"],
+    queryFn: async () => {
+      try {
+        const response = await api.get("/accounts/me/");
+        return response.data;
+      } catch {
+        return null;
+      }
+    },
+    enabled: loggedIn,
+  });
+
+  const isAdmin = currentUser?.is_staff === true || currentUser?.is_superuser === true;
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -224,6 +249,51 @@ export default function RightSidebar() {
           <div className="flex items-start gap-2">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600" />
             <p>{t("sidebar.safety_tip_3")}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Feedback Card - Two Menus */}
+      <Card>
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-purple-50 p-3 text-purple-700">
+            <Star size={18} />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-slate-900">{t("sidebar.feedback")}</h3>
+            <p className="mt-1 text-xs text-slate-500">{t("sidebar.feedback_text")}</p>
+
+            <div className="mt-3 space-y-2">
+              {/* Menu 1: Give Feedback - Everyone can see */}
+              <Link
+                to="/feedback"
+                className="flex items-center justify-between rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 transition hover:bg-purple-100"
+              >
+                <div className="flex items-center gap-2">
+                  <Star size={16} className="text-purple-600" />
+                  <span className="text-sm font-medium text-purple-700">
+                    {t("sidebar.give_feedback")}
+                  </span>
+                </div>
+                <span className="text-xs text-purple-500">→</span>
+              </Link>
+
+              {/* Menu 2: View All Feedback - Only Admin can see */}
+              {isAdmin && (
+                <Link
+                  to="/admin/feedbacks"
+                  className="flex items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 transition hover:bg-indigo-100"
+                >
+                  <div className="flex items-center gap-2">
+                    <Eye size={16} className="text-indigo-600" />
+                    <span className="text-sm font-medium text-indigo-700">
+                      {t("sidebar.view_feedback")}
+                    </span>
+                  </div>
+                  <span className="text-xs text-indigo-500">→</span>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </Card>

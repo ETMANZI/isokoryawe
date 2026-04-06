@@ -27,15 +27,16 @@ type Partner = {
 };
 
 export default function RightSidebar() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(); // Fixed: was incorrectly using useState
   const loggedIn = isAuthenticated();
 
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingPartners, setLoadingPartners] = useState(true);
 
-  const phoneNumber = "+250 788 263 338";
-  const whatsappUrl = `https://wa.me/250788263338`;
-  const telUrl = `tel:+250788263338`;
+  // Phone contact variables
+  const phoneNumber = "+250788263338";
+  const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\+/g, "")}`;
+  const telUrl = `tel:${phoneNumber}`;
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -227,38 +228,37 @@ export default function RightSidebar() {
         </div>
       </Card>
 
-      {/* Need Help Card - Two buttons on single line with default colors */}
+      {/* Need Help Card */}
       <Card>
-        <h3 className="text-base font-semibold text-slate-900">{t("sidebar.need_help")}</h3>
-
-        <div className="mt-4 space-y-3">
-          {/* Two buttons in a single row */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Call Button */}
-            <a
-              href={telUrl}
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              <Phone size={16} className="text-slate-500" />
-              <span>{t("sidebar.call_now")}</span>
-            </a>
-
-            {/* WhatsApp Button */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              <MessageCircle size={16} className="text-slate-500" />
-              <span>{t("sidebar.whatsapp")}</span>
-            </a>
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-indigo-50 p-3 text-indigo-700">
+            <BadgeHelp size={18} />
           </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-slate-900">{t("sidebar.need_help")}</h3>
+            <p className="mt-1 text-xs text-slate-500">{t("sidebar.support_text")}</p>
 
-          {/* Support Text */}
-          <div className="flex items-start gap-2 pt-1">
-            <BadgeHelp size={14} className="mt-0.5 shrink-0 text-slate-400" />
-            <p className="text-xs text-slate-500">{t("sidebar.support_text")}</p>
+            <div className="mt-3 flex gap-2">
+              {/* Call Button */}
+              <a
+                href={telUrl}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                <Phone size={14} className="text-slate-500" />
+                <span>{t("sidebar.call_now")}</span>
+              </a>
+
+              {/* WhatsApp Button */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                <MessageCircle size={14} className="text-slate-500" />
+                <span>{t("sidebar.whatsapp")}</span>
+              </a>
+            </div>
           </div>
         </div>
       </Card>

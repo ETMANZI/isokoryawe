@@ -57,7 +57,7 @@ export default function LoginPage() {
             </p>
 
             <Link to="/listings">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button className="flex items-center gap-2">
                 {t("login.browse_listings")}
                 <ArrowRight size={16} />
               </Button>

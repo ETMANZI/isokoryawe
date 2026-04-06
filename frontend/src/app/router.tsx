@@ -17,8 +17,8 @@ import SubscriptionPlansPage from "../pages/SubscriptionPlansPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
 import TermsPage from "../pages/TermsPage";
 import UserGuidePage from "../pages/UserGuidePage";
-import FeedbackPage  from "../pages/UserGuidePage";
-import AdminFeedbackPage   from "../pages/UserGuidePage";
+import FeedbackPage  from "../pages/FeedbackPage";
+import AdminFeedbackPage   from "../pages/AdminFeedbackList";
 
 
 export const router = createBrowserRouter([

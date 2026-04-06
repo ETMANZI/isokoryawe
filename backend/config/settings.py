@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "apps.moderation",
     "apps.subscriptions",
     "apps.notifications",
+    "apps.chatbot",
     'cloudinary',
     'cloudinary_storage',
 ]

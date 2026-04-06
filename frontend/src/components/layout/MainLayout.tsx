@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import RightSidebar from "./RightSidebar";
 import PageContainer from "./PageContainer";
+import Chatbot from "../chatpot/Chatbot";
 
 export default function MainLayout() {
   return (
@@ -24,17 +25,14 @@ export default function MainLayout() {
             <div className="mt-8 xl:hidden">
               <RightSidebar />
             </div>
-
-
-
-
-
-
           </div>
         </div>
       </PageContainer>
 
       <Footer />
+      
+      {/* Chatbot - appears on all pages */}
+      <Chatbot />
     </div>
   );
 }

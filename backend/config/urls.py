@@ -28,6 +28,7 @@ urlpatterns = [
     path("api/subscriptions/", include("apps.subscriptions.urls")),
     path("api/notifications/", include("apps.notifications.urls")),
     path('api/', include('apps.common.urls')),
+    path('api/chatbot/', include('apps.chatbot.urls')),
     re_path(r"^(?!api/|admin/|static/|media/|locales/).*$",TemplateView.as_view(template_name="index.html")),
 ]
 

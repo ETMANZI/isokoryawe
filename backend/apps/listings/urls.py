@@ -22,12 +22,10 @@ urlpatterns = router.urls + [
     
     path("public/business-ads/", PublicBusinessAdListView.as_view(), name="public-business-ads"),
     path("public/listings/<uuid:id>/", PublicListingDetailView.as_view(), name="public-listing-detail"),
-    
-    # path("track-visit/", TrackPageVisitView.as_view(), name="track-visit"),
-    # path("analytics/track-visit/", TrackPageVisitView.as_view(), name="track-visit"),
-path('recommendations/personalized/', PersonalizedRecommendationsView.as_view(), name='personalized-recommendations'),
-path('recommendations/similar/<int:listing_id>/', SimilarListingsView.as_view(), name='similar-listings'),
-path('recommendations/trending/', TrendingListingsView.as_view(), name='trending-listings'),
-path('recommendations/record-view/<int:listing_id>/', RecordListingViewView.as_view(), name='record-listing-view'),
+
+    path('recommendations/personalized/', PersonalizedRecommendationsView.as_view(), name='personalized-recommendations'),
+    path('recommendations/similar/<int:listing_id>/', SimilarListingsView.as_view(), name='similar-listings'),
+    path('recommendations/trending/', TrendingListingsView.as_view(), name='trending-listings'),
+    path('recommendations/record-view/<int:listing_id>/', RecordListingViewView.as_view(), name='record-listing-view'),
 
 ]

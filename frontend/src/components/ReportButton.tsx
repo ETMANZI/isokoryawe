@@ -63,7 +63,7 @@ export default function ReportButton({ listingId, userId, userName, className = 
         payload.reported_user = userId;
       }
       
-      const response = await api.post('/listings/reports/create/', payload);
+      const response = await api.post('/listings/report/create/', payload);
       
       console.log('Report response:', response.data);
       

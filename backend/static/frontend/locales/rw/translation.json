@@ -508,12 +508,7 @@
   "no_matching_users": "Nta mukoresha usanzwe uhuza n'ibyo ushakisha uhari.",
   "joined": "Yinjiye",
   "regular_user": "Umukoresha Usanzwe",
-  "admin": {
-  "reports": {
-    "title": "Gucunga Ibyamenyeshejwe",
-    "subtitle": "Suzuma ugacunga ibyamenyeshejwe n'abakoresha"
-  }
-  },
+
   "category_modal": {
     "edit_category": "Hindura Icyiciro",
     "add_category": "Ongeraho Icyiciro Gishya",
@@ -1267,7 +1262,13 @@
       "message": "Ubutumwa",
       "page_url": "URL y'urupapuro",
       "delete": "Siba Igitekerezo"
-    }
+    },
+  
+  "reports": {
+    "title": "Gucunga Ibyamenyeshejwe",
+    "subtitle": "Suzuma ugacunga ibyamenyeshejwe n'abakoresha"
+  }
+  
   },
 
   "chatbot": {

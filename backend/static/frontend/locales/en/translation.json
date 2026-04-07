@@ -511,12 +511,12 @@
   "no_matching_users": "There are no matching regular users at the moment.",
   "joined": "Joined",
   "regular_user": "Regular User",
-  "admin": {
+
   "reports": {
     "title": "Reported Content Management",
     "subtitle": "Review and manage user reports for listings and users"
-  }
   },
+
   "category_modal": {
     "edit_category": "Edit Category",
     "add_category": "Add New Category",

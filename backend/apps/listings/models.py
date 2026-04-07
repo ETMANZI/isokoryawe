@@ -523,7 +523,7 @@ class ListingView(models.Model):
         related_name='listing_views'
     )
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='user_views')
-    session_id = models.CharField(max_length=100, null=True, blank=True)
+    session_id = models.CharField(max_length=110, null=True, blank=True)
     viewed_at = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     

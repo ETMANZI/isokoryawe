@@ -73,9 +73,10 @@ export default function AdminReportsPage() {
   const { data: reports = [], isLoading } = useQuery<Report[]>({
     queryKey: ["admin-reports", statusFilter],
     queryFn: async () => {
-      const url = statusFilter === "all" 
-        ? "/listings/admin/reports/" 
-        : `/listings/admin/reports/?status=${statusFilter}`;
+      const url =
+        statusFilter === "all"
+          ? "/admin/reports/"
+          : `/admin/reports/?status=${statusFilter}`;
       const response = await api.get(url);
       return response.data;
     },
@@ -83,7 +84,7 @@ export default function AdminReportsPage() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ reportId, status, notes }: { reportId: number; status: string; notes?: string }) => {
-      const response = await api.patch(`/listings/admin/reports/${reportId}/update/`, {
+      const response = await api.patch(`/admin/reports/${reportId}/update/`, {
         status,
         admin_notes: notes,
       });

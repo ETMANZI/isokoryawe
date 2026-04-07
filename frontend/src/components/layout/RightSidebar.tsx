@@ -16,6 +16,7 @@ import {
   Star,
   Eye,
   BookOpen,
+  Flag,
 } from "lucide-react";
 import Card from "../ui/Card";
 import { isAuthenticated } from "../../lib/auth";
@@ -281,6 +282,36 @@ export default function RightSidebar() {
           </div>
         </div>
       </Card>
+
+      {/* Admin Reports Card - Only for admin users */}
+      {isAdmin && (
+        <Card>
+          <div className="flex items-start gap-3">
+            <div className="rounded-2xl bg-red-50 p-3 text-red-700">
+              <Flag size={18} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-semibold text-slate-900">{t("sidebar.reports")}</h3>
+              <p className="mt-1 text-xs text-slate-500">{t("sidebar.reports_text")}</p>
+
+              <div className="mt-3">
+                <Link
+                  to="/admin/reports"
+                  className="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-3 py-2 transition hover:bg-red-100"
+                >
+                  <div className="flex items-center gap-2">
+                    <Flag size={16} className="text-red-600" />
+                    <span className="text-sm font-medium text-red-700">
+                      {t("sidebar.view_reports")}
+                    </span>
+                  </div>
+                  <span className="text-xs text-red-500">→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Feedback Card - Two Menus */}
       <Card>

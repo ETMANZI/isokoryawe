@@ -260,50 +260,119 @@ export default function ListingDetailsPage() {
     { value: 'other', label: 'Other' },
   ];
 
-  const handleReportSubmit = async () => {
-    if (!isAuthenticated()) {
+  // const handleReportSubmit = async () => {
+  //   if (!isAuthenticated()) {
+  //     setReportError('Please login to report this listing');
+  //     setTimeout(() => setReportError(''), 3000);
+  //     return;
+  //   }
+    
+  //   if (!selectedReason) {
+  //     setReportError('Please select a reason');
+  //     return;
+  //   }
+    
+  //   setIsReporting(true);
+  //   setReportError('');
+    
+  //   try {
+  //     const payload: any = {
+  //       reason: selectedReason,
+  //       description: reportDescription,
+  //     };
+      
+  //     if (listing?.id) {
+  //       payload.listing = listing.id;
+  //     }
+  //     if (listing?.owner_id) {
+  //       payload.reported_user = listing.owner_id;
+  //     }
+      
+  //     await api.post('/listings/reportcreate/', payload);
+      
+  //     setReportSuccess(true);
+  //     setTimeout(() => {
+  //       setShowReportModal(false);
+  //       setReportSuccess(false);
+  //       setSelectedReason('');
+  //       setReportDescription('');
+  //     }, 2000);
+  //   } catch (err: any) {
+  //     console.error('Report error:', err);
+  //     setReportError('Failed to submit report. Please try again.');
+  //   } finally {
+  //     setIsReporting(false);
+  //   }
+  // };
+
+
+const handleReportSubmit = async () => {
+  // Check authentication first
+  if (!isAuthenticated()) {
+    setReportError('Please login to report this listing');
+    setTimeout(() => setReportError(''), 3000);
+    return;
+  }
+  
+  if (!selectedReason) {
+    setReportError('Please select a reason');
+    return;
+  }
+  
+  setIsReporting(true);
+  setReportError('');
+  
+  try {
+    const payload: any = {
+      reason: selectedReason,
+      description: reportDescription,
+    };
+    
+    if (listing?.id) {
+      payload.listing = listing.id;
+    }
+    if (listing?.owner_id) {
+      payload.reported_user = listing.owner_id;
+    }
+    
+    // Try the correct endpoint - make sure this matches your backend URL
+    const response = await api.post('/listings/reportcreate/', payload);
+    
+    console.log('Report response:', response.data);
+    
+    setReportSuccess(true);
+    setTimeout(() => {
+      setShowReportModal(false);
+      setReportSuccess(false);
+      setSelectedReason('');
+      setReportDescription('');
+    }, 2000);
+  } catch (err: any) {
+    console.error('Report error:', err);
+    console.error('Error response:', err?.response?.data);
+    console.error('Error status:', err?.response?.status);
+    
+    // Better error messages based on status code
+    if (err?.response?.status === 401) {
       setReportError('Please login to report this listing');
-      setTimeout(() => setReportError(''), 3000);
-      return;
-    }
-    
-    if (!selectedReason) {
-      setReportError('Please select a reason');
-      return;
-    }
-    
-    setIsReporting(true);
-    setReportError('');
-    
-    try {
-      const payload: any = {
-        reason: selectedReason,
-        description: reportDescription,
-      };
-      
-      if (listing?.id) {
-        payload.listing = listing.id;
-      }
-      if (listing?.owner_id) {
-        payload.reported_user = listing.owner_id;
-      }
-      
-      await api.post('/listings/reportcreate/', payload);
-      
-      setReportSuccess(true);
-      setTimeout(() => {
-        setShowReportModal(false);
-        setReportSuccess(false);
-        setSelectedReason('');
-        setReportDescription('');
-      }, 2000);
-    } catch (err: any) {
-      console.error('Report error:', err);
+    } else if (err?.response?.status === 403) {
+      setReportError('You do not have permission to report this listing');
+    } else if (err?.response?.status === 405) {
+      setReportError('The report endpoint is not configured correctly. Please contact support.');
+    } else if (err?.response?.status === 404) {
+      setReportError('Report endpoint not found. Please contact support.');
+    } else if (err?.response?.data?.error) {
+      setReportError(err.response.data.error);
+    } else if (err?.response?.data?.detail) {
+      setReportError(err.response.data.detail);
+    } else {
       setReportError('Failed to submit report. Please try again.');
-    } finally {
-      setIsReporting(false);
     }
-  };
+  } finally {
+    setIsReporting(false);
+  }
+};
+
 
   // Record view for recommendation engine
   useEffect(() => {

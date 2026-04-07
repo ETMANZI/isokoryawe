@@ -1068,6 +1068,7 @@ class CreateReportView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
+        print("POST request received")
         print("=" * 50)
         print("CREATE REPORT VIEW HIT!")
         print("User:", request.user)

@@ -1068,10 +1068,41 @@ class CreateReportView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        # Simple test response first
-        return Response({
-            'success': True,
-            'message': 'Report endpoint is working!',
-            'received_data': request.data,
-            'user': request.user.email if request.user.is_authenticated else 'Anonymous'
-        }, status=status.HTTP_200_OK)
+        print("=" * 50)
+        print("CREATE REPORT VIEW HIT!")
+        print("User:", request.user)
+        print("Data:", request.data)
+        print("=" * 50)
+        
+        try:
+            reason = request.data.get('reason')
+            description = request.data.get('description', '')
+            listing_id = request.data.get('listing')
+            reported_user_id = request.data.get('reported_user')
+            
+            if not reason:
+                return Response({
+                    'error': 'Reason is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create the report
+            report = Report.objects.create(
+                reporter=request.user,
+                listing_id=listing_id if listing_id else None,
+                reported_user_id=reported_user_id if reported_user_id else None,
+                reason=reason,
+                description=description,
+                status='pending'
+            )
+            
+            return Response({
+                'success': True,
+                'message': 'Report submitted successfully. We will review it shortly.',
+                'report_id': report.id
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            print("Error creating report:", str(e))
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

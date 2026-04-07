@@ -1109,3 +1109,71 @@ class CreateReportView(APIView):
             return Response({
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            
+            
+class AdminReportListView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    
+    def get(self, request):
+        status_filter = request.query_params.get('status')
+        reports = Report.objects.all().select_related('reporter', 'listing', 'reported_user')
+        
+        if status_filter:
+            reports = reports.filter(status=status_filter)
+        
+        # Prepare data with additional info
+        data = []
+        for report in reports:
+            data.append({
+                'id': report.id,
+                'reporter_name': report.reporter.email,
+                'reporter_id': report.reporter.id,
+                'reason': report.reason,
+                'description': report.description,
+                'status': report.status,
+                'created_at': report.created_at.isoformat(),
+                'listing': {
+                    'id': report.listing.id,
+                    'title': report.listing.title,
+                    'owner_name': report.listing.owner.get_full_name() or report.listing.owner.username,
+                    'owner_email': report.listing.owner.email,
+                    'owner_phone': report.listing.contact_phone,
+                } if report.listing else None,
+                'reported_user': {
+                    'id': report.reported_user.id,
+                    'email': report.reported_user.email,
+                    'username': report.reported_user.username,
+                } if report.reported_user else None,
+            })
+        
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class AdminReportUpdateView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    
+    def patch(self, request, report_id):
+        try:
+            report = Report.objects.get(id=report_id)
+        except Report.DoesNotExist:
+            return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        new_status = request.data.get('status')
+        admin_notes = request.data.get('admin_notes', '')
+        
+        if new_status and new_status in dict(Report.STATUS_CHOICES):
+            report.status = new_status
+        
+        if admin_notes:
+            report.admin_notes = admin_notes
+        
+        report.save()
+        
+        return Response({
+            'success': True,
+            'message': f'Report {report.id} updated to {report.status}',
+            'report_id': report.id,
+            'status': report.status,
+            'admin_notes': report.admin_notes
+        }, status=status.HTTP_200_OK)

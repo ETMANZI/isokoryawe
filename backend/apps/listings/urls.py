@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import AdminAnalyticsOverviewView, CreateReportView, ListingViewSet,CategoryViewSet, FavoriteViewSet,AdTickerView, PartnerDetailView, PartnerListView, PersonalizedRecommendationsView, PopularCategoriesView, PromoBannerViewSet, PublicBusinessAdListView, PublicListingDetailView, RecordListingViewView, SellerDashboardStatsView, SimilarListingsView, TrendingListingsView,search_location
+from .views import AdminAnalyticsOverviewView, AdminReportListView, AdminReportUpdateView, CreateReportView, ListingViewSet,CategoryViewSet, FavoriteViewSet,AdTickerView, PartnerDetailView, PartnerListView, PersonalizedRecommendationsView, PopularCategoriesView, PromoBannerViewSet, PublicBusinessAdListView, PublicListingDetailView, RecordListingViewView, SellerDashboardStatsView, SimilarListingsView, TrendingListingsView,search_location
 
 router = DefaultRouter()
 router.register("listings", ListingViewSet, basename="listing")
@@ -29,7 +29,7 @@ urlpatterns = router.urls + [
     path('recommendations/record-view/<str:listing_id>/', RecordListingViewView.as_view(), name='record-listing-view'),
     path('report/create/', CreateReportView.as_view(), name='create-report'),
     path('reportcreate/', CreateReportView.as_view(), name='create-report-alt'),
-    # path('admin/reports/', AdminReportListView.as_view(), name='admin-reports'),
-    # path('admin/reports/<int:report_id>/update/', AdminReportUpdateView.as_view(), name='admin-report-update'),
+    path('admin/reports/', AdminReportListView.as_view(), name='admin-reports'),
+    path('admin/reports/<int:report_id>/update/', AdminReportUpdateView.as_view(), name='admin-report-update'),
 
 ]

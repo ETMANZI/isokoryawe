@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Sparkles, TrendingUp, Eye } from "lucide-react";
+import { Sparkles} from "lucide-react";
 import { api } from "../../lib/api";
 import Card from "../ui/Card";
 import { Link } from "react-router-dom";

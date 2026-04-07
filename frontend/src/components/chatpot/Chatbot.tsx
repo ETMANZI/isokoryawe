@@ -32,6 +32,7 @@ const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   { text: "Contact support", icon: "📞" },
   { text: "Pricing and fees", icon: "💵" },
 ];
+
 export default function Chatbot() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -160,28 +161,33 @@ export default function Chatbot() {
         isMinimized ? 'h-14 w-72' : 'h-[500px] w-[400px]'
       }`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Bot size={20} className="text-white" />
-          <span className="font-semibold text-white">Market Hub Assistant</span>
-          <span className="rounded-full bg-green-400 px-1.5 py-0.5 text-[10px] font-medium text-green-900">
-            Online
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setIsMinimized(!isMinimized)}
-            className="rounded p-1 text-white/80 hover:bg-white/20"
-          >
-            {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
-          </button>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="rounded p-1 text-white/80 hover:bg-white/20"
-          >
-            <X size={18} />
-          </button>
+      {/* Header with caption */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bot size={20} className="text-white" />
+            <div>
+              <span className="font-semibold text-white">Market Hub Assistant</span>
+              <p className="text-[10px] text-white/80">Ask me anything about Market Hub</p>
+            </div>
+            <span className="rounded-full bg-green-400 px-1.5 py-0.5 text-[10px] font-medium text-green-900">
+              Online
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIsMinimized(!isMinimized)}
+              className="rounded p-1 text-white/80 hover:bg-white/20"
+            >
+              {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+            </button>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="rounded p-1 text-white/80 hover:bg-white/20"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
       </div>
 

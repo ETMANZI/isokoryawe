@@ -1062,3 +1062,16 @@ class RecordListingViewView(APIView):
         
         return Response({'message': 'View recorded'})
 
+
+
+class CreateReportView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        # Simple test response first
+        return Response({
+            'success': True,
+            'message': 'Report endpoint is working!',
+            'received_data': request.data,
+            'user': request.user.email if request.user.is_authenticated else 'Anonymous'
+        }, status=status.HTTP_200_OK)

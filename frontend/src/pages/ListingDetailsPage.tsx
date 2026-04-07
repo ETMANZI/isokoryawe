@@ -374,18 +374,13 @@ const handleReportSubmit = async () => {
 };
 
 
-  // Record view for recommendation engine
-  // useEffect(() => {
-  //   if (id) {
-  //     api.post(`/recommendations/record-view/${id}/`).catch(console.error);
-  //   }
-  // }, [id]);
-useEffect(() => {
-  if (id) {
-    api.post(`/recommendations/record-view/${id}/`)
-      .catch(console.error);
-  }
-}, [id]);
+
+  useEffect(() => {
+    if (id) {
+      api.post(`/recommendations/record-view/${id}/`)
+        .catch(console.error);
+    }
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;

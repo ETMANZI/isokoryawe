@@ -16,12 +16,16 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from .utils import create_notification
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from django.db import DatabaseError
 from rest_framework.exceptions import PermissionDenied
 from apps.subscriptions.utils import get_active_subscription
 
 from django.db.models import Sum, Count
 from rest_framework.views import APIView
 from .recommendation_engine import RecommendationEngine
+
+import logging
+logger = logging.getLogger(__name__)
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -1012,55 +1016,95 @@ class PromoBannerViewSet(viewsets.ModelViewSet):
     
 class PersonalizedRecommendationsView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
-        limit = request.query_params.get('limit', 10)
-        recommendations = RecommendationEngine.get_personalized_recommendations(
-            request.user, 
-            limit=int(limit)
-        )
+        try:
+            limit = int(request.query_params.get('limit', 10))
+        except ValueError:
+            limit = 10
+
+        try:
+            recommendations = RecommendationEngine.get_personalized_recommendations(
+                request.user, limit=limit
+            )
+        except Exception as e:
+            logger.exception(f"Error fetching personalized recommendations for {request.user.id}: {e}")
+            return Response({'error': 'Failed to fetch personalized recommendations'}, status=500)
+
         serializer = ListingSerializer(recommendations, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=200)
 
 class SimilarListingsView(APIView):
     permission_classes = [AllowAny]
-    
+
     def get(self, request, listing_id):
         try:
             listing = Listing.objects.get(id=listing_id, visibility_status='active')
         except Listing.DoesNotExist:
             return Response({'error': 'Listing not found'}, status=404)
-        
-        limit = request.query_params.get('limit', 6)
-        similar = RecommendationEngine.get_similar_listings(listing, limit=int(limit))
+        except (ValueError, ValidationError):
+            return Response({'error': 'Invalid listing ID'}, status=400)
+
+        try:
+            limit = int(request.query_params.get('limit', 6))
+        except ValueError:
+            limit = 6
+
+        try:
+            similar = RecommendationEngine.get_similar_listings(listing, limit=limit)
+        except Exception as e:
+            logger.exception(f"Error fetching similar listings for {listing_id}: {e}")
+            return Response({'error': 'Failed to fetch similar listings'}, status=500)
+
         serializer = ListingSerializer(similar, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=200)
 
 class TrendingListingsView(APIView):
     permission_classes = [AllowAny]
-    
+
     def get(self, request):
-        limit = request.query_params.get('limit', 10)
-        trending = RecommendationEngine.get_trending_listings(limit=int(limit))
+        try:
+            limit = int(request.query_params.get('limit', 10))
+        except ValueError:
+            limit = 10
+
+        try:
+            trending = RecommendationEngine.get_trending_listings(limit=limit)
+        except Exception as e:
+            logger.exception(f"Error fetching trending listings: {e}")
+            return Response({'error': 'Failed to fetch trending listings'}, status=500)
+
         serializer = ListingSerializer(trending, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=200)
+
+
 
 class RecordListingViewView(APIView):
     permission_classes = [AllowAny]
-    
+
     def post(self, request, listing_id):
         try:
-            listing = Listing.objects.get(id=listing_id)
+            # Validate listing exists
+            listing = Listing.objects.get(id=listing_id, visibility_status='active')
         except Listing.DoesNotExist:
             return Response({'error': 'Listing not found'}, status=404)
-        
-        RecommendationEngine.record_listing_view(
-            request.user if request.user.is_authenticated else None,
-            listing,
-            request
-        )
-        
-        return Response({'message': 'View recorded'})
+        except (ValueError, ValidationError):
+            return Response({'error': 'Invalid listing ID'}, status=400)
+
+        try:
+            RecommendationEngine.record_listing_view(
+                user=request.user if request.user.is_authenticated else None,
+                listing=listing,
+                request=request
+            )
+        except DatabaseError as db_err:
+            logger.error(f"Database error recording view for listing {listing_id}: {db_err}")
+            return Response({'error': 'Failed to record view'}, status=500)
+        except Exception as e:
+            logger.exception(f"Unexpected error recording view for listing {listing_id}: {e}")
+            return Response({'error': 'Internal server error'}, status=500)
+
+        return Response({'message': 'View recorded'}, status=200)
 
 
 

@@ -10,14 +10,12 @@ import {
   Loader2,
   ExternalLink,
   User,
-//   FileText,
   Calendar,
   Mail,
   Phone,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
-// import Button from "../components/ui/Button";
 import { api } from "../lib/api";
 
 type Report = {
@@ -223,7 +221,7 @@ export default function AdminReportsPage() {
             </button>
           </div>
 
-          {/* Reports List */}
+          {/* Reports List - Fixed onClick handler */}
           {isLoading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -238,52 +236,58 @@ export default function AdminReportsPage() {
           ) : (
             <div className="space-y-4">
               {reports.map((report) => (
-                <Card key={report.id} className="hover:shadow-md transition cursor-pointer" onClick={() => setSelectedReport(report)}>
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center flex-wrap gap-3 mb-2">
-                        <h3 className="font-semibold text-slate-900">
-                          Reported by: {report.reporter_name}
-                        </h3>
-                        {getStatusBadge(report.status)}
+                <div
+                  key={report.id}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedReport(report)}
+                >
+                  <Card className="hover:shadow-md transition">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center flex-wrap gap-3 mb-2">
+                          <h3 className="font-semibold text-slate-900">
+                            Reported by: {report.reporter_name}
+                          </h3>
+                          {getStatusBadge(report.status)}
+                        </div>
+                        
+                        <p className="text-sm text-slate-600 mb-2">
+                          <span className="font-medium">Reason:</span> {reasonLabels[report.reason] || report.reason}
+                        </p>
+                        
+                        {report.listing && (
+                          <p className="text-sm text-slate-600">
+                            <span className="font-medium">Reported Listing:</span> {report.listing.title}
+                          </p>
+                        )}
+                        
+                        {report.reported_user && (
+                          <p className="text-sm text-slate-600">
+                            <span className="font-medium">Reported User:</span> {report.reported_user.email}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
+                          <span className="flex items-center gap-1">
+                            <Calendar size={12} />
+                            {formatDate(report.created_at)}
+                          </span>
+                        </div>
                       </div>
-                      
-                      <p className="text-sm text-slate-600 mb-2">
-                        <span className="font-medium">Reason:</span> {reasonLabels[report.reason] || report.reason}
-                      </p>
-                      
-                      {report.listing && (
-                        <p className="text-sm text-slate-600">
-                          <span className="font-medium">Reported Listing:</span> {report.listing.title}
-                        </p>
-                      )}
-                      
-                      {report.reported_user && (
-                        <p className="text-sm text-slate-600">
-                          <span className="font-medium">Reported User:</span> {report.reported_user.email}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
-                        <span className="flex items-center gap-1">
-                          <Calendar size={12} />
-                          {formatDate(report.created_at)}
-                        </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedReport(report);
+                          }}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                        >
+                          <Eye size={18} />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedReport(report);
-                        }}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                </div>
               ))}
             </div>
           )}

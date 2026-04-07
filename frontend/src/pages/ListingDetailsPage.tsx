@@ -36,7 +36,7 @@ import {
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import { api } from "../lib/api";
-import { SimilarListings, TrendingListings } from "../components/Recommendations";
+// import { SimilarListings, TrendingListings } from "../components/Recommendations";
 
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
@@ -799,14 +799,13 @@ export default function ListingDetailsPage() {
                 </div>
               </div>
 
-              {/* Recommendation Sections */}
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <SimilarListings listingId={listing.id} />
               </div>
               
               <div className="mt-8">
                 <TrendingListings />
-              </div>
+              </div> */}
 
               <div className="mt-6">
                 <Link

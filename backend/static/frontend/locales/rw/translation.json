@@ -1266,6 +1266,14 @@
     "suggested": "Ibibazo bikunze kubazwa:",
     "clear_chat": "Hanagura ibiganiro",
     "error_message": "Tubabazi, hari ikibazo. Ongera ugerageze nyuma."
+  },
+
+  "recommendations": {
+    "personalized": "Ibyakugiriye",
+    "for_you": "Kuri Wewe",
+    "similar_listings": "Ibitangazwa Bisa",
+    "trending": "Bikunzwe",
+    "hot": "Bishyushye"
   }
 
 

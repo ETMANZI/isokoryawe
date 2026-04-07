@@ -2,11 +2,9 @@ from django.conf import settings
 from django.db import models
 from apps.common.models import TimeStampedModel
 from django.core.validators import URLValidator
+from django.utils import timezone
 
 
-# ============================================
-# 1. Category FIRST (since Listing references it)
-# ============================================
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -22,9 +20,7 @@ class Category(models.Model):
         return self.name
 
 
-# ============================================
-# 2. Listing SECOND (references Category)
-# ============================================
+
 class Listing(TimeStampedModel):
     class ListingType(models.TextChoices):
         BUSINESS_AD = "business_ad", "Business Ad"
@@ -129,23 +125,17 @@ class Listing(TimeStampedModel):
     )
     moderated_at = models.DateTimeField(null=True, blank=True)
 
-    # --------------------------
-    # HOUSE FIELDS
-    # --------------------------
+
     bedrooms = models.PositiveIntegerField(null=True, blank=True)
     bathrooms = models.PositiveIntegerField(null=True, blank=True)
     has_electricity = models.BooleanField(default=False)
     has_water = models.BooleanField(default=False)
 
-    # --------------------------
-    # PARCEL FIELDS
-    # --------------------------
+
     upi = models.CharField(max_length=50, null=True, blank=True)
     land_size = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
-    # --------------------------
-    # CAR FIELDS
-    # --------------------------
+
     car_make = models.CharField(max_length=100, blank=True, null=True)
     car_model = models.CharField(max_length=100, blank=True, null=True)
     car_year = models.PositiveIntegerField(blank=True, null=True)
@@ -181,9 +171,7 @@ class Listing(TimeStampedModel):
     )
     car_color = models.CharField(max_length=50, blank=True, null=True)
 
-    # --------------------------
-    # COMMON PRODUCT FIELDS
-    # --------------------------
+
     brand = models.CharField(max_length=100, blank=True, null=True)
     stock_quantity = models.PositiveIntegerField(null=True, blank=True)
     sku = models.CharField(max_length=100, blank=True, null=True)
@@ -198,9 +186,7 @@ class Listing(TimeStampedModel):
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     delivery_notes = models.CharField(max_length=255, blank=True, null=True)
 
-    # --------------------------
-    # CLOTHES PRODUCT FIELDS
-    # --------------------------
+
     clothes_gender = models.CharField(
         max_length=20,
         choices=ClothesGender.choices,
@@ -222,9 +208,7 @@ class Listing(TimeStampedModel):
         help_text="Example: shirt, trouser, dress, shoes, jacket"
     )
 
-    # --------------------------
-    # FOOD PRODUCT FIELDS
-    # --------------------------
+
     food_category = models.CharField(
         max_length=100,
         blank=True,
@@ -247,9 +231,7 @@ class Listing(TimeStampedModel):
     expiry_date = models.DateField(blank=True, null=True)
     is_prepared_food = models.BooleanField(default=False)
 
-    # --------------------------
-    # HOME & KITCHEN PRODUCT FIELDS
-    # --------------------------
+
     home_product_category = models.CharField(
         max_length=100,
         blank=True,
@@ -276,9 +258,7 @@ class Listing(TimeStampedModel):
         return self.title
 
 
-# ============================================
-# 3. Remaining models
-# ============================================
+
 class ListingImage(TimeStampedModel):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to="listings/")
@@ -482,22 +462,79 @@ class ListingViewLog(models.Model):
         return f"{self.listing} - {self.session_key} - {self.created_at}"
 
 
-
-# class PageVisit(models.Model):
-#     user = models.ForeignKey(
-#         settings.AUTH_USER_MODEL,
-#         null=True,
-#         blank=True,
-#         on_delete=models.SET_NULL
-#     )
-#     path = models.CharField(max_length=500)
-#     full_url = models.URLField(blank=True, null=True)
-#     ip_address = models.GenericIPAddressField(null=True, blank=True)
-#     user_agent = models.TextField(blank=True, null=True)
-#     referrer = models.URLField(blank=True, null=True)
-#     session_key = models.CharField(max_length=100, blank=True, null=True)
-#     visited_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"{self.path} - {self.visited_at}"
     
+    
+# ============================================
+# 4. AI-Powered Recommendation Models
+# ============================================
+
+class UserPreference(models.Model):
+    """Store user preferences for personalized recommendations"""
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='preferences'
+    )
+    preferred_categories = models.JSONField(default=list, help_text="List of category IDs user prefers")
+    preferred_listing_types = models.JSONField(default=list, help_text="List of listing types user prefers")
+    price_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    price_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    preferred_districts = models.JSONField(default=list, help_text="List of districts user prefers")
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "User Preference"
+        verbose_name_plural = "User Preferences"
+    
+    def __str__(self):
+        return f"Preferences for {self.user.email}"
+
+
+class RecommendationCache(models.Model):
+    """Cache personalized recommendations for faster loading"""
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='recommendation_cache'
+    )
+    recommendations = models.JSONField(default=list, help_text="List of listing IDs")
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    
+    class Meta:
+        verbose_name = "Recommendation Cache"
+        verbose_name_plural = "Recommendation Caches"
+    
+    def is_valid(self):
+        """Check if cache is still valid"""
+        return timezone.now() < self.expires_at
+    
+    def __str__(self):
+        return f"Recommendations for {self.user.email} - {len(self.recommendations)} items"
+
+
+class ListingView(models.Model):
+    """Track individual listing views for recommendation engine"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='listing_views'
+    )
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='user_views')
+    session_id = models.CharField(max_length=100, null=True, blank=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-viewed_at']
+        indexes = [
+            models.Index(fields=['user', '-viewed_at']),
+            models.Index(fields=['listing', '-viewed_at']),
+            models.Index(fields=['session_id', '-viewed_at']),
+        ]
+    
+    def __str__(self):
+        user_str = self.user.email if self.user else f"Anonymous({self.session_id})"
+        return f"{user_str} viewed {self.listing.title} at {self.viewed_at}"

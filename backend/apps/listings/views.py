@@ -20,7 +20,7 @@ from apps.subscriptions.utils import get_active_subscription
 
 from django.db.models import Sum, Count
 from rest_framework.views import APIView
-
+from .recommendation_engine import RecommendationEngine
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -1009,42 +1009,54 @@ class PromoBannerViewSet(viewsets.ModelViewSet):
     
     
     
+class PersonalizedRecommendationsView(APIView):
+    permission_classes = [IsAuthenticated]
     
-# class TrackPageVisitView(APIView):
-#     permission_classes = [AllowAny]
+    def get(self, request):
+        limit = request.query_params.get('limit', 10)
+        recommendations = RecommendationEngine.get_personalized_recommendations(
+            request.user, 
+            limit=int(limit)
+        )
+        serializer = ListingSerializer(recommendations, many=True)
+        return Response(serializer.data)
 
-#     def post(self, request):
-#         serializer = PageVisitCreateSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
+class SimilarListingsView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, listing_id):
+        try:
+            listing = Listing.objects.get(id=listing_id, visibility_status='active')
+        except Listing.DoesNotExist:
+            return Response({'error': 'Listing not found'}, status=404)
+        
+        limit = request.query_params.get('limit', 6)
+        similar = RecommendationEngine.get_similar_listings(listing, limit=int(limit))
+        serializer = ListingSerializer(similar, many=True)
+        return Response(serializer.data)
 
-#         if not request.session.session_key:
-#             request.session.create()
+class TrendingListingsView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        limit = request.query_params.get('limit', 10)
+        trending = RecommendationEngine.get_trending_listings(limit=int(limit))
+        serializer = ListingSerializer(trending, many=True)
+        return Response(serializer.data)
 
-#         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-#         ip = x_forwarded_for.split(",")[0].strip() if x_forwarded_for else request.META.get("REMOTE_ADDR")
-
-#         from django.utils import timezone
-#         from datetime import timedelta
-
-#         one_hour_ago = timezone.now() - timedelta(hours=1)
-
-#         exists = PageVisit.objects.filter(
-#             path=serializer.validated_data["path"],
-#             session_key=request.session.session_key,
-#             visited_at__gte=one_hour_ago
-#         ).exists()
-
-#         if exists:
-#             return Response({"message": "Already tracked recently"})
-
-#         visit = PageVisit.objects.create(
-#             user=request.user if request.user.is_authenticated else None,
-#             path=serializer.validated_data["path"],
-#             full_url=serializer.validated_data.get("full_url"),
-#             ip_address=ip,
-#             user_agent=request.META.get("HTTP_USER_AGENT", ""),
-#             referrer=request.META.get("HTTP_REFERER", ""),
-#             session_key=request.session.session_key,
-#         )
-
-#         return Response(PageVisitSerializer(visit).data)
+class RecordListingViewView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request, listing_id):
+        try:
+            listing = Listing.objects.get(id=listing_id)
+        except Listing.DoesNotExist:
+            return Response({'error': 'Listing not found'}, status=404)
+        
+        RecommendationEngine.record_listing_view(
+            request.user if request.user.is_authenticated else None,
+            listing,
+            request
+        )
+        
+        return Response({'message': 'View recorded'})

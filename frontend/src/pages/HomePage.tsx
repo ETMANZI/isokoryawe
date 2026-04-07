@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import AnimatedText from "../components/ui/AnimatedText";
 import PageContainer from "../components/layout/PageContainer";
 import { api } from "../lib/api";
+import { isAuthenticated } from "../lib/auth";
+import { PersonalizedRecommendations, TrendingListings } from "../components/Recommendations";
 
 type ListingImage = {
   id: string | number;
@@ -194,6 +196,21 @@ export default function HomePage() {
               )}
             </div>
           </motion.div>
+        </section>
+
+        {/* Recommendation Sections */}
+        <section className="py-8">
+          {/* Personalized Recommendations - Only for logged-in users */}
+          {isAuthenticated() && (
+            <div className="mb-12">
+              <PersonalizedRecommendations />
+            </div>
+          )}
+
+          {/* Trending Listings - Show for everyone */}
+          <div>
+            <TrendingListings />
+          </div>
         </section>
       </PageContainer>
     </div>

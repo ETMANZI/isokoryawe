@@ -27,8 +27,8 @@ urlpatterns = router.urls + [
     path('recommendations/similar/<int:listing_id>/', SimilarListingsView.as_view(), name='similar-listings'),
     path('recommendations/trending/', TrendingListingsView.as_view(), name='trending-listings'),
     path('recommendations/record-view/<int:listing_id>/', RecordListingViewView.as_view(), name='record-listing-view'),
-    path('reports/create/', CreateReportView.as_view(), name='create-report'),
-    # path('report/create/', CreateReportView.as_view(), name='create-report'),
+    # path('reports/create/', CreateReportView.as_view(), name='create-report'),
+    path('report/create/', CreateReportView.as_view(), name='create-report'),
     path('admin/reports/', AdminReportListView.as_view(), name='admin-reports'),
     path('admin/reports/<int:report_id>/update/', AdminReportUpdateView.as_view(), name='admin-report-update'),
 

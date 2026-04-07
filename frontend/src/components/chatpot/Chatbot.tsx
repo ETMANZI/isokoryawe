@@ -32,7 +32,6 @@ const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   { text: "Contact support", icon: "📞" },
   { text: "Pricing and fees", icon: "💵" },
 ];
-
 export default function Chatbot() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +43,6 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load session ID from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('chat_session_id');
     if (stored) {

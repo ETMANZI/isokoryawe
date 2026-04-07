@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import ShareButton from '../components/ShareButton';
+import ReportButton from '../components/ReportButton';
 import {
   MapPin,
   House,
@@ -31,16 +32,11 @@ import {
   Hash,
   Archive,
   Scale,
-  Flag,
-  AlertTriangle,
-  X,
-  CheckCircle,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/ui/Card";
 import { api } from "../lib/api";
 import { SimilarListings, TrendingListings } from "../components/Recommendations";
-import { isAuthenticated } from "../lib/auth";
 
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
@@ -91,7 +87,7 @@ type Listing = {
   has_electricity?: boolean;
   has_water?: boolean;
   negotiable?: boolean;
-  owner_id?: string;
+  owner_id?:string;
 
   car_make?: string;
   car_model?: string;
@@ -241,69 +237,6 @@ export default function ListingDetailsPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState<string>("");
-  
-  // Report modal states
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [selectedReason, setSelectedReason] = useState('');
-  const [reportDescription, setReportDescription] = useState('');
-  const [isReporting, setIsReporting] = useState(false);
-  const [reportSuccess, setReportSuccess] = useState(false);
-  const [reportError, setReportError] = useState('');
-
-  const reportReasons = [
-    { value: 'spam', label: 'Spam or Misleading' },
-    { value: 'fraud', label: 'Fraud or Scam' },
-    { value: 'illegal', label: 'Illegal Content' },
-    { value: 'harassment', label: 'Harassment or Abuse' },
-    { value: 'incorrect_info', label: 'Incorrect Information' },
-    { value: 'duplicate', label: 'Duplicate Listing' },
-    { value: 'other', label: 'Other' },
-  ];
-
-  const handleReportSubmit = async () => {
-    if (!isAuthenticated()) {
-      setReportError('Please login to report this listing');
-      setTimeout(() => setReportError(''), 3000);
-      return;
-    }
-    
-    if (!selectedReason) {
-      setReportError('Please select a reason');
-      return;
-    }
-    
-    setIsReporting(true);
-    setReportError('');
-    
-    try {
-      const payload: any = {
-        reason: selectedReason,
-        description: reportDescription,
-      };
-      
-      if (listing?.id) {
-        payload.listing = listing.id;
-      }
-      if (listing?.owner_id) {
-        payload.reported_user = listing.owner_id;
-      }
-      
-      await api.post('/listings/report/create/', payload);
-      
-      setReportSuccess(true);
-      setTimeout(() => {
-        setShowReportModal(false);
-        setReportSuccess(false);
-        setSelectedReason('');
-        setReportDescription('');
-      }, 2000);
-    } catch (err: any) {
-      console.error('Report error:', err);
-      setReportError('Failed to submit report. Please try again.');
-    } finally {
-      setIsReporting(false);
-    }
-  };
 
   // Record view for recommendation engine
   useEffect(() => {
@@ -852,17 +785,14 @@ export default function ListingDetailsPage() {
                           {t("listing_detail.no_contact")}
                         </button>
                       )}
-                    </div>
-
-                    <div className="mt-4 flex gap-3">
-                      <ShareButton title={listing.title} />
-                      <button
-                        onClick={() => setShowReportModal(true)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
-                      >
-                        <Flag size={16} />
-                        Report
-                      </button>
+<div className="mt-4 flex gap-3">
+  <ShareButton title={listing.title} />
+  <ReportButton 
+    listingId={listing.id} 
+    userId={listing.owner_id}
+    userName={listing.owner_name}
+  />
+</div>
                     </div>
                   </Card>
                 </div>
@@ -889,89 +819,6 @@ export default function ListingDetailsPage() {
           )}
         </div>
       </PageContainer>
-
-      {/* Report Modal */}
-      {showReportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowReportModal(false)}>
-          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="border-b border-slate-200 px-5 py-4 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <AlertTriangle size={20} className="text-red-500" />
-                <h3 className="text-lg font-semibold text-slate-900">Report Listing</h3>
-              </div>
-              <button onClick={() => setShowReportModal(false)} className="text-slate-400 hover:text-slate-600">
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="p-5">
-              <p className="mb-4 text-sm text-slate-600">
-                Reporting: <span className="font-semibold">{listing?.owner_name || 'This listing'}</span>
-              </p>
-              
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Reason *
-                </label>
-                <select
-                  value={selectedReason}
-                  onChange={(e) => setSelectedReason(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200"
-                >
-                  <option value="">Select a reason</option>
-                  {reportReasons.map((reason) => (
-                    <option key={reason.value} value={reason.value}>
-                      {reason.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={reportDescription}
-                  onChange={(e) => setReportDescription(e.target.value)}
-                  rows={4}
-                  placeholder="Please provide additional details..."
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200"
-                />
-              </div>
-              
-              {reportError && (
-                <div className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                  {reportError}
-                </div>
-              )}
-              
-              {reportSuccess && (
-                <div className="mb-4 rounded-xl bg-green-50 p-3 text-sm text-green-600 flex items-center gap-2">
-                  <CheckCircle size={16} />
-                  Report submitted successfully. We will review it shortly.
-                </div>
-              )}
-              
-              <div className="flex gap-3">
-                <button
-                  onClick={handleReportSubmit}
-                  disabled={isReporting || reportSuccess}
-                  className="flex-1 rounded-xl bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:opacity-50"
-                >
-                  {isReporting ? 'Submitting...' : 'Submit Report'}
-                </button>
-                <button
-                  onClick={() => setShowReportModal(false)}
-                  className="flex-1 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

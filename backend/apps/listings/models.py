@@ -256,7 +256,160 @@ class Listing(TimeStampedModel):
 
     def __str__(self):
         return self.title
+    
+    def to_dict(self):
+        """Convert listing to dictionary for API responses"""
+        # Get images - assuming you have an Image model related to Listing
+        images_data = []
+        primary_image = None
+        
+        if hasattr(self, 'images'):
+            images_data = [
+                {
+                    'image': img.image.url if hasattr(img.image, 'url') else str(img.image),
+                    'is_cover': getattr(img, 'is_cover', False)
+                }
+                for img in self.images.all()
+            ]
+            
+            # Get primary image (cover image or first image)
+            if images_data:
+                cover_images = [img for img in images_data if img.get('is_cover')]
+                primary_image = cover_images[0]['image'] if cover_images else images_data[0]['image']
+        
+        return {
+            'id': self.id,
+            'title': self.title,
+            'slug': self.slug,
+            'description': self.description,
+            'price': str(self.price) if self.price else '0',
+            'discount_price': str(self.discount_price) if self.discount_price else None,
+            'listing_type': self.listing_type,
+            'sale_mode': self.sale_mode,
+            'district': self.district,
+            'sector': self.sector,
+            'village': self.village,
+            'address': self.address,
+            'views_count': self.views_count,
+            'call_clicks': self.call_clicks,
+            'whatsapp_clicks': self.whatsapp_clicks,
+            'is_featured': self.is_featured,
+            'negotiable': self.negotiable,
+            'status': self.status,
+            'visibility_status': self.visibility_status,
+            'images': images_data,
+            'primary_image': primary_image,
+            'owner_id': self.owner_id,
+            'owner_name': self.owner.get_full_name() or self.owner.username if hasattr(self, 'owner') else None,
+            'category_id': self.category_id,
+            'category_name': self.category.name if self.category else None,
+            'created_at': self.created_at.isoformat() if hasattr(self, 'created_at') else None,
+            'updated_at': self.updated_at.isoformat() if hasattr(self, 'updated_at') else None,
+            
+            # House specific fields
+            'bedrooms': self.bedrooms,
+            'bathrooms': self.bathrooms,
+            'has_electricity': self.has_electricity,
+            'has_water': self.has_water,
+            
+            # Parcel specific fields
+            'upi': self.upi,
+            'land_size': str(self.land_size) if self.land_size else None,
+            
+            # Car specific fields
+            'car_make': self.car_make,
+            'car_model': self.car_model,
+            'car_year': self.car_year,
+            'car_mileage': self.car_mileage,
+            'car_fuel_type': self.car_fuel_type,
+            'car_transmission': self.car_transmission,
+            'car_condition': self.car_condition,
+            'car_color': self.car_color,
+            
+            # Product specific fields
+            'brand': self.brand,
+            'stock_quantity': self.stock_quantity,
+            'sku': self.sku,
+            'product_condition': self.product_condition,
+            
+            # Delivery fields
+            'has_home_delivery': self.has_home_delivery,
+            'delivery_fee': str(self.delivery_fee) if self.delivery_fee else None,
+            'delivery_notes': self.delivery_notes,
+            
+            # Clothes specific fields
+            'clothes_gender': self.clothes_gender,
+            'clothes_size': self.clothes_size,
+            'clothes_color': self.clothes_color,
+            'clothes_material': self.clothes_material,
+            'clothes_category': self.clothes_category,
+            
+            # Food specific fields
+            'food_category': self.food_category,
+            'food_unit': self.food_unit,
+            'food_weight_volume': self.food_weight_volume,
+            'is_perishable': self.is_perishable,
+            'expiry_date': self.expiry_date.isoformat() if self.expiry_date else None,
+            'is_prepared_food': self.is_prepared_food,
+            
+            # Home product specific fields
+            'home_product_category': self.home_product_category,
+            'material': self.material,
+            'color': self.color,
+            'dimensions': self.dimensions,
+            'weight': self.weight,
+            'warranty_months': self.warranty_months,
+            
+            # Contact fields
+            'contact_phone': self.contact_phone,
+            'contact_email': self.contact_email,
+            
+            # Location fields
+            'latitude': str(self.latitude) if self.latitude else None,
+            'longitude': str(self.longitude) if self.longitude else None,
+        }
 
+    def to_dict_light(self):
+        """Lightweight version for listing pages (better performance)"""
+        # Get primary image efficiently
+        primary_image = None
+        if hasattr(self, 'images'):
+            cover_image = self.images.filter(is_cover=True).first()
+            if cover_image:
+                primary_image = cover_image.image.url if hasattr(cover_image.image, 'url') else str(cover_image.image)
+            else:
+                first_image = self.images.first()
+                if first_image:
+                    primary_image = first_image.image.url if hasattr(first_image.image, 'url') else str(first_image.image)
+        
+        return {
+            'id': self.id,
+            'title': self.title,
+            'slug': self.slug,
+            'price': str(self.price) if self.price else '0',
+            'discount_price': str(self.discount_price) if self.discount_price else None,
+            'listing_type': self.listing_type,
+            'sale_mode': self.sale_mode,
+            'district': self.district,
+            'sector': self.sector,
+            'views_count': self.views_count,
+            'is_featured': self.is_featured,
+            'negotiable': self.negotiable,
+            'primary_image': primary_image,
+            'owner_id': self.owner_id,
+            'owner_name': self.owner.get_full_name() or self.owner.username if hasattr(self, 'owner') else None,
+            'category_id': self.category_id,
+            'category_name': self.category.name if self.category else None,
+            'created_at': self.created_at.isoformat() if hasattr(self, 'created_at') else None,
+            
+            # Specific fields based on listing type (add as needed)
+            'bedrooms': self.bedrooms if self.listing_type == self.ListingType.HOUSE else None,
+            'bathrooms': self.bathrooms if self.listing_type == self.ListingType.HOUSE else None,
+            'car_make': self.car_make if self.listing_type == self.ListingType.CAR else None,
+            'car_model': self.car_model if self.listing_type == self.ListingType.CAR else None,
+            'car_year': self.car_year if self.listing_type == self.ListingType.CAR else None,
+        }
+    
 
 
 class ListingImage(TimeStampedModel):

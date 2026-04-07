@@ -377,7 +377,7 @@ const handleReportSubmit = async () => {
   // Record view for recommendation engine
   useEffect(() => {
     if (id) {
-      api.post(`/listings/recommendations/record-view/${id}/`).catch(console.error);
+      api.post(`/recommendations/record-view/${id}/`).catch(console.error);
     }
   }, [id]);
 

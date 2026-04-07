@@ -122,7 +122,10 @@
   "view_feedback": "View All Feedback",
   "user_guide": "User Guide",
   "user_guide_text": "Learn how to use Market Hub",
-  "read_guide": "Read User Guide"
+  "read_guide": "Read User Guide",
+  "reports": "Reported Content",
+  "reports_text": "Manage user reports and flagged content",
+  "view_reports": "View Reports"
 },
 "login": {
   "welcome_back": "Welcome back",
@@ -508,7 +511,12 @@
   "no_matching_users": "There are no matching regular users at the moment.",
   "joined": "Joined",
   "regular_user": "Regular User",
-  
+  "admin": {
+  "reports": {
+    "title": "Reported Content Management",
+    "subtitle": "Review and manage user reports for listings and users"
+  }
+  },
   "category_modal": {
     "edit_category": "Edit Category",
     "add_category": "Add New Category",

@@ -284,7 +284,10 @@
   "view_feedback": "Reba Ibitekerezo",
   "user_guide": "Ubuyobozi",
   "user_guide_text": "Menya uko ukoresha Market Hub",
-  "read_guide": "Soma Ubuyobozi"
+  "read_guide": "Soma Ubuyobozi",
+  "reports": "Ibyamenyeshejwe",
+  "reports_text": "Gucunga ibyamenyeshejwe n'abakoresha",
+  "view_reports": "Reba Ibyamenyeshejwe"
     },
 "login": {
   "welcome_back": "Murakaza neza",
@@ -505,7 +508,12 @@
   "no_matching_users": "Nta mukoresha usanzwe uhuza n'ibyo ushakisha uhari.",
   "joined": "Yinjiye",
   "regular_user": "Umukoresha Usanzwe",
-  
+  "admin": {
+  "reports": {
+    "title": "Gucunga Ibyamenyeshejwe",
+    "subtitle": "Suzuma ugacunga ibyamenyeshejwe n'abakoresha"
+  }
+  },
   "category_modal": {
     "edit_category": "Hindura Icyiciro",
     "add_category": "Ongeraho Icyiciro Gishya",

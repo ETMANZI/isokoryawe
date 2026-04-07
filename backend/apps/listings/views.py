@@ -1064,11 +1064,11 @@ class RecordListingViewView(APIView):
 
 
 
+
 class CreateReportView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        print("POST request received")
         print("=" * 50)
         print("CREATE REPORT VIEW HIT!")
         print("User:", request.user)
@@ -1086,7 +1086,7 @@ class CreateReportView(APIView):
                     'error': 'Reason is required'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # Create the report
+            # Create the report - use 'pending' which fits in max_length=25
             report = Report.objects.create(
                 reporter=request.user,
                 listing_id=listing_id if listing_id else None,
@@ -1104,6 +1104,8 @@ class CreateReportView(APIView):
             
         except Exception as e:
             print("Error creating report:", str(e))
+            import traceback
+            traceback.print_exc()
             return Response({
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

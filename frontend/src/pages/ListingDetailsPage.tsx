@@ -336,7 +336,7 @@ const handleReportSubmit = async () => {
     }
     
     // Try the correct endpoint - make sure this matches your backend URL
-    const response = await api.post('/listings/reportcreate/', payload);
+    const response = await api.post('/listings/reportcreate', payload);
     
     console.log('Report response:', response.data);
     

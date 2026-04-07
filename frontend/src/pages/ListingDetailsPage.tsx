@@ -288,7 +288,7 @@ export default function ListingDetailsPage() {
         payload.reported_user = listing.owner_id;
       }
       
-      await api.post('/listings/report/create/', payload);
+      await api.post('/listings/reportcreate/', payload);
       
       setReportSuccess(true);
       setTimeout(() => {

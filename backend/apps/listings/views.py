@@ -1041,10 +1041,10 @@ class SimilarListingsView(APIView):
 
     def get(self, request, listing_id):
         try:
-            limit = int(request.GET.get('limit', 4))
+            limit = int(request.GET.get('limit', 1))
         except (ValueError, TypeError):
             limit = 4
-        limit = max(1, min(limit, 20))
+        limit = max(1, min(limit, 2))
 
         try:
             listing = Listing.objects.get(id=listing_id)
@@ -1066,10 +1066,10 @@ class TrendingListingsView(APIView):
 
     def get(self, request):
         try:
-            limit = int(request.GET.get('limit', 8))
+            limit = int(request.GET.get('limit', 1))
         except (ValueError, TypeError):
             limit = 8
-        limit = max(1, min(limit, 50))
+        limit = max(1, min(limit, 2))
 
         try:
             trending = RecommendationEngine.get_trending_listings(limit)

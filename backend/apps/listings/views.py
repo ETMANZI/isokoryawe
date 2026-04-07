@@ -1010,130 +1010,55 @@ class PromoBannerViewSet(viewsets.ModelViewSet):
     
     
     
-# class PersonalizedRecommendationsView(APIView):
-#     permission_classes = [IsAuthenticated]
-    
-#     def get(self, request):
-#         limit = request.query_params.get('limit', 10)
-#         recommendations = RecommendationEngine.get_personalized_recommendations(
-#             request.user, 
-#             limit=int(limit)
-#         )
-#         serializer = ListingSerializer(recommendations, many=True)
-#         return Response(serializer.data)
-
-# class SimilarListingsView(APIView):
-#     permission_classes = [AllowAny]
-    
-#     def get(self, request, listing_id):
-#         try:
-#             listing = Listing.objects.get(id=listing_id, visibility_status='active')
-#         except Listing.DoesNotExist:
-#             return Response({'error': 'Listing not found'}, status=404)
-        
-#         limit = request.query_params.get('limit', 6)
-#         similar = RecommendationEngine.get_similar_listings(listing, limit=int(limit))
-#         serializer = ListingSerializer(similar, many=True)
-#         return Response(serializer.data)
-
-# class TrendingListingsView(APIView):
-#     permission_classes = [AllowAny]
-    
-#     def get(self, request):
-#         limit = request.query_params.get('limit', 10)
-#         trending = RecommendationEngine.get_trending_listings(limit=int(limit))
-#         serializer = ListingSerializer(trending, many=True)
-#         return Response(serializer.data)
-
-# class RecordListingViewView(APIView):
-#     permission_classes = [AllowAny]
-    
-#     def post(self, request, listing_id):
-#         try:
-#             listing = Listing.objects.get(id=listing_id)
-#         except Listing.DoesNotExist:
-#             return Response({'error': 'Listing not found'}, status=404)
-        
-#         RecommendationEngine.record_listing_view(
-#             request.user if request.user.is_authenticated else None,
-#             listing,
-#             request
-#         )
-        
-#         return Response({'message': 'View recorded'})
-
-
-
 class PersonalizedRecommendationsView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        # Return empty list for now
-        return Response([])
+        limit = request.query_params.get('limit', 10)
+        recommendations = RecommendationEngine.get_personalized_recommendations(
+            request.user, 
+            limit=int(limit)
+        )
+        serializer = ListingSerializer(recommendations, many=True)
+        return Response(serializer.data)
 
 class SimilarListingsView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request, listing_id):
-        # Return empty list for now
-        return Response([])
+        try:
+            listing = Listing.objects.get(id=listing_id, visibility_status='active')
+        except Listing.DoesNotExist:
+            return Response({'error': 'Listing not found'}, status=404)
+        
+        limit = request.query_params.get('limit', 6)
+        similar = RecommendationEngine.get_similar_listings(listing, limit=int(limit))
+        serializer = ListingSerializer(similar, many=True)
+        return Response(serializer.data)
 
 class TrendingListingsView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
-        # Return empty list for now
-        return Response([])
+        limit = request.query_params.get('limit', 10)
+        trending = RecommendationEngine.get_trending_listings(limit=int(limit))
+        serializer = ListingSerializer(trending, many=True)
+        return Response(serializer.data)
 
 class RecordListingViewView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request, listing_id):
-        # Just return success without doing anything
-        return Response({'message': 'View recorded'})
- 
-    
-class CreateReportView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        print("Report request received")  # Debug
-        print("Request data:", request.data)  # Debug
-        print("User:", request.user)  # Debug
-        
-        serializer = ReportSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message': 'Report submitted successfully. We will review it shortly.',
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
-        
-        print("Serializer errors:", serializer.errors)  # Debug
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class AdminReportListView(APIView):
-    permission_classes = [permissions.IsAdminUser]
-    
-    def get(self, request):
-        status_filter = request.query_params.get('status')
-        reports = Report.objects.all()
-        if status_filter:
-            reports = reports.filter(status=status_filter)
-        serializer = ReportSerializer(reports, many=True)
-        return Response(serializer.data)
-
-class AdminReportUpdateView(APIView):
-    permission_classes = [permissions.IsAdminUser]
-    
-    def patch(self, request, report_id):
         try:
-            report = Report.objects.get(id=report_id)
-        except Report.DoesNotExist:
-            return Response({'error': 'Report not found'}, status=404)
+            listing = Listing.objects.get(id=listing_id)
+        except Listing.DoesNotExist:
+            return Response({'error': 'Listing not found'}, status=404)
         
-        report.status = request.data.get('status', report.status)
-        report.admin_notes = request.data.get('admin_notes', report.admin_notes)
-        report.save()
+        RecommendationEngine.record_listing_view(
+            request.user if request.user.is_authenticated else None,
+            listing,
+            request
+        )
         
-        return Response({'message': 'Report updated successfully'})
+        return Response({'message': 'View recorded'})
+

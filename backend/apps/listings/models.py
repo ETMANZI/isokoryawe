@@ -468,6 +468,26 @@ class ListingViewLog(models.Model):
 # 4. AI-Powered Recommendation Models
 # ============================================
 
+class ListingView(models.Model):
+    """Track individual listing views for recommendation engine"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='recommendation_views'
+    )
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='recommendation_views')
+    session_id = models.CharField(max_length=100, null=True, blank=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-viewed_at']
+    
+    def __str__(self):
+        user_str = self.user.email if self.user else f"Anonymous({self.session_id})"
+        return f"{user_str} viewed {self.listing.title}"
+
 class UserPreference(models.Model):
     """Store user preferences for personalized recommendations"""
     user = models.OneToOneField(
@@ -475,20 +495,12 @@ class UserPreference(models.Model):
         on_delete=models.CASCADE,
         related_name='preferences'
     )
-    preferred_categories = models.JSONField(default=list, help_text="List of category IDs user prefers")
-    preferred_listing_types = models.JSONField(default=list, help_text="List of listing types user prefers")
-    price_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    price_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    preferred_districts = models.JSONField(default=list, help_text="List of districts user prefers")
+    preferred_categories = models.JSONField(default=list)
+    preferred_listing_types = models.JSONField(default=list)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name = "User Preference"
-        verbose_name_plural = "User Preferences"
     
     def __str__(self):
         return f"Preferences for {self.user.email}"
-
 
 class RecommendationCache(models.Model):
     """Cache personalized recommendations for faster loading"""
@@ -497,47 +509,12 @@ class RecommendationCache(models.Model):
         on_delete=models.CASCADE,
         related_name='recommendation_cache'
     )
-    recommendations = models.JSONField(default=list, help_text="List of listing IDs")
+    recommendations = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     
-    class Meta:
-        verbose_name = "Recommendation Cache"
-        verbose_name_plural = "Recommendation Caches"
-    
-    def is_valid(self):
-        """Check if cache is still valid"""
-        return timezone.now() < self.expires_at
-    
     def __str__(self):
-        return f"Recommendations for {self.user.email} - {len(self.recommendations)} items"
-
-
-class ListingView(models.Model):
-    """Track individual listing views for recommendation engine"""
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='listing_views'
-    )
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='user_views')
-    session_id = models.CharField(max_length=110, null=True, blank=True)
-    viewed_at = models.DateTimeField(auto_now_add=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    
-    class Meta:
-        ordering = ['-viewed_at']
-        indexes = [
-            models.Index(fields=['user', '-viewed_at']),
-            models.Index(fields=['listing', '-viewed_at']),
-            models.Index(fields=['session_id', '-viewed_at']),
-        ]
-    
-    def __str__(self):
-        user_str = self.user.email if self.user else f"Anonymous({self.session_id})"
-        return f"{user_str} viewed {self.listing.title} at {self.viewed_at}"
+        return f"Recommendations for {self.user.email}"
     
     
     

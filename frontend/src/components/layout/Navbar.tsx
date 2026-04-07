@@ -323,7 +323,7 @@ export default function Navbar() {
             to="/"
             className="text-2xl font-bold text-slate-800 transition-colors hover:text-slate-600"
           >
-            ISOKO RYAWE
+            Isoko Ryawe
           </Link>
 
           <div className="flex items-center gap-1 text-sm">
@@ -466,7 +466,7 @@ export default function Navbar() {
 
         <div className="flex items-center justify-between py-3 md:hidden">
           <Link to="/" className="text-xl font-bold text-slate-800">
-            Market Hub
+            Isoko Ryawe
           </Link>
 
           <div className="flex items-center gap-2">

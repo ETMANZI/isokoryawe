@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, permissions, parsers,generics
 from rest_framework.decorators import action
-from .models import Listing, Category, Favorite, Partner, PromoBanner, Report
+from .models import Listing, Category, Favorite, ListingView, Partner, PromoBanner, RecommendationCache, Report, UserPreference
 from .serializers import AdTickerSerializer, ListingSerializer, CategorySerializer, FavoriteSerializer, PromoBannerSerializer, ReportSerializer
 from rest_framework import viewsets, permissions, parsers
 from rest_framework.decorators import action
@@ -15,7 +15,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .utils import create_notification
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from django.db.models import Q, Count
+from decimal import Decimal
 from django.db import DatabaseError
 from rest_framework.exceptions import PermissionDenied
 from apps.subscriptions.utils import get_active_subscription
@@ -1022,19 +1023,15 @@ class PersonalizedRecommendationsView(APIView):
             limit = int(request.query_params.get('limit', 10))
         except (ValueError, TypeError):
             limit = 10
-
-        # Optional: enforce reasonable bounds
         limit = max(1, min(limit, 50))
 
         try:
-            recommendations = RecommendationEngine.get_personalized_recommendations(
-                request.user, limit=limit
-            )
+            recommendations = RecommendationEngine.get_personalized_recommendations(request.user, limit=limit)
+            data = [l.to_dict() for l in recommendations if l is not None]
         except Exception as e:
             logger.exception(f"Error fetching personalized recommendations for user {request.user.id}: {e}")
-            return Response({'error': 'Failed to fetch personalized recommendations'}, status=500)
+            data = []
 
-        data = [listing.to_dict() for listing in recommendations]
         return Response({'results': data}, status=200)
 
 
@@ -1051,15 +1048,15 @@ class SimilarListingsView(APIView):
         try:
             listing = Listing.objects.get(id=listing_id)
         except Listing.DoesNotExist:
-            return Response({'error': 'Listing not found'}, status=404)
+            return Response({'results': []}, status=404)
 
         try:
             similar = RecommendationEngine.get_similar_listings(listing, limit)
+            data = [l.to_dict() for l in similar if l is not None]
         except Exception as e:
             logger.exception(f"Error fetching similar listings for listing {listing_id}: {e}")
-            return Response({'error': 'Failed to fetch similar listings'}, status=500)
+            data = []
 
-        data = [l.to_dict() for l in similar]
         return Response({'results': data}, status=200)
 
 
@@ -1075,12 +1072,144 @@ class TrendingListingsView(APIView):
 
         try:
             trending = RecommendationEngine.get_trending_listings(limit)
+            data = [l.to_dict() for l in trending if l is not None]
         except Exception as e:
             logger.exception(f"Error fetching trending listings: {e}")
-            return Response({'error': 'Failed to fetch trending listings'}, status=500)
+            data = []
 
-        data = [l.to_dict() for l in trending]
         return Response({'results': data}, status=200)
+
+# ------------------ Recommendation Engine ------------------
+
+class RecommendationEngine:
+
+    @staticmethod
+    def get_personalized_recommendations(user, limit=10):
+        try:
+            cache_valid_until = timezone.now() - timedelta(hours=6)
+            cached = RecommendationCache.objects.filter(user=user, created_at__gt=cache_valid_until).first()
+            if cached:
+                listing_ids = cached.recommendations[:limit]
+                return list(Listing.objects.filter(id__in=listing_ids, visibility_status=Listing.VisibilityStatus.ACTIVE))
+
+            viewed_listings = ListingView.objects.filter(user=user).select_related('listing').order_by('-viewed_at')[:20]
+            viewed_categories, viewed_types, viewed_districts, viewed_prices = set(), set(), set(), []
+
+            for view in viewed_listings:
+                l = view.listing
+                if l:
+                    if l.category:
+                        viewed_categories.add(l.category_id)
+                    if l.listing_type:
+                        viewed_types.add(l.listing_type)
+                    if l.district:
+                        viewed_districts.add(l.district)
+                    if l.price is not None:
+                        viewed_prices.append(float(l.price))
+
+            try:
+                prefs = user.preferences
+                preferred_categories = prefs.preferred_categories or []
+                preferred_types = prefs.preferred_listing_types or []
+                preferred_districts = prefs.preferred_districts or []
+                price_min = prefs.price_min
+                price_max = prefs.price_max
+            except UserPreference.DoesNotExist:
+                preferred_categories, preferred_types, preferred_districts = [], [], []
+                price_min = price_max = None
+
+            avg_price = float(sum(viewed_prices)/len(viewed_prices)) if viewed_prices else None
+
+            query = Q(visibility_status=Listing.VisibilityStatus.ACTIVE)
+
+            categories_to_use = list(viewed_categories) + preferred_categories
+            if categories_to_use:
+                query &= Q(category__in=categories_to_use)
+
+            types_to_use = list(viewed_types) + preferred_types
+            if types_to_use:
+                query &= Q(listing_type__in=types_to_use)
+
+            districts_to_use = list(viewed_districts) + preferred_districts
+            if districts_to_use:
+                query &= Q(district__in=districts_to_use)
+
+            if price_min is not None and price_max is not None:
+                query &= Q(price__gte=Decimal(price_min), price__lte=Decimal(price_max))
+            elif avg_price is not None:
+                price_range = avg_price * 0.3
+                query &= Q(price__gte=Decimal(avg_price - price_range), price__lte=Decimal(avg_price + price_range))
+
+            viewed_ids = [v.listing_id for v in viewed_listings if v.listing_id]
+            if viewed_ids:
+                query &= ~Q(id__in=viewed_ids)
+
+            recommendations = list(Listing.objects.filter(query)[:limit])
+
+            if len(recommendations) < limit:
+                popular = Listing.objects.filter(
+                    visibility_status=Listing.VisibilityStatus.ACTIVE
+                ).annotate(view_count=Count('views')).order_by('-view_count')[:limit - len(recommendations)]
+                recommendations.extend([p for p in popular if p not in recommendations])
+
+            RecommendationCache.objects.update_or_create(
+                user=user,
+                defaults={
+                    'recommendations': [r.id for r in recommendations],
+                    'expires_at': timezone.now() + timedelta(hours=6)
+                }
+            )
+
+            return recommendations[:limit]
+
+        except Exception as e:
+            logger.exception(f"Error in get_personalized_recommendations: {e}")
+            return []
+
+    @staticmethod
+    def get_similar_listings(listing, limit=6):
+        try:
+            if not listing:
+                return []
+
+            query = Q(visibility_status=Listing.VisibilityStatus.ACTIVE) & ~Q(id=listing.id)
+
+            if listing.category:
+                query &= Q(category=listing.category)
+            if listing.listing_type:
+                query &= Q(listing_type=listing.listing_type)
+            if listing.price is not None:
+                price_range = float(listing.price) * 0.2
+                query &= Q(price__gte=Decimal(float(listing.price) - price_range),
+                           price__lte=Decimal(float(listing.price) + price_range))
+            if listing.district:
+                query &= Q(district=listing.district)
+
+            similar = list(Listing.objects.filter(query)[:limit])
+
+            if len(similar) < limit:
+                popular = Listing.objects.filter(
+                    visibility_status=Listing.VisibilityStatus.ACTIVE,
+                    listing_type=listing.listing_type
+                ).exclude(id=listing.id).annotate(view_count=Count('views')).order_by('-view_count')[:limit - len(similar)]
+                similar.extend([p for p in popular if p not in similar])
+
+            return similar[:limit]
+
+        except Exception as e:
+            logger.exception(f"Error in get_similar_listings: {e}")
+            return []
+
+    @staticmethod
+    def get_trending_listings(limit=8):
+        try:
+            trending = Listing.objects.filter(
+                visibility_status=Listing.VisibilityStatus.ACTIVE
+            ).annotate(view_count=Count('views')).order_by('-view_count')[:limit]
+            return list(trending)
+        except Exception as e:
+            logger.exception(f"Error in get_trending_listings: {e}")
+            return []
 
 
 

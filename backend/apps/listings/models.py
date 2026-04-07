@@ -580,7 +580,7 @@ class Report(models.Model):
     )
     reason = models.CharField(max_length=50, choices=REASON_CHOICES)
     description = models.TextField(blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default='pending')
     admin_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

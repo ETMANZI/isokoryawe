@@ -323,7 +323,7 @@ export default function Navbar() {
             to="/"
             className="text-2xl font-bold text-slate-800 transition-colors hover:text-slate-600"
           >
-            Market Hub
+            ISOKO RYAWE
           </Link>
 
           <div className="flex items-center gap-1 text-sm">

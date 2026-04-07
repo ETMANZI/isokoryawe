@@ -538,3 +538,56 @@ class ListingView(models.Model):
     def __str__(self):
         user_str = self.user.email if self.user else f"Anonymous({self.session_id})"
         return f"{user_str} viewed {self.listing.title} at {self.viewed_at}"
+    
+    
+    
+class Report(models.Model):
+    REASON_CHOICES = (
+        ('spam', 'Spam or Misleading'),
+        ('fraud', 'Fraud or Scam'),
+        ('illegal', 'Illegal Content'),
+        ('harassment', 'Harassment or Abuse'),
+        ('incorrect_info', 'Incorrect Information'),
+        ('duplicate', 'Duplicate Listing'),
+        ('other', 'Other'),
+    )
+    
+    STATUS_CHOICES = (
+        ('pending', 'Pending Review'),
+        ('investigating', 'Under Investigation'),
+        ('resolved', 'Resolved'),
+        ('dismissed', 'Dismissed'),
+    )
+    
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reports_made'
+    )
+    listing = models.ForeignKey(
+        Listing,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reports'
+    )
+    reported_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reports_received'
+    )
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        target = self.listing.title if self.listing else self.reported_user.email
+        return f"{self.reporter.email} reported {target} for {self.reason}"

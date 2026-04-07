@@ -1,11 +1,12 @@
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, permissions, parsers,generics
 from rest_framework.decorators import action
-from .models import Listing, Category, Favorite, Partner, PromoBanner
-from .serializers import AdTickerSerializer, ListingSerializer, CategorySerializer, FavoriteSerializer, PromoBannerSerializer
+from .models import Listing, Category, Favorite, Partner, PromoBanner, Report
+from .serializers import AdTickerSerializer, ListingSerializer, CategorySerializer, FavoriteSerializer, PromoBannerSerializer, ReportSerializer
 from rest_framework import viewsets, permissions, parsers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -1060,3 +1061,43 @@ class RecordListingViewView(APIView):
         )
         
         return Response({'message': 'View recorded'})
+    
+    
+class CreateReportView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        serializer = ReportSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Report submitted successfully. We will review it shortly.',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminReportListView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    
+    def get(self, request):
+        status_filter = request.query_params.get('status')
+        reports = Report.objects.all()
+        if status_filter:
+            reports = reports.filter(status=status_filter)
+        serializer = ReportSerializer(reports, many=True)
+        return Response(serializer.data)
+
+class AdminReportUpdateView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+    
+    def patch(self, request, report_id):
+        try:
+            report = Report.objects.get(id=report_id)
+        except Report.DoesNotExist:
+            return Response({'error': 'Report not found'}, status=404)
+        
+        report.status = request.data.get('status', report.status)
+        report.admin_notes = request.data.get('admin_notes', report.admin_notes)
+        report.save()
+        
+        return Response({'message': 'Report updated successfully'})

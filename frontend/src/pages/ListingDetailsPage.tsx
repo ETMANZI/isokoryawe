@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import ShareButton from '../components/ShareButton';
+import ReportButton from '../components/ReportButton';
 import {
   MapPin,
   House,
@@ -85,6 +87,7 @@ type Listing = {
   has_electricity?: boolean;
   has_water?: boolean;
   negotiable?: boolean;
+  owner_id?:string;
 
   car_make?: string;
   car_model?: string;
@@ -783,6 +786,14 @@ export default function ListingDetailsPage() {
                           {t("listing_detail.no_contact")}
                         </button>
                       )}
+<div className="mt-4 flex gap-3">
+  <ShareButton title={listing.title} />
+  <ReportButton 
+    listingId={listing.id} 
+    userId={listing.owner_id}
+    userName={listing.owner_name}
+  />
+</div>
                     </div>
                   </Card>
                 </div>

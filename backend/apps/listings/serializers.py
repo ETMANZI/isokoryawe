@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Listing, ListingImage, Category, Favorite, Partner, PromoBanner
+from .models import Listing, ListingImage, Category, Favorite, Partner, PromoBanner, Report
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -658,3 +658,22 @@ class PromoBannerSerializer(serializers.ModelSerializer):
 
 #     def get_user_email(self, obj):
 #         return obj.user.email if obj.user else None
+
+
+class ReportSerializer(serializers.ModelSerializer):
+    reporter_name = serializers.CharField(source='reporter.email', read_only=True)
+    
+    class Meta:
+        model = Report
+        fields = ['id', 'listing', 'reported_user', 'reason', 'description', 
+                  'status', 'reporter_name', 'created_at']
+        read_only_fields = ['id', 'status', 'reporter_name', 'created_at']
+    
+    def validate(self, data):
+        if not data.get('listing') and not data.get('reported_user'):
+            raise serializers.ValidationError("Either listing or reported_user is required")
+        return data
+    
+    def create(self, validated_data):
+        validated_data['reporter'] = self.context['request'].user
+        return super().create(validated_data)

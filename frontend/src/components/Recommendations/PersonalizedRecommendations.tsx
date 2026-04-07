@@ -21,7 +21,7 @@ export default function PersonalizedRecommendations() {
     queryKey: ["personalized-recommendations"],
     queryFn: async () => {
       try {
-        const response = await api.get("/listings/recommendations/personalized/?limit=8");
+        const response = await api.get("/recommendations/personalized/?limit=8");
         return response.data;
       } catch (error) {
         console.error("Failed to load recommendations:", error);

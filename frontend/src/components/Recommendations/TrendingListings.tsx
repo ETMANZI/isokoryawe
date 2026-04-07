@@ -21,7 +21,7 @@ export default function TrendingListings() {
   const { data: trending = [], isLoading } = useQuery<Listing[]>({
     queryKey: ["trending-listings"],
     queryFn: async () => {
-      const response = await api.get("/api/recommendations/trending/?limit=8");
+      const response = await api.get("/recommendations/trending/?limit=8");
       return response.data;
     },
   });

@@ -20,7 +20,7 @@ export default function SimilarListings({ listingId }: { listingId: string }) {
   const { data: similar = [], isLoading } = useQuery<Listing[]>({
     queryKey: ["similar-listings", listingId],
     queryFn: async () => {
-      const response = await api.get(`/api/recommendations/similar/${listingId}/?limit=4`);
+      const response = await api.get(`/recommendations/similar/${listingId}/?limit=4`);
       return response.data;
     },
     enabled: !!listingId,

@@ -985,7 +985,9 @@
   "common": {
     "included": "Birimo",
     "not_included": "Ntibirimo",
-    "processing": "Biri gukorwa..."
+    "processing": "Biri gukorwa...",
+    "close": "Funga",
+    "cancel": "Reka"
   },
   "autho": {
     "login_to_subscribe": "Injira ubanze"
@@ -1274,8 +1276,39 @@
     "similar_listings": "Ibitangazwa Bisa",
     "trending": "Bikunzwe",
     "hot": "Bishyushye"
-  }
+  },
 
+  "share": {
+    "share": "Sangiza",
+    "share_listing": "Sangiza Itangazwa",
+    "share_via": "Sangiza binyuze kuri",
+    "email": "Imeli",
+    "copy_link": "Kora Kopi",
+    "copied": "Yakopiwe!"
+  },
+  "report": {
+    "report": "Menyesha",
+    "report_listing": "Menyesha Itangazwa",
+    "reporting": "Urimo umenyesha",
+    "reason": "Impamvu",
+    "select_reason": "Hitamo impamvu",
+    "reasons": {
+      "spam": "Ibyanditswe bitari ibyo",
+      "fraud": "Uburiganya",
+      "illegal": "Ibitemewe n'amategeko",
+      "harassment": "Ihohoterwa",
+      "incorrect_info": "Amakuru atari yo",
+      "duplicate": "Itangazwa risa",
+      "other": "Ikindi"
+    },
+    "description": "Ibisobanuro (Bishoboka)",
+    "description_placeholder": "Tangira ibisobanuro birambuye...",
+    "submit": "Ohereza",
+    "submitting": "Biriherekezwa...",
+    "success": "Urakoze kubimenyesha. Tuzabisuzume vuba.",
+    "error": "Kohereza byananiwe. Ongera ugerageze.",
+    "login_required": "Injira muri konti yawe mbere yo kumenyesha"
+  }
 
 
   

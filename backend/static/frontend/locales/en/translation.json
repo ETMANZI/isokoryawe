@@ -987,7 +987,9 @@
   "common": {
     "included": "Included",
     "not_included": "Not included",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "close": "Close",
+    "cancel": "Cancel"
   },
   "autho": {
     "login_to_subscribe": "Login to Subscribe"
@@ -1278,9 +1280,39 @@
     "similar_listings": "Similar Listings",
     "trending": "Trending Now",
     "hot": "Hot"
+  },
+
+    "share": {
+    "share": "Share",
+    "share_listing": "Share Listing",
+    "share_via": "Share via",
+    "email": "Email",
+    "copy_link": "Copy Link",
+    "copied": "Copied!"
+  },
+  "report": {
+    "report": "Report",
+    "report_listing": "Report Listing",
+    "reporting": "Reporting",
+    "reason": "Reason",
+    "select_reason": "Select a reason",
+    "reasons": {
+      "spam": "Spam or Misleading",
+      "fraud": "Fraud or Scam",
+      "illegal": "Illegal Content",
+      "harassment": "Harassment or Abuse",
+      "incorrect_info": "Incorrect Information",
+      "duplicate": "Duplicate Listing",
+      "other": "Other"
+    },
+    "description": "Description (Optional)",
+    "description_placeholder": "Please provide additional details...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "success": "Thank you for your report. We will review it shortly.",
+    "error": "Failed to submit report. Please try again.",
+    "login_required": "Please login to report this listing"
   }
 
-
- 
 
 }

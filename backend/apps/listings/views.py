@@ -1020,62 +1020,67 @@ class PersonalizedRecommendationsView(APIView):
     def get(self, request):
         try:
             limit = int(request.query_params.get('limit', 10))
-        except ValueError:
+        except (ValueError, TypeError):
             limit = 10
+
+        # Optional: enforce reasonable bounds
+        limit = max(1, min(limit, 50))
 
         try:
             recommendations = RecommendationEngine.get_personalized_recommendations(
                 request.user, limit=limit
             )
         except Exception as e:
-            logger.exception(f"Error fetching personalized recommendations for {request.user.id}: {e}")
+            logger.exception(f"Error fetching personalized recommendations for user {request.user.id}: {e}")
             return Response({'error': 'Failed to fetch personalized recommendations'}, status=500)
 
-        serializer = ListingSerializer(recommendations, many=True)
-        return Response(serializer.data, status=200)
+        data = [listing.to_dict() for listing in recommendations]
+        return Response({'results': data}, status=200)
+
 
 class SimilarListingsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, listing_id):
         try:
-            listing = Listing.objects.get(id=listing_id, visibility_status='active')
+            limit = int(request.GET.get('limit', 4))
+        except (ValueError, TypeError):
+            limit = 4
+        limit = max(1, min(limit, 20))
+
+        try:
+            listing = Listing.objects.get(id=listing_id)
         except Listing.DoesNotExist:
             return Response({'error': 'Listing not found'}, status=404)
-        except (ValueError, ValidationError):
-            return Response({'error': 'Invalid listing ID'}, status=400)
 
         try:
-            limit = int(request.query_params.get('limit', 6))
-        except ValueError:
-            limit = 6
-
-        try:
-            similar = RecommendationEngine.get_similar_listings(listing, limit=limit)
+            similar = RecommendationEngine.get_similar_listings(listing, limit)
         except Exception as e:
-            logger.exception(f"Error fetching similar listings for {listing_id}: {e}")
+            logger.exception(f"Error fetching similar listings for listing {listing_id}: {e}")
             return Response({'error': 'Failed to fetch similar listings'}, status=500)
 
-        serializer = ListingSerializer(similar, many=True)
-        return Response(serializer.data, status=200)
+        data = [l.to_dict() for l in similar]
+        return Response({'results': data}, status=200)
+
 
 class TrendingListingsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         try:
-            limit = int(request.query_params.get('limit', 10))
-        except ValueError:
-            limit = 10
+            limit = int(request.GET.get('limit', 8))
+        except (ValueError, TypeError):
+            limit = 8
+        limit = max(1, min(limit, 50))
 
         try:
-            trending = RecommendationEngine.get_trending_listings(limit=limit)
+            trending = RecommendationEngine.get_trending_listings(limit)
         except Exception as e:
             logger.exception(f"Error fetching trending listings: {e}")
             return Response({'error': 'Failed to fetch trending listings'}, status=500)
 
-        serializer = ListingSerializer(trending, many=True)
-        return Response(serializer.data, status=200)
+        data = [l.to_dict() for l in trending]
+        return Response({'results': data}, status=200)
 
 
 

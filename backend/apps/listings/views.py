@@ -1067,6 +1067,10 @@ class CreateReportView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
+        print("Report request received")  # Debug
+        print("Request data:", request.data)  # Debug
+        print("User:", request.user)  # Debug
+        
         serializer = ReportSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
@@ -1074,6 +1078,8 @@ class CreateReportView(APIView):
                 'message': 'Report submitted successfully. We will review it shortly.',
                 'data': serializer.data
             }, status=status.HTTP_201_CREATED)
+        
+        print("Serializer errors:", serializer.errors)  # Debug
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AdminReportListView(APIView):

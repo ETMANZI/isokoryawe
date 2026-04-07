@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flag, AlertTriangle, X, CheckCircle } from 'lucide-react';
 import { api } from '../lib/api';
-import { isAuthenticated } from '../lib/auth';
+import { isAuthenticated, getAccessToken } from '../lib/auth';
 
 type ReportButtonProps = {
   listingId?: string;
@@ -31,6 +31,7 @@ export default function ReportButton({ listingId, userId, userName, className = 
   const [error, setError] = useState('');
   
   const handleSubmit = async () => {
+    // Check authentication first
     if (!isAuthenticated()) {
       setError(t('report.login_required'));
       setTimeout(() => setError(''), 3000);
@@ -46,12 +47,25 @@ export default function ReportButton({ listingId, userId, userName, className = 
     setError('');
     
     try {
-      await api.post('/listings/reports/create/', {
-        listing_id: listingId,
-        reported_user: userId,
+      const token = getAccessToken();
+      console.log('Token exists:', !!token);
+      console.log('Submitting report for listing:', listingId);
+      
+      const payload: any = {
         reason: selectedReason,
         description: description,
-      });
+      };
+      
+      if (listingId) {
+        payload.listing = listingId;
+      }
+      if (userId) {
+        payload.reported_user = userId;
+      }
+      
+      const response = await api.post('/listings/reports/create/', payload);
+      
+      console.log('Report response:', response.data);
       
       setSuccess(true);
       setTimeout(() => {
@@ -61,7 +75,19 @@ export default function ReportButton({ listingId, userId, userName, className = 
         setDescription('');
       }, 2000);
     } catch (err: any) {
-      setError(err?.response?.data?.detail || t('report.error'));
+      console.error('Report error:', err);
+      console.error('Error response:', err?.response?.data);
+      console.error('Error status:', err?.response?.status);
+      
+      if (err?.response?.status === 401) {
+        setError(t('report.login_required'));
+      } else if (err?.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (err?.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError(t('report.error'));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -71,7 +97,7 @@ export default function ReportButton({ listingId, userId, userName, className = 
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 ${className}`}
+        className={`inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 ${className}`}
       >
         <Flag size={16} />
         {t('report.report')}

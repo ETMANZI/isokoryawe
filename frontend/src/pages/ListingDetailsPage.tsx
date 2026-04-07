@@ -239,12 +239,11 @@ export default function ListingDetailsPage() {
   const [selectedImage, setSelectedImage] = useState<string>("");
 
   // Record view for recommendation engine
-  useEffect(() => {
-    if (id) {
-      // Record that user viewed this listing for recommendations
-      api.post(`/listings/recommendations/record-view/${id}/`).catch(console.error);
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id) {
+  //     api.post(`/listings/recommendations/record-view/${id}/`).catch(console.error);
+  //   }
+  // }, [id]);
 
   useEffect(() => {
     if (!id) return;

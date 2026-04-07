@@ -19,6 +19,7 @@ import TermsPage from "../pages/TermsPage";
 import UserGuidePage from "../pages/UserGuidePage";
 import AdminFeedbackPage   from "../pages/AdminFeedbackList";
 import FeedbackPage from "../pages/FeedbackPage";
+import AdminReportsPage from "../pages/AdminReportsPage";
 
 
 export const router = createBrowserRouter([
@@ -41,7 +42,8 @@ export const router = createBrowserRouter([
       { path: "/terms", element: <TermsPage />},
       { path: "/guide", element: <UserGuidePage />},
       { path: "/feedback", element: <FeedbackPage />},
-      { path: "/admin/feedbacks", element:<AdminFeedbackPage />}
+      { path: "/admin/feedbacks", element:<AdminFeedbackPage />},
+      { path: "/admin/reports", element: <AdminReportsPage />}
       
     ],
   },

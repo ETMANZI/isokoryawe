@@ -1262,6 +1262,14 @@
       "page_url": "Page URL",
       "delete": "Delete Feedback"
     }
+  },
+
+  "chatbot": {
+    "welcome_message": "👋 Hello! I'm your Market Hub assistant. I can help you with:\n\n• Posting listings\n• Subscription plans\n• Image requirements\n• Pricing and payments\n• Account help\n\nWhat would you like to know?",
+    "input_placeholder": "Type your question here...",
+    "suggested": "Suggested questions:",
+    "clear_chat": "Clear conversation",
+    "error_message": "Sorry, I'm having trouble connecting. Please try again later."
   }
 
 

@@ -1258,6 +1258,14 @@
       "page_url": "URL y'urupapuro",
       "delete": "Siba Igitekerezo"
     }
+  },
+
+  "chatbot": {
+    "welcome_message": "👋 Muraho! Ndi umufasha wa Market Hub. Nshobora kugufasha:\n\n• Gutangaza ibitangazwa\n• Gahunda z'ubusabirizimu\n• Ibisabwa ku mashusho\n• Ibiciro n'ishyura\n• Ubufasha kuri konti\n\nUshaka kumenya iki?",
+    "input_placeholder": "Andika ikibazo cyawe hano...",
+    "suggested": "Ibibazo bikunze kubazwa:",
+    "clear_chat": "Hanagura ibiganiro",
+    "error_message": "Tubabazi, hari ikibazo. Ongera ugerageze nyuma."
   }
 
 

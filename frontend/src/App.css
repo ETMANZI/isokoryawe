@@ -40,3 +40,43 @@
 .read-the-docs {
   color: #888;
 }
+
+
+
+/* Add to your index.css or App.css */
+
+/* Fix for Leaflet map containers */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  position: relative !important;
+  z-index: 1;
+}
+
+/* Prevent map from being affected by scroll */
+.map-fixed-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.map-fixed-container .leaflet-container {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* If map is inside a sticky element */
+.sticky-map-container {
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+}
+
+.sticky-map-container .leaflet-container {
+  position: relative !important;
+}

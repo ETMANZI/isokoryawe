@@ -5,6 +5,10 @@ from rest_framework import status
 from .models import ChatSession, ChatMessage
 from .intents import get_intent, get_response
 import uuid
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class ChatbotView(APIView):
     permission_classes = [AllowAny]
@@ -15,6 +19,8 @@ class ChatbotView(APIView):
         if not session_id:
             session_id = str(uuid.uuid4())
         
+        print(f"🔍 [SESSION] Getting/Creating session: {session_id} with language: {language}")
+        
         session, created = ChatSession.objects.get_or_create(
             session_id=session_id,
             defaults={
@@ -23,7 +29,13 @@ class ChatbotView(APIView):
             }
         )
         
+        if created:
+            print(f"🔍 [SESSION] Created new session with language: {language}")
+        else:
+            print(f"🔍 [SESSION] Existing session found. Current language: {session.language}")
+        
         if not created and session.language != language:
+            print(f"🔍 [SESSION] Updating language from {session.language} to {language}")
             session.language = language
             session.save()
         
@@ -37,10 +49,19 @@ class ChatbotView(APIView):
         message = request.data.get('message', '').strip()
         language = request.data.get('language', 'en')
         
+        print(f"🔍 [REQUEST] ====================")
+        print(f"🔍 [REQUEST] Message: '{message}'")
+        print(f"🔍 [REQUEST] Language from frontend: '{language}'")
+        print(f"🔍 [REQUEST] Full request data: {request.data}")
+        print(f"🔍 [REQUEST] Headers: {dict(request.headers)}")
+        print(f"🔍 [REQUEST] ====================")
+        
         if not message:
             return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         session = self.get_or_create_session(request, language=language)
+        
+        print(f"🔍 [SESSION] Final session language: {session.language}")
         
         ChatMessage.objects.create(
             session=session,
@@ -48,8 +69,13 @@ class ChatbotView(APIView):
             content=message
         )
         
+        print(f"🔍 [INTENT] Calling get_intent with language={language}")
         intent = get_intent(message, language=language)
+        print(f"🔍 [INTENT] Result: {intent}")
+        
+        print(f"🔍 [RESPONSE] Calling get_response with intent={intent}, language={language}")
         response_text = get_response(intent, language=language)
+        print(f"🔍 [RESPONSE] Response preview: {response_text[:100]}...")
         
         ChatMessage.objects.create(
             session=session,

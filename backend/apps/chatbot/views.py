@@ -9,7 +9,7 @@ import uuid
 class ChatbotView(APIView):
     permission_classes = [AllowAny]
     
-    def get_or_create_session(self, request):
+    def get_or_create_session(self, request, language='en'):  # ← ADD language parameter
         session_id = request.headers.get('X-Session-ID')
         
         if not session_id:
@@ -17,8 +17,16 @@ class ChatbotView(APIView):
         
         session, created = ChatSession.objects.get_or_create(
             session_id=session_id,
-            defaults={'user': request.user if request.user.is_authenticated else None}
+            defaults={
+                'user': request.user if request.user.is_authenticated else None,
+                'language': language  # ← ADD THIS
+            }
         )
+        
+        # Update language if session exists and language changed
+        if not created and session.language != language:
+            session.language = language
+            session.save()
         
         if not created and request.user.is_authenticated and not session.user:
             session.user = request.user
@@ -28,17 +36,13 @@ class ChatbotView(APIView):
     
     def post(self, request):
         message = request.data.get('message', '').strip()
-        language = request.data.get('language', 'en')  # Get language from request (default: 'en')
+        language = request.data.get('language', 'en')
         
         if not message:
             return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        session = self.get_or_create_session(request)
-        
-        # Save language preference in session
-        if hasattr(session, 'language'):
-            session.language = language
-            session.save()
+        # Pass language to get_or_create_session
+        session = self.get_or_create_session(request, language=language)
         
         ChatMessage.objects.create(
             session=session,
@@ -46,11 +50,10 @@ class ChatbotView(APIView):
             content=message
         )
         
-        # Pass language to intent and response functions
         intent = get_intent(message, language=language)
         response_text = get_response(intent, language=language)
         
-        assistant_message = ChatMessage.objects.create(
+        ChatMessage.objects.create(
             session=session,
             role='assistant',
             content=response_text,
@@ -63,7 +66,7 @@ class ChatbotView(APIView):
             'response': response_text,
             'intent': intent,
             'session_id': session.session_id,
-            'language': language,  # Return current language
+            'language': session.language,
             'history': [
                 {'role': msg.role, 'content': msg.content, 'created_at': msg.created_at}
                 for msg in reversed(history)

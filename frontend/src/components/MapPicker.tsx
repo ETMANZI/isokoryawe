@@ -57,7 +57,7 @@ function FlyToLocation({
 
   useEffect(() => {
     if (isValidCoord(latitude) && isValidCoord(longitude)) {
-      map.flyTo([latitude, longitude], 18); // Zoom level 18 shows buildings clearly
+      map.flyTo([latitude, longitude], 30); // INCREASED to 19 - shows houses clearly
     }
   }, [latitude, longitude, map]);
 
@@ -176,29 +176,22 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
 
       <MapContainer 
         center={center} 
-        zoom={15} 
+        zoom={18} // INCREASED from 13 to 18 - starts zoomed in
         style={{ height: "350px", width: "100%", borderRadius: "12px", zIndex: 1 }}
+        zoomControl={true}
       >
-        {/* MOST POWERFUL TILE LAYER - Shows buildings and houses clearly */}
-        {/* Humanitarian Style - Best for seeing building footprints */}
-        {/* <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors | Humanitarian Style'
-          url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-        /> */}
-        
-        {/* ALTERNATIVE: If you want satellite view with buildings, uncomment this instead:
+        {/* Satellite view - best for seeing actual houses */}
         <TileLayer
-          attribution='&copy; <a href="https://www.google.com/maps">Google</a>'
+          attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
           url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
         />
-        */}
-
-        ALTERNATIVE 2: Clean style with building outlines:
+        
+        {/* You can also try this hybrid view (satellite + labels):
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+          url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
         />
-       
+        */}
 
         <FlyToLocation latitude={selectedLat} longitude={selectedLng} />
 
@@ -213,9 +206,15 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
         />
       </MapContainer>
       
-      <p className="text-xs text-slate-500 mt-2">
-        💡 Tip: Zoom in (scroll) to see individual houses and buildings. At zoom level 16-18, you'll see clear building outlines.
-      </p>
+      <div className="mt-2 text-xs text-slate-500">
+        <p>📍 <strong>Tips to see houses:</strong></p>
+        <ul className="list-disc pl-4 mt-1 space-y-1">
+          <li>🔍 Use the + button to zoom in closer</li>
+          <li>🏠 At zoom level 18-19, you'll see individual houses</li>
+          <li>🗺️ Satellite view shows actual buildings from above</li>
+          <li>📍 Click anywhere on the map to select a location</li>
+        </ul>
+      </div>
     </div>
   );
 }

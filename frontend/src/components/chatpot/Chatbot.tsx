@@ -75,15 +75,21 @@ export default function Chatbot() {
   // Load language preference from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem('chat_language') as 'en' | 'rw';
+    console.log('🔍 [FRONTEND] Loading saved language from localStorage:', savedLanguage);
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'rw')) {
       setLanguage(savedLanguage);
+      console.log('🔍 [FRONTEND] Language set to:', savedLanguage);
+    } else {
+      console.log('🔍 [FRONTEND] No saved language, using default: en');
     }
   }, []);
 
   // Save language preference
   const handleLanguageChange = (newLanguage: 'en' | 'rw') => {
+    console.log('🔍 [FRONTEND] Language changing from', language, 'to', newLanguage);
     setLanguage(newLanguage);
     localStorage.setItem('chat_language', newLanguage);
+    console.log('🔍 [FRONTEND] Language saved to localStorage:', newLanguage);
     
     // Optional: Add system message about language change
     setMessages(prev => [...prev, {
@@ -114,6 +120,9 @@ export default function Chatbot() {
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
 
+    console.log('🔍 [FRONTEND] sendMessage called with:', message);
+    console.log('🔍 [FRONTEND] Current language state:', language);
+
     // Add user message to UI
     const userMessage: Message = { role: 'user', content: message };
     setMessages(prev => [...prev, userMessage]);
@@ -121,13 +130,20 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
+      const requestBody = { 
+        message: message,
+        language: language  // Send language to backend
+      };
+      console.log('🔍 [FRONTEND] Sending to backend:', requestBody);
+      
       const response = await api.post('/chatbot/chat/', 
-        { 
-          message: message,
-          language: language  // Send language to backend
-        },
+        requestBody,
         { headers: sessionId ? { 'X-Session-ID': sessionId } : {} }
       );
+
+      console.log('🔍 [FRONTEND] Response from backend:', response.data);
+      console.log('🔍 [FRONTEND] Response language:', response.data.language);
+      console.log('🔍 [FRONTEND] Response text:', response.data.response);
 
       // Save session ID
       if (response.data.session_id && !sessionId) {
@@ -143,7 +159,7 @@ export default function Chatbot() {
       setMessages(prev => [...prev, assistantMessage]);
 
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('🔍 [FRONTEND] Chat error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: ERROR_MESSAGES[language]
@@ -154,6 +170,7 @@ export default function Chatbot() {
   };
 
   const clearChat = async () => {
+    console.log('🔍 [FRONTEND] Clearing chat');
     if (sessionId) {
       try {
         await api.delete('/chatbot/chat/clear/', {
@@ -168,6 +185,7 @@ export default function Chatbot() {
     setSessionId(null);
     
     // Add welcome message in current language
+    console.log('🔍 [FRONTEND] Adding welcome message in language:', language);
     setMessages([{
       role: 'assistant',
       content: WELCOME_MESSAGES[language]
@@ -182,14 +200,17 @@ export default function Chatbot() {
   const handleSuggestedQuestion = (question: SuggestedQuestion) => {
     // Send question in appropriate language
     const questionText = language === 'rw' && question.textRw ? question.textRw : question.text;
+    console.log('🔍 [FRONTEND] Suggested question clicked:', questionText);
     sendMessage(questionText);
   };
 
   // Welcome message on first open
   const handleOpen = () => {
+    console.log('🔍 [FRONTEND] Chat opened, current language:', language);
     setIsOpen(true);
     setIsMinimized(false);
     if (messages.length === 0) {
+      console.log('🔍 [FRONTEND] No messages, adding welcome message in:', language);
       setMessages([{
         role: 'assistant',
         content: WELCOME_MESSAGES[language]

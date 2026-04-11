@@ -197,7 +197,6 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
           url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
         />
        
-
         <FlyToLocation latitude={selectedLat} longitude={selectedLng} />
 
         <LocationMarker

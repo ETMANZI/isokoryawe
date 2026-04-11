@@ -89,11 +89,167 @@ class RecommendationEngine:
             logger.error(f"Error in get_personalized_recommendations: {e}")
             return []
 
-
-    
-    
     @staticmethod
     def get_similar_listings(listing, limit=6):
+        """
+        AI-Powered Similar Listings Algorithm - More Flexible
+        
+        Scoring Factors:
+        1. Category Match (30%) - Same category or related
+        2. Price Similarity (25%) - Flexible price range
+        3. Listing Type Match (20%) - Same type
+        4. Location Match (15%) - Same district or nearby
+        5. Popularity Boost (10%) - High view count bonus
+        """
+        try:
+            from django.db.models import Case, When, Value, DecimalField, F, Q
+            
+            if not listing:
+                return []
+
+            # Start with all active listings except current
+            similar = Listing.objects.filter(
+                visibility_status=Listing.VisibilityStatus.ACTIVE
+            ).exclude(id=listing.id)
+
+            # Apply flexible filters (not strict)
+            
+            # 1. Same listing type (preferred but not required)
+            type_filter = Q(listing_type=listing.listing_type)
+            
+            # 2. Category - same or None (don't filter out if no category)
+            if listing.category:
+                category_filter = Q(category=listing.category) | Q(category__isnull=True)
+            else:
+                category_filter = Q()
+            
+            # 3. Price - flexible range (50% to 150%)
+            if listing.price:
+                price_filter = Q(
+                    price__gte=listing.price * Decimal('0.5'),
+                    price__lte=listing.price * Decimal('1.5')
+                ) | Q(price__isnull=True)
+            else:
+                price_filter = Q()
+            
+            # 4. Location - same district or nearby
+            if listing.district:
+                location_filter = Q(district=listing.district) | Q(district__isnull=True)
+            else:
+                location_filter = Q()
+            
+            # Apply all filters (using OR so we don't exclude everything)
+            similar = similar.filter(
+                type_filter | category_filter | price_filter | location_filter
+            )
+            
+            # Now annotate with similarity scores
+            similar = similar.annotate(
+                # Category score (30%)
+                category_score=Case(
+                    When(category=listing.category, then=Value(100)),
+                    default=Value(30),  # Give partial score even if different category
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # Price similarity score (25%)
+                price_score=Case(
+                    When(
+                        price__gte=listing.price * Decimal('0.8'),
+                        price__lte=listing.price * Decimal('1.2'),
+                        then=Value(100)
+                    ),
+                    When(
+                        price__gte=listing.price * Decimal('0.5'),
+                        price__lte=listing.price * Decimal('1.5'),
+                        then=Value(60)
+                    ),
+                    default=Value(20),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # Listing type score (20%)
+                type_score=Case(
+                    When(listing_type=listing.listing_type, then=Value(100)),
+                    default=Value(20),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # Location score (15%)
+                location_score=Case(
+                    When(district=listing.district, then=Value(100)),
+                    When(sector=listing.sector, then=Value(60)),
+                    default=Value(10),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # Popularity score (10%)
+                popularity_score=Case(
+                    When(views_count__gte=100, then=Value(100)),
+                    When(views_count__gte=50, then=Value(70)),
+                    When(views_count__gte=10, then=Value(40)),
+                    default=Value(10),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+            )
+            
+            # Calculate final similarity score
+            similar = similar.annotate(
+                similarity_score=(
+                    (F('category_score') * Decimal('0.30')) +
+                    (F('price_score') * Decimal('0.25')) +
+                    (F('type_score') * Decimal('0.20')) +
+                    (F('location_score') * Decimal('0.15')) +
+                    (F('popularity_score') * Decimal('0.10'))
+                )
+            ).order_by('-similarity_score')[:limit]
+            
+            # Convert to list
+            similar_list = list(similar)
+            
+            # If still no results, get popular listings as fallback
+            if len(similar_list) == 0:
+                print("No similar listings found, falling back to popular listings")
+                popular = Listing.objects.filter(
+                    visibility_status=Listing.VisibilityStatus.ACTIVE
+                ).exclude(id=listing.id).order_by('-views_count')[:limit]
+                
+                for p in popular:
+                    p.similarity_score = 0
+                    p.match_quality = "📌 Popular"
+                    similar_list.append(p)
+            
+            # Add match quality labels
+            for item in similar_list:
+                if hasattr(item, 'similarity_score') and item.similarity_score > 0:
+                    if item.similarity_score >= 70:
+                        item.match_quality = "🔥 Very Similar"
+                    elif item.similarity_score >= 50:
+                        item.match_quality = "👍 Similar"
+                    elif item.similarity_score >= 30:
+                        item.match_quality = "👀 You might also like"
+                    else:
+                        item.match_quality = "📌 Related"
+                else:
+                    item.match_quality = "📌 Popular"
+            
+            print(f"Found {len(similar_list)} similar listings for '{listing.title}'")
+            return similar_list[:limit]
+
+        except Exception as e:
+            logger.error(f"Error in get_similar_listings: {e}")
+            # Ultimate fallback - just return popular listings
+            try:
+                popular = Listing.objects.filter(
+                    visibility_status=Listing.VisibilityStatus.ACTIVE
+                ).exclude(id=listing.id).order_by('-views_count')[:limit]
+                return list(popular)
+            except:
+                return []
+        
+    
+    @staticmethod
+    def get_similar_listings11(listing, limit=6):
         """
         AI-Powered Similar Listings Algorithm
         
@@ -207,7 +363,6 @@ class RecommendationEngine:
                         output_field=DecimalField(max_digits=5, decimal_places=2)
                     )
                 )
-                # Adjust weights for cars
                 similar = similar.annotate(
                     similarity_score=(
                         (F('category_score') * Decimal('0.25')) +

@@ -641,6 +641,19 @@ class ListingView(models.Model):
         user_str = self.user.email if self.user else f"Anonymous({self.session_id})"
         return f"{user_str} viewed {self.listing.title}"
 
+# class UserPreference(models.Model):
+#     """Store user preferences for personalized recommendations"""
+#     user = models.OneToOneField(
+#         settings.AUTH_USER_MODEL,
+#         on_delete=models.CASCADE,
+#         related_name='preferences'
+#     )
+#     preferred_categories = models.JSONField(default=list)
+#     preferred_listing_types = models.JSONField(default=list)
+#     updated_at = models.DateTimeField(auto_now=True)
+    
+#     def __str__(self):
+#         return f"Preferences for {self.user.email}"
 class UserPreference(models.Model):
     """Store user preferences for personalized recommendations"""
     user = models.OneToOneField(
@@ -650,11 +663,16 @@ class UserPreference(models.Model):
     )
     preferred_categories = models.JSONField(default=list)
     preferred_listing_types = models.JSONField(default=list)
+    
+    # Add these missing fields
+    price_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    location_preferences = models.CharField(max_length=255, blank=True, null=True)
+    
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"Preferences for {self.user.email}"
-
 class RecommendationCache(models.Model):
     """Cache personalized recommendations for faster loading"""
     user = models.OneToOneField(

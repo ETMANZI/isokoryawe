@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { 
   MessageCircle, 
   X, 
@@ -61,7 +61,7 @@ const SUGGESTED_TEXTS = {
 };
 
 export default function Chatbot() {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);

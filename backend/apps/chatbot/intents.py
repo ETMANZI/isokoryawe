@@ -108,14 +108,14 @@ INTENTS_RW = {
         "patterns": ["muraho", "bite", "mwiriwe", "sawa", "mwaramutse", "mwiriwe", "umunsi mwiza"],
         "responses": [
             "Muraho! 👋 Nigute nakugufasha kuri Market Hub uyumunsi?",
-            "Mwiriwe! Murakaza neza kuri Market Hub Support. Niki nakugirira akamaro?",
+            "Mwiriwe! Murakaza neza kuri Market Hub Support. Ni iki nakugirira akamaro?",
             "Yoo! Ndi hano kugira ngo nkugufashe mu matangazo, kwiyandikisha, cyangwa ibibazo ufite."
         ]
     },
     "pricing": {
         "patterns": ["angahe", "igiciro", "ibiciro", "amafaranga", "kodi", "ibishyo"],
         "responses": [
-            "Market Hub itanga gahunda z'iyandikishwa rikoze:\n\n• Basic: 1,500 FRW/bukwe - 3 matangazo, ishusho 1 kuri buri tangazo\n• Classic: 2,000 FRW/bukwe - 3 matangazo, ishusho 2 kuri buri tangazo\n• Premium: 3,000 FRW/bukwe - 4 matangazo, ishusho 3 kuri buri tangazo\n• Business: 4,000 FRW/bukwe - 5 matangazo, ishusho 4 kuri buri tangazo\n\nNi iyihe gahunda igukundisha?"
+            "Market Hub itanga gahunda z'iyandikishwa rikoze:\n\n• Basic: 1,500 FRW/Ukwezi - 3 matangazo, ishusho 1 kuri buri tangazo\n• Classic: 2,000 FRW/Ukwezi - 3 matangazo, ishusho 2 kuri buri tangazo\n• Premium: 3,000 FRW/Ukwezi - 4 matangazo, ishusho 3 kuri buri tangazo\n• Business: 4,000 FRW/Ukwezi - 5 matangazo, ishusho 4 kuri buri tangazo\n\nNi iyihe gahunda igukundisha?"
         ]
     },
     "how_to_post": {
@@ -127,49 +127,49 @@ INTENTS_RW = {
     "subscription": {
         "patterns": ["kwiyandikisha", "iyandikishwa", "gahunda", "kuzamura", "ubumembari", "premium", "abonementi"],
         "responses": [
-            "Urashobora kureba gahunda zose z'iyandikishwa ku rupapuro rw'Iyandikishwa. Buri gahunda itanga inyungu zitandukanye:\n\n• Basic: 2 matangazo, ishusho 1\n• Classic: 3 matangazo, ishusho 2 + amatangazo y'abucuruzi\n• Premium: 4 matangazo, ishusho 3 + ibibarwa\n• Business: 5 matangazo, ishusho 4 + ubufasha bwihutirwa\n\nUrashaka nkugufashe guhitamo gahunda?"
+            "Urashobora kureba gahunda zose z'iyandikishwa ku rupapuro rw'Iyandikishwa. Buri gahunda itanga amahirwe atandukanye:\n\n• Basic: 2 matangazo, ishusho 1\n• Classic: 3 matangazo, ishusho 2 + amatangazo y'abucuruzi\n• Premium: 4 matangazo, ishusho 3 + ibibarwa\n• Business: 5 matangazo, ishusho 4 + ubufasha bwihutirwa\n\nUrashaka nkugufashe guhitamo gahunda?"
         ]
     },
     "image_requirements": {
         "patterns": ["ishusho", "ifoto", "amashusho", "gushyiramo ifoto", "ubunini bw'ishusho", "ingano y'ishusho"],
         "responses": [
-            "Amabwiriza y'amashusho:\n\n📸 Koresha amashusho meza, afite urumuri\n📏 Ubunini ntarengwa: 800x600 pixels\n💾 Ingano ntarengwa: 10MB kuri buri shusho\n🖼️ Ubwoko bukwirakwizwa: PNG, JPG, WEBP, GIF\n📷 Werekanwe impande zitandukanye\n🚫 Nta kirango cyangwa inyandiko ku mashusho\n\nGahunda yawe igena amashusho angahe ushobora gushyira kuri buri tangazo."
+            "Amabwiriza y'amashusho:\n\n📸 Koresha amashusho meza, afite urumuri\n📏 Ubunini ntarengwa: 800x600 pixels\n💾 Ingano ntarengwa: 10MB kuri buri shusho\n🖼️ Ubwoko bukwirakwizwa: PNG, JPG, WEBP, GIF\n📷 Werekanwe impande zitandukanye\n🚫 Nta kirango cyangwa inyandiko ku mashusho\n\nGahunda yawe igena amashusho runaka ushobora gushyira kuri buri gicuruzwa."
         ]
     },
     "payment": {
         "patterns": ["kwishyura", "ishyura", "mobile money", "mtn", "airtel", "kwimura", "amafaranga yishyuwe"],
         "responses": [
-            "Twemera uburyo bwinshi bwo kwishyura:\n\n💰 Mobile Money (MTN, Airtel)\n💳 Amakarita yo kwishyura\n🏦 Kwimura banki\n\nNyuma yo kwiyandikisha, uzakira amabwiriza yo kwishyura. Amafaranga yose arinzwe neza."
+            "Kugeza ubu twemera uburyo bumwe bwo kwishyura:\n\n💰 Mobile Money (MTN) kuri numero musanga kurubuga\n💳 Amakarita yo kwishyura\n🏦 Gyukoresha Bank bizmera nyuma\n\nNyuma yo kwiyandikisha, Igicuruzwa cyawe kigaragara nyuma yo kwishyura."
         ]
     },
     "account": {
         "patterns": ["konti", "porofile", "hindura ijambo banga", "vandura imeri", "siba konti", "gucunga konti"],
         "responses": [
-            "Urashobora gucunga konti yawe kuri Dashboard:\n\n• Vandura amakuru ya porofile\n• Hindura ijambo banga\n• Reba ibyo utangaje\n• Kurikirana abaguzi bashishikaye\n• Genga notifikasiyo\n\nHari ikintu runaka ushaka guhindura?"
+            "Urashobora gucunga konti yawe kuri Dashboard:\n\n• Guhindura amakuru y'umwirondoro\n• Hindura ijambo banga\n• Reba ibyo utangaje\n• Kurikirana abaguzi\n• Genga notifikasiyo\n\nHari ikintu runaka ushaka guhindura?"
         ]
     },
     "contact_support": {
         "patterns": ["ubufasha", "fasha", "twandikire", "vugisha umuntu", "umukozi", "serivisi y'abakiriya", "support"],
         "responses": [
-            "Urashobora guhura n'itsinda ryacu ry'ubufasha:\n\n📞 Guhamagara: +250 788 263 338\n💬 WhatsApp: wa.me/250788263338\n✉️ Imeri: support@markethub.com\n\nCyangwa sura Igice cy'Ubufasha kubijyanye n'ibyobwe n'ibibazo bikunze kubazwa. Urashaka nkuguhuza n'umukozi?"
+            "Ushobora kuvugana n'itsinda ryacu ry'ubufasha:\n\n📞 Guhamagara: +250 788 263 338\n💬 WhatsApp: wa.me/250788263338\n✉️ Imeri: support@markethub.com\n\nCyangwa sura Igice cy'Ubufasha kubijyanye n'ibibazo bikunze kubazwa. Urashaka nkuguhuza n'umukozi?"
         ]
     },
     "listing_approval": {
         "patterns": ["kwemera", "gitegereje", "gusuzuma", "igihe kingana iki", "igihe cyo kwemera", "itangazo ryoherejwe"],
         "responses": [
-            "Itangazo risuzumwa mu masaha 24. Abiyandikishije kuri Premium na Business babona ubufasha bwihutirwa mu masaha 4.\n\nUzakira notifikasiyo iyo itangazo ryemerewe. Ukeneye ubufasha bwihutirwa? Tekereza kuzamura gahunda yawe!"
+            "Igicuruzwa risuzumwa mu minota 20. Abiyandikishije kuri Premium na Business babona ubufasha bwihutirwa mu minota 10.\n\nUzakira notifikasiyo iyo igicuruzwa ryemerewe. Ukeneye ubufasha bwihutirwa? Tekereza kuzamura gahunda yawe!"
         ]
     },
     "refund": {
         "patterns": ["kusubiza amafaranga", "garura amafaranga", "garuka", "guhagarika kwiyandikisha", "kwishyuza"],
         "responses": [
-            "Amafaranga y'iyandikishwa ntabwo asubizwa. Nyamara, niba wagize ikibazo gikorana na tekinoloji, twandikire itsinda ry'ubufasha mu minsi 7 nyuma yo kwishyura.\n\nKugira ngo uhagarike kwiyandikisha kwikora, jya ku Iyandikishwa → Genga → Zimya ikora mu buryo bwikora."
+            "Amafaranga y'iyandikishwa ntabwo asubizwa. Nyamara, niba wagize ikibazo gikorana na tekinoloji, twandikire, itsinda ry'ubufasha mu minsi 3 nyuma yo kwishyura.\n\nKugira ngo uhagarike kwiyandikisha kwikora, jya ku Iyandikishwa → Genga."
         ]
     },
     "featured_listing": {
         "patterns": ["mu mwanya mbere", "gushimangira", "kwamamaza", "kwerekana", "garagaza", "itangazo ryambere"],
         "responses": [
-            "Itangazo riri mu mwanya mbere riragaragara ku isonga ry'ibisubizo! 🚀\n\nGahunda za Premium na Business zirimo amatangazo y'umwanya mbere. Urashobora kuzamura gahunda yawe ku rupapuro rw'Iyandikishwa kugira ngo ibintu byawe bigaragare cyane."
+            "Igicuruzwa kiri mu mwanya mbere riragaragara ku isonga ry'ibisubizo! 🚀\n\nGahunda za Premium na Business zirimo ibicuruzwa bya mbere. Urashobora kuzamura gahunda yawe ku rupapuro rw'Iyandikishwa kugira ngo ibintu byawe bigaragare cyane."
         ]
     },
     "business_ads": {

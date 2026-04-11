@@ -38,6 +38,525 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 
+# class ListingViewSet(viewsets.ModelViewSet):
+#     serializer_class = ListingSerializer
+#     permission_classes = [permissions.AllowAny]
+#     parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
+#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+#     queryset = (
+#         Listing.objects
+#         .select_related("owner", "category")
+#         .prefetch_related("images")
+#         .annotate(interested_count=Count("interests", distinct=True))
+#     )
+
+#     filterset_fields = [
+#         "listing_type",
+#         "district",
+#         "sector",
+#         "sale_mode",
+#         "is_featured",
+#         "status",
+#         "category",
+#         "visibility_status",
+#         "negotiable",
+#     ]
+
+#     search_fields = [
+#         "title",
+#         "description",
+#         "address",
+#         "district",
+#         "sector",
+#         "village",
+#         "upi",
+#         "contact_phone",
+#         "contact_email",
+#         "brand",
+#         "sku",
+#         "clothes_category",
+#         "food_category",
+#         "home_product_category",
+#     ]
+
+#     ordering_fields = ["price", "created_at", "views_count", "interested_count"]
+
+#     def get_client_ip(self, request):
+#         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+#         if x_forwarded_for:
+#             return x_forwarded_for.split(",")[0].strip()
+#         return request.META.get("REMOTE_ADDR")
+
+#     def _base_queryset(self):
+#         return (
+#             Listing.objects
+#             .select_related("owner", "category")
+#             .prefetch_related("images")
+#             .annotate(interested_count=Count("interests", distinct=True))
+#         )
+
+#     def _apply_custom_filters(self, queryset):
+#         params = self.request.query_params
+
+#         q = (params.get("q") or "").strip()
+#         min_price = params.get("min_price")
+#         max_price = params.get("max_price")
+#         category = params.get("category")
+#         district = (params.get("district") or "").strip()
+#         sector = (params.get("sector") or "").strip()
+#         listing_type = (params.get("listing_type") or "").strip()
+#         sale_mode = (params.get("sale_mode") or "").strip()
+#         with_discount = (params.get("with_discount") or "").strip()
+#         negotiable = (params.get("negotiable") or "").strip()
+
+#         brand = (params.get("brand") or "").strip()
+#         has_delivery = (params.get("has_home_delivery") or "").strip()
+#         product_condition = (params.get("product_condition") or "").strip()
+#         clothes_gender = (params.get("clothes_gender") or "").strip()
+#         clothes_size = (params.get("clothes_size") or "").strip()
+#         food_unit = (params.get("food_unit") or "").strip()
+#         is_prepared_food = (params.get("is_prepared_food") or "").strip()
+#         is_perishable = (params.get("is_perishable") or "").strip()
+
+#         if q:
+#             queryset = queryset.filter(
+#                 Q(title__icontains=q)
+#                 | Q(description__icontains=q)
+#                 | Q(address__icontains=q)
+#                 | Q(district__icontains=q)
+#                 | Q(sector__icontains=q)
+#                 | Q(village__icontains=q)
+#                 | Q(contact_phone__icontains=q)
+#                 | Q(contact_email__icontains=q)
+#                 | Q(brand__icontains=q)
+#                 | Q(sku__icontains=q)
+#                 | Q(clothes_category__icontains=q)
+#                 | Q(food_category__icontains=q)
+#                 | Q(home_product_category__icontains=q)
+#             )
+
+#         if min_price:
+#             try:
+#                 queryset = queryset.filter(price__gte=min_price)
+#             except (TypeError, ValueError):
+#                 pass
+
+#         if max_price:
+#             try:
+#                 queryset = queryset.filter(price__lte=max_price)
+#             except (TypeError, ValueError):
+#                 pass
+
+#         if category:
+#             queryset = queryset.filter(category_id=category)
+
+#         if district:
+#             queryset = queryset.filter(district__iexact=district)
+
+#         if sector:
+#             queryset = queryset.filter(sector__iexact=sector)
+
+#         if listing_type:
+#             queryset = queryset.filter(listing_type=listing_type)
+
+#         if sale_mode:
+#             queryset = queryset.filter(sale_mode=sale_mode)
+
+#         if with_discount.lower() in ["1", "true", "yes"]:
+#             queryset = queryset.filter(discount_price__isnull=False)
+
+#         if negotiable.lower() in ["1", "true", "yes"]:
+#             queryset = queryset.filter(negotiable=True)
+
+#         if brand:
+#             queryset = queryset.filter(brand__icontains=brand)
+
+#         if has_delivery.lower() in ["1", "true", "yes"]:
+#             queryset = queryset.filter(has_home_delivery=True)
+
+#         if product_condition:
+#             queryset = queryset.filter(product_condition=product_condition)
+
+#         if clothes_gender:
+#             queryset = queryset.filter(clothes_gender=clothes_gender)
+
+#         if clothes_size:
+#             queryset = queryset.filter(clothes_size=clothes_size)
+
+#         if food_unit:
+#             queryset = queryset.filter(food_unit=food_unit)
+
+#         if is_prepared_food.lower() in ["1", "true", "yes"]:
+#             queryset = queryset.filter(is_prepared_food=True)
+
+#         if is_perishable.lower() in ["1", "true", "yes"]:
+#             queryset = queryset.filter(is_perishable=True)
+
+#         return queryset
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         mine = self.request.query_params.get("mine")
+#         base_qs = self._base_queryset()
+
+#         if user.is_authenticated and (user.is_staff or user.is_superuser):
+#             if mine == "1":
+#                 qs = base_qs.filter(owner=user).order_by("-interested_count", "-created_at")
+#             else:
+#                 qs = base_qs.order_by("-interested_count", "-created_at")
+#             return self._apply_custom_filters(qs)
+
+#         if user.is_authenticated and mine == "1":
+#             qs = base_qs.filter(owner=user).order_by("-interested_count", "-created_at")
+#             return self._apply_custom_filters(qs)
+
+#         qs = (
+#             base_qs.filter(
+#                 status=Listing.Status.APPROVED,
+#                 visibility_status=Listing.VisibilityStatus.ACTIVE,
+#             )
+#             .exclude(listing_type=Listing.ListingType.BUSINESS_AD)
+#             .order_by("-interested_count", "-created_at")
+#         )
+#         return self._apply_custom_filters(qs)
+
+#     def get_permissions(self):
+#         if self.action == "create":
+#             return [permissions.IsAuthenticated()]
+
+#         if self.action in ["update", "partial_update", "destroy"]:
+#             return [permissions.IsAdminUser()]
+
+#         return [permissions.AllowAny()]
+
+#     def get_serializer_context(self):
+#         context = super().get_serializer_context()
+#         context["request"] = self.request
+#         return context
+
+  
+#     def perform_create(self, serializer):
+#         user = self.request.user
+
+#         if not user.is_authenticated:
+#             raise PermissionDenied("Please login first.")
+
+#         if user.is_staff or user.is_superuser:
+#             serializer.save(owner=user)
+#             return
+
+#         subscription = get_active_subscription(user)
+
+#         if (
+#             not subscription
+#             or subscription.status != "approved"
+#             or not subscription.is_currently_active
+#         ):
+#             raise PermissionDenied(
+#                 "Your subscription is not approved or has expired."
+#             )
+
+#         current_listings_count = Listing.objects.filter(
+#             owner=user,
+#             status__in=[Listing.Status.PENDING, Listing.Status.APPROVED],
+#         ).count()
+
+#         max_listings = subscription.plan.max_listings or 0
+
+#         if current_listings_count >= max_listings:
+#             raise PermissionDenied(
+#                 f"You have reached your subscription limit of {max_listings} listings."
+#             )
+
+#         listing_type = serializer.validated_data.get("listing_type")
+
+#         if (
+#             listing_type == Listing.ListingType.BUSINESS_AD
+#             and not subscription.plan.can_post_business_ads
+#         ):
+#             raise PermissionDenied(
+#                 "Your current subscription does not allow business ads."
+#             )
+
+#         uploaded_images = self.request.FILES.getlist("new_images")
+#         max_images = subscription.plan.max_images_per_listing or 0
+
+#         if len(uploaded_images) > max_images:
+#             raise ValidationError(
+#                 {
+#                     "new_images": [
+#                         f"You can upload a maximum of {max_images} images for your current subscription plan."
+#                     ]
+#                 }
+#             )
+
+#         serializer.save(owner=user)
+
+#     def perform_update(self, serializer):
+#         serializer.save()
+
+#     def perform_destroy(self, instance):
+#         instance.delete()
+
+#     @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
+#     def my_listings(self, request):
+#         qs = (
+#             self._base_queryset()
+#             .filter(owner=request.user)
+#             .order_by("-interested_count", "-created_at")
+#         )
+#         serializer = self.get_serializer(qs, many=True)
+#         return Response(serializer.data)
+
+#     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser])
+#     def approve(self, request, pk=None):
+#         listing = self.get_object()
+#         listing.status = Listing.Status.APPROVED
+#         listing.moderated_by = request.user
+#         listing.moderated_at = timezone.now()
+#         listing.rejection_reason = None
+#         listing.save(update_fields=["status", "moderated_by", "moderated_at", "rejection_reason"])
+
+#         create_notification(
+#             user=listing.owner,
+#             title="Listing Approved",
+#             message=f'Your listing "{listing.title}" has been approved.',
+#             notification_type="listing_approved",
+#             listing=listing,
+#         )
+
+#         return Response({"message": "Listing approved"})
+
+#     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser])
+#     def reject(self, request, pk=None):
+#         listing = self.get_object()
+#         reason = (request.data.get("reason") or "").strip()
+
+#         listing.status = Listing.Status.REJECTED
+#         listing.rejection_reason = reason if reason else "Rejected by moderator"
+#         listing.moderated_by = request.user
+#         listing.moderated_at = timezone.now()
+#         listing.save(
+#             update_fields=[
+#                 "status",
+#                 "rejection_reason",
+#                 "moderated_by",
+#                 "moderated_at",
+#             ]
+#         )
+
+#         create_notification(
+#             user=listing.owner,
+#             title="Listing Rejected",
+#             message=f'Your listing "{listing.title}" was rejected. Reason: {listing.rejection_reason}',
+#             notification_type="listing_rejected",
+#             listing=listing,
+#         )
+
+#         return Response({"message": "Listing rejected"})
+
+#     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser])
+#     def hide(self, request, pk=None):
+#         listing = self.get_object()
+#         listing.visibility_status = Listing.VisibilityStatus.INACTIVE
+#         listing.save(update_fields=["visibility_status"])
+#         return Response({"message": "Listing hidden successfully"})
+
+#     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser])
+#     def unhide(self, request, pk=None):
+#         listing = self.get_object()
+#         listing.visibility_status = Listing.VisibilityStatus.ACTIVE
+#         listing.save(update_fields=["visibility_status"])
+#         return Response({"message": "Listing unhidden successfully"})
+
+#     @action(detail=True, methods=["post"], permission_classes=[permissions.AllowAny])
+#     def track_contact(self, request, pk=None):
+#         listing = self.get_object()
+#         contact_type = (request.data.get("contact_type") or "").strip()
+
+#         if not request.session.session_key:
+#             request.session.save()
+
+#         if contact_type == "call":
+#             listing.call_clicks += 1
+#             listing.save(update_fields=["call_clicks"])
+#         elif contact_type == "whatsapp":
+#             listing.whatsapp_clicks += 1
+#             listing.save(update_fields=["whatsapp_clicks"])
+
+#         ListingContactEvent.objects.create(
+#             listing=listing,
+#             contact_type=contact_type if contact_type in ["call", "whatsapp"] else "call",
+#             ip_address=self.get_client_ip(request),
+#             session_key=request.session.session_key,
+#             user=request.user if request.user.is_authenticated else None,
+#         )
+
+#         create_notification(
+#             user=listing.owner,
+#             title="New Buyer Interest",
+#             message=f'Someone clicked {contact_type or "contact"} on your listing "{listing.title}".',
+#             notification_type="listing_contact",
+#             listing=listing,
+#         )
+
+#         return Response({"message": "Contact tracked"})
+
+
+#     @action(detail=True, methods=["post"], permission_classes=[AllowAny])
+#     def toggle_interest(self, request, pk=None):
+#         listing = self.get_object()
+
+#         if request.user.is_authenticated:
+#             interest = ListingInterest.objects.filter(
+#                 listing=listing,
+#                 user=request.user
+#             ).first()
+
+#             if interest:
+#                 interest.delete()
+#                 interested = False
+#             else:
+#                 ListingInterest.objects.create(
+#                     listing=listing,
+#                     user=request.user
+#                 )
+#                 interested = True
+
+#                 create_notification(
+#                     user=listing.owner,
+#                     title="New Interested User",
+#                     message=f'Someone marked interest on your listing "{listing.title}".',
+#                     notification_type="listing_interest",
+#                     listing=listing,
+#                 )
+
+#         else:
+#             anonymous_user_id = request.data.get("anonymous_user_id")
+
+#             if not anonymous_user_id:
+#                 return Response(
+#                     {"detail": "anonymous_user_id is required for unauthenticated users."},
+#                     status=400,
+#                 )
+
+#             interest = ListingInterest.objects.filter(
+#                 listing=listing,
+#                 anonymous_user_id=anonymous_user_id
+#             ).first()
+
+#             if interest:
+#                 interest.delete()
+#                 interested = False
+#             else:
+#                 ListingInterest.objects.create(
+#                     listing=listing,
+#                     anonymous_user_id=anonymous_user_id
+#                 )
+#                 interested = True
+
+#                 create_notification(
+#                     user=listing.owner,
+#                     title="New Interested User",
+#                     message=f'Someone marked interest on your listing "{listing.title}".',
+#                     notification_type="listing_interest",
+#                     listing=listing,
+#                 )
+
+#         count = listing.interests.count()
+
+#         return Response({
+#             "interested": interested,
+#             "interested_count": count
+#         })
+
+
+#     @action(detail=True, methods=["post"], permission_classes=[AllowAny])
+#     def track_view(self, request, pk=None):
+#         listing = self.get_object()
+
+#         if not request.session.session_key:
+#             request.session.create()
+
+#         session_key = request.session.session_key
+#         ip = self.get_client_ip(request)
+#         one_hour_ago = timezone.now() - timedelta(hours=1)
+
+#         exists = ListingViewLog.objects.filter(
+#             listing=listing,
+#             session_key=session_key,
+#             ip_address=ip,
+#             created_at__gte=one_hour_ago
+#         ).exists()
+
+#         if not exists:
+#             ListingViewLog.objects.create(
+#                 listing=listing,
+#                 session_key=session_key,
+#                 ip_address=ip
+#             )
+
+#             listing.views_count += 1
+#             listing.save(update_fields=["views_count"])
+
+#             if listing.views_count in [10, 25, 50, 100]:
+#                 create_notification(
+#                     user=listing.owner,
+#                     title="Listing Performance",
+#                     message=f'Your listing "{listing.title}" has reached {listing.views_count} views.',
+#                     notification_type="listing_view",
+#                     listing=listing,
+#                 )
+
+#         return Response({"message": "View tracked"})
+    
+#     @action(detail=True, methods=["post"], permission_classes=[AllowAny])
+#     def increment_view(self, request, pk=None):
+#         listing = self.get_object()
+        
+#         # Get client IP address
+#         ip = self.get_client_ip(request)
+        
+#         # For authenticated users, use their ID; for anonymous, use IP
+#         if request.user.is_authenticated:
+#             identifier = f"user_{request.user.id}"
+#         else:
+#             identifier = f"ip_{ip}"
+        
+#         # Check if viewed in last hour
+#         one_hour_ago = timezone.now() - timedelta(hours=1)
+        
+#         existing_view = ListingViewLog.objects.filter(
+#             listing=listing,
+#             session_key=identifier,
+#             created_at__gte=one_hour_ago
+#         ).exists()
+        
+#         if not existing_view:
+#             ListingViewLog.objects.create(
+#                 listing=listing,
+#                 session_key=identifier,
+#                 ip_address=ip,
+#                 user=request.user if request.user.is_authenticated else None
+#             )
+            
+#             listing.views_count += 1
+#             listing.save(update_fields=["views_count"])
+            
+#             return Response({
+#                 "status": "success",
+#                 "message": "View tracked",
+#                 "views_count": listing.views_count
+#             })
+        
+#         return Response({
+#             "status": "already_counted", 
+#             "message": "View already counted in the last hour",
+#             "views_count": listing.views_count
+#         })
+    
+
 class ListingViewSet(viewsets.ModelViewSet):
     serializer_class = ListingSerializer
     permission_classes = [permissions.AllowAny]
@@ -195,6 +714,37 @@ class ListingViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def _apply_featured_ordering(self, queryset):
+        """
+        Apply featured ordering: Business first, then Premium, then Normal
+        This ensures Premium and Business listings appear first
+        """
+        from django.db.models import Case, When, Value, IntegerField, Q
+        
+        return queryset.annotate(
+            featured_order=Case(
+                # Business subscription gets priority 3 (highest)
+                When(
+                    Q(owner__subscription__plan='business', 
+                       owner__subscription__is_active=True,
+                       owner__subscription__status='approved'),
+                    then=Value(3)
+                ),
+                # Premium subscription gets priority 2
+                When(
+                    Q(owner__subscription__plan='premium', 
+                       owner__subscription__is_active=True,
+                       owner__subscription__status='approved'),
+                    then=Value(2)
+                ),
+                # Manually featured listings get priority 1
+                When(is_featured=True, then=Value(1)),
+                # Normal listings get priority 0
+                default=Value(0),
+                output_field=IntegerField()
+            )
+        ).order_by('-featured_order', '-interested_count', '-created_at')
+
     def get_queryset(self):
         user = self.request.user
         mine = self.request.query_params.get("mine")
@@ -202,24 +752,27 @@ class ListingViewSet(viewsets.ModelViewSet):
 
         if user.is_authenticated and (user.is_staff or user.is_superuser):
             if mine == "1":
-                qs = base_qs.filter(owner=user).order_by("-interested_count", "-created_at")
+                qs = base_qs.filter(owner=user)
+                qs = self._apply_custom_filters(qs)
+                return self._apply_featured_ordering(qs)
             else:
-                qs = base_qs.order_by("-interested_count", "-created_at")
-            return self._apply_custom_filters(qs)
+                qs = base_qs
+                qs = self._apply_custom_filters(qs)
+                return self._apply_featured_ordering(qs)
 
         if user.is_authenticated and mine == "1":
-            qs = base_qs.filter(owner=user).order_by("-interested_count", "-created_at")
-            return self._apply_custom_filters(qs)
+            qs = base_qs.filter(owner=user)
+            qs = self._apply_custom_filters(qs)
+            return self._apply_featured_ordering(qs)
 
-        qs = (
-            base_qs.filter(
-                status=Listing.Status.APPROVED,
-                visibility_status=Listing.VisibilityStatus.ACTIVE,
-            )
-            .exclude(listing_type=Listing.ListingType.BUSINESS_AD)
-            .order_by("-interested_count", "-created_at")
-        )
-        return self._apply_custom_filters(qs)
+        # Public listings (approved, active, exclude business ads)
+        qs = base_qs.filter(
+            status=Listing.Status.APPROVED,
+            visibility_status=Listing.VisibilityStatus.ACTIVE,
+        ).exclude(listing_type=Listing.ListingType.BUSINESS_AD)
+        
+        qs = self._apply_custom_filters(qs)
+        return self._apply_featured_ordering(qs)
 
     def get_permissions(self):
         if self.action == "create":
@@ -235,10 +788,7 @@ class ListingViewSet(viewsets.ModelViewSet):
         context["request"] = self.request
         return context
 
-    # def perform_create(self, serializer):
-    #     serializer.save()
-        
-#------------------------------------    
+  
     def perform_create(self, serializer):
         user = self.request.user
 
@@ -293,9 +843,22 @@ class ListingViewSet(viewsets.ModelViewSet):
                     ]
                 }
             )
-
-        serializer.save(owner=user)
-#--------------------------------------
+        is_featured = False
+        featured_priority = 0
+        featured_expires_at = None
+        
+        if subscription.plan in ['premium', 'business']:
+            is_featured = True
+            featured_priority = 2 if subscription.plan == 'business' else 1
+            featured_expires_at = timezone.now() + timedelta(days=30)
+            
+        serializer.save(
+        owner=user,
+        is_featured=is_featured,
+        featured_priority=featured_priority,
+        featured_expires_at=featured_expires_at
+    )
+        
 
     def perform_update(self, serializer):
         serializer.save()
@@ -560,58 +1123,57 @@ class ListingViewSet(viewsets.ModelViewSet):
             "views_count": listing.views_count
         })
     
+    # NEW: Featured Listings Endpoint (shows only featured listings)
+    @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
+    def featured(self, request):
+        """Get only featured listings (Premium & Business first)"""
+        queryset = self._base_queryset().filter(
+            status=Listing.Status.APPROVED,
+            visibility_status=Listing.VisibilityStatus.ACTIVE,
+        )
+        
+        # Apply custom filters if provided
+        queryset = self._apply_custom_filters(queryset)
+        
+        # Apply featured ordering
+        queryset = self._apply_featured_ordering(queryset)
+        
+        # Filter only featured (priority 1 or higher)
+        from django.db.models import Q
+        queryset = queryset.filter(
+            Q(is_featured=True) |
+            Q(owner__subscription__plan__in=['premium', 'business'],
+              owner__subscription__is_active=True,
+              owner__subscription__status='approved')
+        )
+        
+        # Paginate
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-    # @action(detail=True, methods=["post"], permission_classes=[AllowAny])
-    # def increment_view(self, request, pk=None):
-    #     listing = self.get_object()
+
+
+    # Add to your ListingViewSet
+    @action(detail=False, methods=["post"], permission_classes=[permissions.IsAdminUser])
+    def refresh_featured(self, request):
+        """Admin endpoint to refresh all featured listings"""
+        from django.core.management import call_command
         
-    #     # Get or create session for anonymous users
-    #     if not request.session.session_key:
-    #         request.session.create()
-        
-    #     session_key = request.session.session_key
-    #     ip = self.get_client_ip(request)
-        
-    #     one_hour_ago = timezone.now() - timedelta(hours=1)
-        
-    #     existing_view = ListingViewLog.objects.filter(
-    #         listing=listing,
-    #         session_key=session_key,
-    #         ip_address=ip,
-    #         created_at__gte=one_hour_ago
-    #     ).exists()
-        
-    #     if not existing_view:
-    #         ListingViewLog.objects.create(
-    #             listing=listing,
-    #             session_key=session_key,
-    #             ip_address=ip,
-    #             user=request.user if request.user.is_authenticated else None
-    #         )
-            
-    #         listing.views_count += 1
-    #         listing.save(update_fields=["views_count"])
-            
-    #         if listing.views_count in [10, 25, 50, 100, 500, 1000]:
-    #             create_notification(
-    #                 user=listing.owner,
-    #                 title="Listing Performance",
-    #                 message=f'Your listing "{listing.title}" has reached {listing.views_count} views!',
-    #                 notification_type="listing_view",
-    #                 listing=listing,
-    #             )
-            
-    #         return Response({
-    #             "status": "success",
-    #             "message": "View tracked",
-    #             "views_count": listing.views_count
-    #         })
-        
-    #     return Response({
-    #         "status": "already_counted",
-    #         "message": "View already counted for this user in the last hour",
-    #         "views_count": listing.views_count
-    #     })
+        try:
+            call_command('sync_featured_listings')
+            return Response({"message": "Featured listings refreshed successfully"})
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+
+
+
+
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):

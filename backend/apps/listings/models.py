@@ -253,6 +253,9 @@ class Listing(TimeStampedModel):
         help_text="Example: 5kg"
     )
     warranty_months = models.PositiveIntegerField(blank=True, null=True)
+    is_featured = models.BooleanField(default=False)
+    featured_priority = models.IntegerField(default=0, help_text="0=Normal, 1=Premium, 2=Business")
+    featured_expires_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.title

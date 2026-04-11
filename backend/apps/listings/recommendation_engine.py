@@ -119,12 +119,12 @@ class RecommendationEngine:
             similar = list(Listing.objects.filter(query)[:limit])
 
             if len(similar) < limit:
-                # FIX HERE: Change 'views' to 'views_count'
+                # FIXED: Changed 'views' to 'views_count'
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE,
                     listing_type=listing.listing_type
                 ).exclude(id=listing.id).annotate(
-                    view_count=Count('views_count')  # ← Changed from 'views' to 'views_count'
+                    view_count=Count('views_count')  # ← THIS IS THE FIX
                 ).order_by('-view_count')[:limit - len(similar)]
 
                 similar.extend([p for p in popular if p not in similar])

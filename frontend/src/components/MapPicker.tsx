@@ -57,7 +57,7 @@ function FlyToLocation({
 
   useEffect(() => {
     if (isValidCoord(latitude) && isValidCoord(longitude)) {
-      map.flyTo([latitude, longitude], 30); // INCREASED to 19 - shows houses clearly
+      map.flyTo([latitude, longitude], 19); // INCREASED to 19 - shows houses clearly
     }
   }, [latitude, longitude, map]);
 

@@ -211,7 +211,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
         />
       </MapContainer>
       
-      <div className="mt-2 text-xs text-slate-500">
+      {/* <div className="mt-2 text-xs text-slate-500">
         <p>📍 <strong>Tips to see houses:</strong></p>
         <ul className="list-disc pl-4 mt-1 space-y-1">
           <li>🔍 Use the + button to zoom in closer</li>
@@ -219,7 +219,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
           <li>🗺️ Satellite view shows actual buildings from above</li>
           <li>📍 Click anywhere on the map to select a location</li>
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 }

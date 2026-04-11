@@ -57,7 +57,7 @@ function FlyToLocation({
 
   useEffect(() => {
     if (isValidCoord(latitude) && isValidCoord(longitude)) {
-      map.flyTo([latitude, longitude], 18); // Zoom level 18 shows buildings clearly
+      map.flyTo([latitude, longitude], 16);
     }
   }, [latitude, longitude, map]);
 
@@ -90,7 +90,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
     if (isValidCoord(selectedLat) && isValidCoord(selectedLng)) {
       return [selectedLat, selectedLng];
     }
-    return [-1.9441, 30.0619]; // Kigali, Rwanda
+    return [-1.9441, 30.0619];
   }, [selectedLat, selectedLng]);
 
   const handleSearch = async () => {
@@ -162,11 +162,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
             border: "none",
             borderRadius: "8px",
             cursor: "pointer",
-            backgroundColor: "#4f46e5",
-            color: "white",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#4338ca")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#4f46e5")}
         >
           {loading ? "Searching..." : "Search"}
         </button>
@@ -174,31 +170,11 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
 
       {error && <div style={{ color: "red", fontSize: "14px" }}>{error}</div>}
 
-      <MapContainer 
-        center={center} 
-        zoom={15} 
-        style={{ height: "350px", width: "100%", borderRadius: "12px", zIndex: 1 }}
-      >
-        {/* MOST POWERFUL TILE LAYER - Shows buildings and houses clearly */}
-        {/* Humanitarian Style - Best for seeing building footprints */}
+      <MapContainer center={center} zoom={13} style={{ height: "350px", width: "100%" }}>
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors | Humanitarian Style'
-          url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
-        {/* ALTERNATIVE: If you want satellite view with buildings, uncomment this instead:
-        <TileLayer
-          attribution='&copy; <a href="https://www.google.com/maps">Google</a>'
-          url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-        />
-        */}
-
-        {/* ALTERNATIVE 2: Clean style with building outlines:
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        />
-        */}
 
         <FlyToLocation latitude={selectedLat} longitude={selectedLng} />
 
@@ -212,10 +188,6 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
           }}
         />
       </MapContainer>
-      
-      <p className="text-xs text-slate-500 mt-2">
-        💡 Tip: Zoom in (scroll) to see individual houses and buildings. At zoom level 16-18, you'll see clear building outlines.
-      </p>
     </div>
   );
 }

@@ -1295,50 +1295,24 @@ export default function EditListingPage() {
                 <label className="mb-2 block text-sm font-medium text-slate-700">{t("edit_listing.address_label")}</label>
                 <Input placeholder={t("edit_listing.address_placeholder")} {...register("address")} />
               </div>
-{showMap && (
-  <div className="md:col-span-2">
-    <label className="mb-2 block text-sm font-medium text-slate-700">
-      {t("edit_listing.map_label")}
-    </label>
-
-    {/* Add fixed height container to prevent map from moving during scroll */}
-    <div className="relative rounded-2xl border border-slate-200 bg-white" style={{ height: '300px', zIndex: 1 }}>
-      <div className="absolute inset-0">
-        <MapPicker
-          latitude={latitude}
-          longitude={longitude}
-          onChange={(lat, lng) => {
-            setValue("latitude", lat, { shouldDirty: true });
-            setValue("longitude", lng, { shouldDirty: true });
-          }}
-        />
-      </div>
-    </div>
-
-    <div className="mt-2 text-xs text-slate-500">
-      {t("edit_listing.selected_location")}{" "}
-      <span className="font-medium text-slate-700">{latitude ?? t("edit_listing.na")}, {longitude ?? t("edit_listing.na")}</span>
-    </div>
-
-    <input type="hidden" {...register("latitude", { valueAsNumber: true })} />
-    <input type="hidden" {...register("longitude", { valueAsNumber: true })} />
-  </div>
-)}
-              {/* {showMap && (
+              {showMap && (
                 <div className="md:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-700">
                     {t("edit_listing.map_label")}
                   </label>
 
-                  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                    <MapPicker
-                      latitude={latitude}
-                      longitude={longitude}
-                      onChange={(lat, lng) => {
-                        setValue("latitude", lat, { shouldDirty: true });
-                        setValue("longitude", lng, { shouldDirty: true });
-                      }}
-                    />
+                  {/* Add fixed height container to prevent map from moving during scroll */}
+                  <div className="relative rounded-2xl border border-slate-200 bg-white" style={{ height: '300px', zIndex: 1 }}>
+                    <div className="absolute inset-0">
+                      <MapPicker
+                        latitude={latitude}
+                        longitude={longitude}
+                        onChange={(lat, lng) => {
+                          setValue("latitude", lat, { shouldDirty: true });
+                          setValue("longitude", lng, { shouldDirty: true });
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <div className="mt-2 text-xs text-slate-500">
@@ -1349,7 +1323,8 @@ export default function EditListingPage() {
                   <input type="hidden" {...register("latitude", { valueAsNumber: true })} />
                   <input type="hidden" {...register("longitude", { valueAsNumber: true })} />
                 </div>
-              )} */}
+              )}
+
 
               {!showMap && (
                 <>

@@ -523,7 +523,7 @@
     "edit_description": "Update the selected category details.",
     "add_description": "Create a new category or subcategory.",
     "close": "Close",
-    "cancel":"cancel",
+    "cancel":"Cancel",
     "category_name": "Category Name",
     "category_name_placeholder": "Enter category name",
     "slug": "Slug",

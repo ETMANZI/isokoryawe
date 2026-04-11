@@ -801,13 +801,9 @@ class ListingViewSet(viewsets.ModelViewSet):
 
         subscription = get_active_subscription(user)
 
-        if (
-            not subscription
-            or subscription.status != "approved"
-            or not subscription.is_currently_active
-        ):
+        if not subscription:
             raise PermissionDenied(
-                "Your subscription is not approved or has expired."
+                "You need an active subscription to post listings."
             )
 
         current_listings_count = Listing.objects.filter(
@@ -843,21 +839,22 @@ class ListingViewSet(viewsets.ModelViewSet):
                     ]
                 }
             )
+
         is_featured = False
         featured_priority = 0
         featured_expires_at = None
         
-        if subscription.plan in ['premium', 'business']:
+        if subscription.plan.name in ['premium', 'business']:
             is_featured = True
-            featured_priority = 2 if subscription.plan == 'business' else 1
-            featured_expires_at = timezone.now() + timedelta(days=30)
-            
+            featured_priority = 2 if subscription.plan.name == 'business' else 1
+            featured_expires_at = subscription.end_date
+        
         serializer.save(
-        owner=user,
-        is_featured=is_featured,
-        featured_priority=featured_priority,
-        featured_expires_at=featured_expires_at
-    )
+            owner=user,
+            is_featured=is_featured,
+            featured_priority=featured_priority,
+            featured_expires_at=featured_expires_at
+        )
         
 
     def perform_update(self, serializer):

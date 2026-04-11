@@ -25,7 +25,7 @@ def expire_user_subscriptions_and_hide_listings(user):
     expired_list = list(expired_subscriptions)
 
     if expired_list:
-        expired_subscriptions.update(status="expired")
+        expired_subscriptions.update(status="expired", is_active=False)
 
         for subscription in expired_list:
             create_notification(
@@ -36,6 +36,16 @@ def expire_user_subscriptions_and_hide_listings(user):
                     f'Your listings are now hidden until you renew.'
                 ),
                 notification_type="subscription_expired",
+            )
+            
+            # Remove featured status from expired subscription listings
+            Listing.objects.filter(
+                owner=user,
+                is_featured=True
+            ).update(
+                is_featured=False,
+                featured_priority=0,
+                featured_expires_at=None
             )
 
     has_active_subscription = UserSubscription.objects.filter(
@@ -54,6 +64,28 @@ def expire_user_subscriptions_and_hide_listings(user):
         ).update(
             visibility_status=Listing.VisibilityStatus.INACTIVE
         )
+    else:
+        # User has active subscription - ensure their listings are visible
+        Listing.objects.filter(
+            owner=user,
+            visibility_status=Listing.VisibilityStatus.INACTIVE,
+            status=Listing.Status.APPROVED
+        ).update(
+            visibility_status=Listing.VisibilityStatus.ACTIVE
+        )
+        
+        # Also ensure premium/business listings are featured
+        active_sub = get_active_subscription(user)
+        if active_sub and active_sub.plan.name in ['premium', 'business']:
+            priority = 2 if active_sub.plan.name == 'business' else 1
+            Listing.objects.filter(
+                owner=user,
+                visibility_status=Listing.VisibilityStatus.ACTIVE
+            ).update(
+                is_featured=True,
+                featured_priority=priority,
+                featured_expires_at=active_sub.end_date
+            )
 
 
 def get_active_subscription(user):

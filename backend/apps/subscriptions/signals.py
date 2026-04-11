@@ -3,9 +3,9 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import timedelta
-from .models import Subscription
+from .models import UserSubscription  # Fixed: Use UserSubscription
 
-@receiver(post_save, sender=Subscription)
+@receiver(post_save, sender=UserSubscription)
 def update_listings_on_subscription_change(sender, instance, created, **kwargs):
     """
     When a user subscribes to Premium/Business, update their listings
@@ -14,9 +14,18 @@ def update_listings_on_subscription_change(sender, instance, created, **kwargs):
     from apps.listings.models import Listing
     
     user = instance.user
-    is_premium_or_business = instance.plan in ['premium', 'business'] and instance.is_active and instance.status == 'approved'
+    plan_name = instance.plan.name if instance.plan else None
     
-    # Get user's listings
+    # Check if user has active Premium or Business plan
+    is_premium_or_business = (
+        plan_name in ['premium', 'business'] and 
+        instance.status == 'approved' and 
+        instance.is_active and
+        instance.end_date and 
+        instance.end_date > timezone.now()
+    )
+    
+    # Get user's active listings
     user_listings = Listing.objects.filter(
         owner=user,
         visibility_status=Listing.VisibilityStatus.ACTIVE
@@ -24,15 +33,15 @@ def update_listings_on_subscription_change(sender, instance, created, **kwargs):
     
     if is_premium_or_business:
         # User has active Premium/Business - Feature their listings
-        priority = 2 if instance.plan == 'business' else 1
-        expires_at = timezone.now() + timedelta(days=30)
+        priority = 2 if plan_name == 'business' else 1
+        expires_at = instance.end_date  # Use subscription end date
         
         updated_count = user_listings.update(
             is_featured=True,
             featured_priority=priority,
             featured_expires_at=expires_at
         )
-        print(f"✅ Featured {updated_count} listings for {user.email} ({instance.plan} plan)")
+        print(f"✅ Featured {updated_count} listings for {user.email} ({plan_name} plan)")
     else:
         # User downgraded or subscription expired - Remove featured status
         updated_count = user_listings.update(
@@ -42,7 +51,7 @@ def update_listings_on_subscription_change(sender, instance, created, **kwargs):
         )
         print(f"❌ Removed featured from {updated_count} listings for {user.email}")
 
-@receiver(post_delete, sender=Subscription)
+@receiver(post_delete, sender=UserSubscription)
 def remove_featured_on_subscription_delete(sender, instance, **kwargs):
     """When subscription is deleted, remove featured status from listings"""
     from apps.listings.models import Listing

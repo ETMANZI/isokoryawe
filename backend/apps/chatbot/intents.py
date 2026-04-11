@@ -1,5 +1,7 @@
-# Predefined intents and responses
-INTENTS = {
+# chatbot/intents.py - English and Kinyarwanda only
+
+# ENGLISH Intents
+INTENTS_EN = {
     "greeting": {
         "patterns": ["hello", "hi", "hey", "good morning", "good afternoon", "hi there"],
         "responses": [
@@ -100,9 +102,120 @@ INTENTS = {
     }
 }
 
-def get_intent(message):
+# KINYARWANDA Intents
+INTENTS_RW = {
+    "greeting": {
+        "patterns": ["muraho", "bite", "mwiriwe", "sawa", "mwaramutse", "mwiriwe", "umunsi mwiza"],
+        "responses": [
+            "Muraho! 👋 Nigute nakugufasha kuri Market Hub uyumunsi?",
+            "Mwiriwe! Murakaza neza kuri Market Hub Support. Niki nakugirira akamaro?",
+            "Yoo! Ndi hano kugira ngo nkugufashe mu matangazo, kwiyandikisha, cyangwa ibibazo ufite."
+        ]
+    },
+    "pricing": {
+        "patterns": ["angahe", "igiciro", "ibiciro", "amafaranga", "kodi", "ibishyo"],
+        "responses": [
+            "Market Hub itanga gahunda z'iyandikishwa rikoze:\n\n• Basic: 1,500 FRW/bukwe - 3 matangazo, ishusho 1 kuri buri tangazo\n• Classic: 2,000 FRW/bukwe - 3 matangazo, ishusho 2 kuri buri tangazo\n• Premium: 3,000 FRW/bukwe - 4 matangazo, ishusho 3 kuri buri tangazo\n• Business: 4,000 FRW/bukwe - 5 matangazo, ishusho 4 kuri buri tangazo\n\nNi iyihe gahunda igukundisha?"
+        ]
+    },
+    "how_to_post": {
+        "patterns": ["tangaza", "kota tangazo", "gurisha", "ongera itangazo", "kota", "ishyira ahagaragara", "kwandika itangazo"],
+        "responses": [
+            "Kugira ngo utangaze:\n\n1️⃣ Kanda kuri 'Tangaza' kuruhande\n2️⃣ Uzuze ibyangombwa (umutwe, ibisobanuro, igiciro)\n3️⃣ Shyiramo amashusho meza y'ibyo ugurisha\n4️⃣ Hitamo ubwoko bw'itangazo (Inzu, Imodoka, Ibicuruzwa, nk.)\n5️⃣ Kanda 'Sohora'\n\nUkeneye kwiyandikisha? Reba gahunda zacu mbere!"
+        ]
+    },
+    "subscription": {
+        "patterns": ["kwiyandikisha", "iyandikishwa", "gahunda", "kuzamura", "ubumembari", "premium", "abonementi"],
+        "responses": [
+            "Urashobora kureba gahunda zose z'iyandikishwa ku rupapuro rw'Iyandikishwa. Buri gahunda itanga inyungu zitandukanye:\n\n• Basic: 2 matangazo, ishusho 1\n• Classic: 3 matangazo, ishusho 2 + amatangazo y'abucuruzi\n• Premium: 4 matangazo, ishusho 3 + ibibarwa\n• Business: 5 matangazo, ishusho 4 + ubufasha bwihutirwa\n\nUrashaka nkugufashe guhitamo gahunda?"
+        ]
+    },
+    "image_requirements": {
+        "patterns": ["ishusho", "ifoto", "amashusho", "gushyiramo ifoto", "ubunini bw'ishusho", "ingano y'ishusho"],
+        "responses": [
+            "Amabwiriza y'amashusho:\n\n📸 Koresha amashusho meza, afite urumuri\n📏 Ubunini ntarengwa: 800x600 pixels\n💾 Ingano ntarengwa: 10MB kuri buri shusho\n🖼️ Ubwoko bukwirakwizwa: PNG, JPG, WEBP, GIF\n📷 Werekanwe impande zitandukanye\n🚫 Nta kirango cyangwa inyandiko ku mashusho\n\nGahunda yawe igena amashusho angahe ushobora gushyira kuri buri tangazo."
+        ]
+    },
+    "payment": {
+        "patterns": ["kwishyura", "ishyura", "mobile money", "mtn", "airtel", "kwimura", "amafaranga yishyuwe"],
+        "responses": [
+            "Twemera uburyo bwinshi bwo kwishyura:\n\n💰 Mobile Money (MTN, Airtel)\n💳 Amakarita yo kwishyura\n🏦 Kwimura banki\n\nNyuma yo kwiyandikisha, uzakira amabwiriza yo kwishyura. Amafaranga yose arinzwe neza."
+        ]
+    },
+    "account": {
+        "patterns": ["konti", "porofile", "hindura ijambo banga", "vandura imeri", "siba konti", "gucunga konti"],
+        "responses": [
+            "Urashobora gucunga konti yawe kuri Dashboard:\n\n• Vandura amakuru ya porofile\n• Hindura ijambo banga\n• Reba ibyo utangaje\n• Kurikirana abaguzi bashishikaye\n• Genga notifikasiyo\n\nHari ikintu runaka ushaka guhindura?"
+        ]
+    },
+    "contact_support": {
+        "patterns": ["ubufasha", "fasha", "twandikire", "vugisha umuntu", "umukozi", "serivisi y'abakiriya", "support"],
+        "responses": [
+            "Urashobora guhura n'itsinda ryacu ry'ubufasha:\n\n📞 Guhamagara: +250 788 263 338\n💬 WhatsApp: wa.me/250788263338\n✉️ Imeri: support@markethub.com\n\nCyangwa sura Igice cy'Ubufasha kubijyanye n'ibyobwe n'ibibazo bikunze kubazwa. Urashaka nkuguhuza n'umukozi?"
+        ]
+    },
+    "listing_approval": {
+        "patterns": ["kwemera", "gitegereje", "gusuzuma", "igihe kingana iki", "igihe cyo kwemera", "itangazo ryoherejwe"],
+        "responses": [
+            "Itangazo risuzumwa mu masaha 24. Abiyandikishije kuri Premium na Business babona ubufasha bwihutirwa mu masaha 4.\n\nUzakira notifikasiyo iyo itangazo ryemerewe. Ukeneye ubufasha bwihutirwa? Tekereza kuzamura gahunda yawe!"
+        ]
+    },
+    "refund": {
+        "patterns": ["kusubiza amafaranga", "garura amafaranga", "garuka", "guhagarika kwiyandikisha", "kwishyuza"],
+        "responses": [
+            "Amafaranga y'iyandikishwa ntabwo asubizwa. Nyamara, niba wagize ikibazo gikorana na tekinoloji, twandikire itsinda ry'ubufasha mu minsi 7 nyuma yo kwishyura.\n\nKugira ngo uhagarike kwiyandikisha kwikora, jya ku Iyandikishwa → Genga → Zimya ikora mu buryo bwikora."
+        ]
+    },
+    "featured_listing": {
+        "patterns": ["mu mwanya mbere", "gushimangira", "kwamamaza", "kwerekana", "garagaza", "itangazo ryambere"],
+        "responses": [
+            "Itangazo riri mu mwanya mbere riragaragara ku isonga ry'ibisubizo! 🚀\n\nGahunda za Premium na Business zirimo amatangazo y'umwanya mbere. Urashobora kuzamura gahunda yawe ku rupapuro rw'Iyandikishwa kugira ngo ibintu byawe bigaragare cyane."
+        ]
+    },
+    "business_ads": {
+        "patterns": ["itangazo ry'ubucuruzi", "isosiyete", "konti y'ubucuruzi", "gurishira ubucuruzi", "kwamamaza ibicuruzwa"],
+        "responses": [
+            "Amatangazo y'ubucuruzi arahari kuri gahunda za Classic, Premium, na Business.\n\nInyungu:\n• Kugera ku bakiriya benshi\n• Kwerekana izina rya sosiyete\n• Ibibarwa kuri dashboard\n• Ubufasha bwihutirwa\n\nZamura gahunda yawe kugira ngo utangire gutanga amatangazo y'ubucuruzi!"
+        ]
+    },
+    "analytics": {
+        "patterns": ["ibibarwa", "ibarura", "abarebye", "bashishikaye", "imikorere", "statistiki"],
+        "responses": [
+            "Dashboard yawe yerekana:\n\n👁️ Abarebye - Ni bangahe barebye itangazo ryawe\n⭐ Bashishikaye - Abaguzi bishoboka\n📈 Imikorere - Uko bigenda mu gihe\n\nGahunda za Premium na Business zirimo ibibarwa bihanitse bifite amakuru arambuye!"
+        ]
+    },
+    "goodbye": {
+        "patterns": ["muraho", "reba", "turabonana", "urakoze", "murakoze", "ngaho", "komeza"],
+        "responses": [
+            "Urakaze! 👋 Urahemerewe kugaruka niba ufite ibibazo byinshi. Ugurishe neza kuri Market Hub!",
+            "Urakoze cyane! Ugire umunsi mwiza! 🌟"
+        ]
+    },
+    "help": {
+        "patterns": ["fasha", "iki ukora", "ibyo ushobora", "ubushobozi", "mfasha", "nkugirire akamaro"],
+        "responses": [
+            "Ndagufasha kubijyanye na:\n\n📋 Gutangaza\n💰 Ibiciro no kwiyandikisha\n📸 Amabwiriza y'amashusho\n✅ Kwemera itangazo\n📊 Ibarura na statistiki\n🆘 Ubufasha bwa tekinoloji\n🔐 Gucunga konti\n\nNi iki ushaka kumenya?"
+        ]
+    },
+    "default": {
+        "responses": [
+            "Sinumva neza. Ushobora gusubiramo ikibazo mu bundi buryo?\n\nUrashobora kumbaza ibijyanye na:\n• Uko utangaza\n• Gahunda z'iyandikishwa\n• Amabwiriza y'amashusho\n• Ibiciro\n• Ubufasha kuri konti\n\nCyangwa anda 'fasha' kugira ngo urebe ibihitamo byose."
+        ]
+    }
+}
+
+# Language mapping
+LANGUAGES = {
+    'en': INTENTS_EN,
+    'rw': INTENTS_RW
+}
+
+def get_intent(message, language='en'):
+    """Get intent from message based on selected language"""
     message_lower = message.lower()
-    for intent, data in INTENTS.items():
+    intents = LANGUAGES.get(language, INTENTS_EN)
+    
+    for intent, data in intents.items():
         if intent == "default":
             continue
         for pattern in data.get("patterns", []):
@@ -110,7 +223,9 @@ def get_intent(message):
                 return intent
     return "default"
 
-def get_response(intent):
+def get_response(intent, language='en'):
+    """Get response for intent in selected language"""
     import random
-    responses = INTENTS[intent].get("responses", INTENTS["default"]["responses"])
+    intents = LANGUAGES.get(language, INTENTS_EN)
+    responses = intents[intent].get("responses", intents["default"]["responses"])
     return random.choice(responses)

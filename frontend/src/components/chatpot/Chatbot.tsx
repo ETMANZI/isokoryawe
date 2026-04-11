@@ -9,7 +9,7 @@ import {
   Minimize2,
   Maximize2,
   Trash2,
-  // HelpCircle
+  Globe
 } from 'lucide-react';
 import { api } from '../../lib/api';
 
@@ -22,16 +22,43 @@ type Message = {
 type SuggestedQuestion = {
   text: string;
   icon: string;
+  textRw?: string; // Kinyarwanda version
 };
 
 const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
-  { text: "How to post a listing?", icon: "📋" },
-  { text: "What are subscription plans?", icon: "💰" },
-  { text: "Image requirements?", icon: "📸" },
-  { text: "How long for approval?", icon: "⏰" },
-  { text: "Contact support", icon: "📞" },
-  { text: "Pricing and fees", icon: "💵" },
+  { text: "How to post a listing?", textRw: "Nigute utangaza?", icon: "📋" },
+  { text: "What are subscription plans?", textRw: "Gahunda z'iyandikishwa?", icon: "💰" },
+  { text: "Image requirements?", textRw: "Amabwiriza y'amashusho?", icon: "📸" },
+  { text: "How long for approval?", textRw: "Igihe cyo kwemera?", icon: "⏰" },
+  { text: "Contact support", textRw: "Twandikire ubufasha", icon: "📞" },
+  { text: "Pricing and fees", textRw: "Ibiciro", icon: "💵" },
 ];
+
+// Welcome messages by language
+const WELCOME_MESSAGES = {
+  en: "Hello! 👋 How can I help you with Market Hub today?",
+  rw: "Muraho! 👋 Nigute nakugufasha kuri Market Hub uyumunsi?"
+};
+
+const ERROR_MESSAGES = {
+  en: "Sorry, I encountered an error. Please try again.",
+  rw: "Ibyabaye, habaye ikibazo. Nyamuneka ongerageze."
+};
+
+const CLEAR_CHAT_TEXTS = {
+  en: "Clear chat",
+  rw: "Hanagura ibiganiro"
+};
+
+const INPUT_PLACEHOLDERS = {
+  en: "Type your message...",
+  rw: "Andika ubutumwa..."
+};
+
+const SUGGESTED_TEXTS = {
+  en: "Suggested questions:",
+  rw: "Ibibazo bikunze kubazwa:"
+};
 
 export default function Chatbot() {
   const { t } = useTranslation();
@@ -41,8 +68,29 @@ export default function Chatbot() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [language, setLanguage] = useState<'en' | 'rw'>('en'); // Language state
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load language preference from localStorage
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('chat_language') as 'en' | 'rw';
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'rw')) {
+      setLanguage(savedLanguage);
+    }
+  }, []);
+
+  // Save language preference
+  const handleLanguageChange = (newLanguage: 'en' | 'rw') => {
+    setLanguage(newLanguage);
+    localStorage.setItem('chat_language', newLanguage);
+    
+    // Optional: Add system message about language change
+    setMessages(prev => [...prev, {
+      role: 'system',
+      content: newLanguage === 'en' ? 'Language changed to English' : 'Ururimi ryahinduwe mu Kinyarwanda'
+    }]);
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem('chat_session_id');
@@ -74,7 +122,10 @@ export default function Chatbot() {
 
     try {
       const response = await api.post('/chatbot/chat/', 
-        { message },
+        { 
+          message: message,
+          language: language  // Send language to backend
+        },
         { headers: sessionId ? { 'X-Session-ID': sessionId } : {} }
       );
 
@@ -95,7 +146,7 @@ export default function Chatbot() {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: t('chatbot.error_message') 
+        content: ERROR_MESSAGES[language]
       }]);
     } finally {
       setIsLoading(false);
@@ -116,10 +167,10 @@ export default function Chatbot() {
     localStorage.removeItem('chat_session_id');
     setSessionId(null);
     
-    // Add welcome message
+    // Add welcome message in current language
     setMessages([{
       role: 'assistant',
-      content: t('chatbot.welcome_message')
+      content: WELCOME_MESSAGES[language]
     }]);
   };
 
@@ -128,8 +179,10 @@ export default function Chatbot() {
     sendMessage(inputValue);
   };
 
-  const handleSuggestedQuestion = (question: string) => {
-    sendMessage(question);
+  const handleSuggestedQuestion = (question: SuggestedQuestion) => {
+    // Send question in appropriate language
+    const questionText = language === 'rw' && question.textRw ? question.textRw : question.text;
+    sendMessage(questionText);
   };
 
   // Welcome message on first open
@@ -139,7 +192,7 @@ export default function Chatbot() {
     if (messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: t('chatbot.welcome_message')
+        content: WELCOME_MESSAGES[language]
       }]);
     }
   };
@@ -158,23 +211,34 @@ export default function Chatbot() {
   return (
     <div
       className={`fixed bottom-6 right-6 z-50 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-300 ${
-        isMinimized ? 'h-14 w-72' : 'h-[500px] w-[400px]'
+        isMinimized ? 'h-14 w-72' : 'h-[550px] w-[400px]'
       }`}
     >
-      {/* Header with caption */}
+      {/* Header with caption and language selector */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bot size={20} className="text-white" />
             <div>
               <span className="font-semibold text-white">Market Hub Assistant</span>
-              <p className="text-[10px] text-white/80">Ask me anything about Market Hub</p>
+              <p className="text-[10px] text-white/80">
+                {language === 'en' ? 'Ask me anything about Market Hub' : 'Mbaza ikibazo cyose kuri Market Hub'}
+              </p>
             </div>
             <span className="rounded-full bg-green-400 px-1.5 py-0.5 text-[10px] font-medium text-green-900">
-              Online
+              {language === 'en' ? 'Online' : 'Turi hano'}
             </span>
           </div>
           <div className="flex items-center gap-1">
+            {/* Language Switcher */}
+            <button
+              onClick={() => handleLanguageChange(language === 'en' ? 'rw' : 'en')}
+              className="rounded bg-white/10 px-2 py-1 text-xs text-white transition hover:bg-white/20"
+              title={language === 'en' ? 'Kinyarwanda' : 'English'}
+            >
+              <Globe size={14} className="inline mr-1" />
+              {language === 'en' ? 'RW' : 'EN'}
+            </button>
             <button
               onClick={() => setIsMinimized(!isMinimized)}
               className="rounded p-1 text-white/80 hover:bg-white/20"
@@ -199,7 +263,7 @@ export default function Chatbot() {
               <div className="flex h-full flex-col items-center justify-center text-center">
                 <Bot size={48} className="text-slate-300" />
                 <p className="mt-2 text-sm text-slate-500">
-                  {t('chatbot.welcome_message')}
+                  {WELCOME_MESSAGES[language]}
                 </p>
               </div>
             ) : (
@@ -207,12 +271,14 @@ export default function Chatbot() {
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : msg.role === 'system' ? 'justify-center' : 'justify-start'}`}
                   >
                     <div
                       className={`max-w-[85%] rounded-2xl px-3 py-2 ${
                         msg.role === 'user'
                           ? 'bg-indigo-600 text-white'
+                          : msg.role === 'system'
+                          ? 'bg-gray-200 text-gray-500 text-xs'
                           : 'bg-white text-slate-700 shadow-sm'
                       }`}
                     >
@@ -247,16 +313,16 @@ export default function Chatbot() {
           {/* Suggested Questions */}
           {messages.length < 3 && (
             <div className="border-t border-slate-100 bg-white p-3">
-              <p className="mb-2 text-xs text-slate-500">{t('chatbot.suggested')}</p>
+              <p className="mb-2 text-xs text-slate-500">{SUGGESTED_TEXTS[language]}</p>
               <div className="flex flex-wrap gap-2">
                 {SUGGESTED_QUESTIONS.map((q, idx) => (
                   <button
                     key={idx}
-                    onClick={() => handleSuggestedQuestion(q.text)}
+                    onClick={() => handleSuggestedQuestion(q)}
                     className="rounded-full bg-slate-100 px-3 py-1.5 text-xs text-slate-700 transition hover:bg-slate-200"
                   >
                     <span className="mr-1">{q.icon}</span>
-                    {q.text}
+                    {language === 'rw' && q.textRw ? q.textRw : q.text}
                   </button>
                 ))}
               </div>
@@ -270,7 +336,7 @@ export default function Chatbot() {
               className="mx-3 mb-2 flex items-center justify-center gap-1 rounded-lg border border-slate-200 py-1.5 text-xs text-slate-500 transition hover:bg-slate-50"
             >
               <Trash2 size={12} />
-              {t('chatbot.clear_chat')}
+              {CLEAR_CHAT_TEXTS[language]}
             </button>
           )}
 
@@ -282,7 +348,7 @@ export default function Chatbot() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder={t('chatbot.input_placeholder')}
+                placeholder={INPUT_PLACEHOLDERS[language]}
                 className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
                 disabled={isLoading}
               />

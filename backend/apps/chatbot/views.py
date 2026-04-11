@@ -1,3 +1,4 @@
+# views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -28,11 +29,17 @@ class ChatbotView(APIView):
     
     def post(self, request):
         message = request.data.get('message', '').strip()
+        language = request.data.get('language', 'en')  # Get language from request (default: 'en')
         
         if not message:
             return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         session = self.get_or_create_session(request)
+        
+        # Save language preference in session
+        if hasattr(session, 'language'):
+            session.language = language
+            session.save()
         
         ChatMessage.objects.create(
             session=session,
@@ -40,8 +47,9 @@ class ChatbotView(APIView):
             content=message
         )
         
-        intent = get_intent(message)
-        response_text = get_response(intent)
+        # Pass language to intent and response functions
+        intent = get_intent(message, language=language)
+        response_text = get_response(intent, language=language)
         
         assistant_message = ChatMessage.objects.create(
             session=session,
@@ -56,6 +64,7 @@ class ChatbotView(APIView):
             'response': response_text,
             'intent': intent,
             'session_id': session.session_id,
+            'language': language,  # Return current language
             'history': [
                 {'role': msg.role, 'content': msg.content, 'created_at': msg.created_at}
                 for msg in reversed(history)

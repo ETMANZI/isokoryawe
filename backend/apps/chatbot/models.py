@@ -2,6 +2,11 @@ from django.db import models
 from django.conf import settings
 
 class ChatSession(models.Model):
+    LANGUAGE_CHOICES = (
+        ('en', 'English'),
+        ('rw', 'Kinyarwanda'),
+    )
+    
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -10,6 +15,11 @@ class ChatSession(models.Model):
         related_name='chat_sessions'
     )
     session_id = models.CharField(max_length=100, unique=True)
+    language = models.CharField(
+        max_length=2, 
+        choices=LANGUAGE_CHOICES, 
+        default='en'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
@@ -18,7 +28,8 @@ class ChatSession(models.Model):
         ordering = ['-updated_at']
 
     def __str__(self):
-        return f"Session {self.session_id} - {self.user or 'Anonymous'}"
+        lang_display = dict(self.LANGUAGE_CHOICES).get(self.language, 'English')
+        return f"Session {self.session_id} - {self.user or 'Anonymous'} ({lang_display})"
 
 class ChatMessage(models.Model):
     ROLE_CHOICES = (

@@ -153,41 +153,91 @@ class RecommendationEngine:
         except Exception as e:
             logger.error(f"Error in record_listing_view: {e}")
 
+    # @staticmethod
+    # def update_preferences_from_view(user, listing):
+    #     try:
+    #         prefs, _ = UserPreference.objects.get_or_create(user=user)
+
+    #         # Categories
+    #         if listing.category and listing.category.id not in prefs.preferred_categories:
+    #             categories = prefs.preferred_categories[:5]
+    #             categories.insert(0, listing.category.id)
+    #             prefs.preferred_categories = categories
+
+    #         # Listing types
+    #         if listing.listing_type and listing.listing_type not in prefs.preferred_listing_types:
+    #             types = prefs.preferred_listing_types[:3]
+    #             types.insert(0, listing.listing_type)
+    #             prefs.preferred_listing_types = types
+
+    #         # Price
+    #         if listing.price:
+    #             price = float(listing.price)
+    #             prefs.price_min = min(prefs.price_min or price, price)
+    #             prefs.price_max = max(prefs.price_max or price, price)
+
+    #         # Districts
+    #         if listing.district and listing.district not in prefs.preferred_districts:
+    #             districts = prefs.preferred_districts[:3]
+    #             districts.insert(0, listing.district)
+    #             prefs.preferred_districts = districts
+
+    #         prefs.save()
+
+    #     except Exception as e:
+    #         logger.error(f"Error in update_preferences_from_view: {e}")
+            
     @staticmethod
     def update_preferences_from_view(user, listing):
         try:
             prefs, _ = UserPreference.objects.get_or_create(user=user)
-
+            
+            # Ensure fields are lists before modifying
+            if not isinstance(prefs.preferred_categories, list):
+                prefs.preferred_categories = []
+            if not isinstance(prefs.preferred_listing_types, list):
+                prefs.preferred_listing_types = []
+            
             # Categories
             if listing.category and listing.category.id not in prefs.preferred_categories:
-                categories = prefs.preferred_categories[:5]
+                categories = prefs.preferred_categories[:4]  # Keep last 4, insert at front
                 categories.insert(0, listing.category.id)
                 prefs.preferred_categories = categories
-
+            
             # Listing types
             if listing.listing_type and listing.listing_type not in prefs.preferred_listing_types:
-                types = prefs.preferred_listing_types[:3]
+                types = prefs.preferred_listing_types[:2]  # Keep last 2, insert at front
                 types.insert(0, listing.listing_type)
                 prefs.preferred_listing_types = types
-
-            # Price
-            if listing.price:
-                price = float(listing.price)
-                prefs.price_min = min(prefs.price_min or price, price)
-                prefs.price_max = max(prefs.price_max or price, price)
-
-            # Districts
-            if listing.district and listing.district not in prefs.preferred_districts:
-                districts = prefs.preferred_districts[:3]
-                districts.insert(0, listing.district)
-                prefs.preferred_districts = districts
-
+            
+            # Price - Only if price_min and price_max fields exist in your model
+            # If these fields don't exist, comment out this block
+            if hasattr(prefs, 'price_min') and hasattr(prefs, 'price_max'):
+                if listing.price:
+                    price = float(listing.price)
+                    current_min = prefs.price_min
+                    current_max = prefs.price_max
+                    
+                    if current_min is None or price < current_min:
+                        prefs.price_min = price
+                    if current_max is None or price > current_max:
+                        prefs.price_max = price
+            
+            # Districts - Only if preferred_districts field exists in your model
+            # If this field doesn't exist, comment out this block
+            if hasattr(prefs, 'preferred_districts'):
+                if not isinstance(prefs.preferred_districts, list):
+                    prefs.preferred_districts = []
+                
+                if listing.district and listing.district not in prefs.preferred_districts:
+                    districts = prefs.preferred_districts[:2]
+                    districts.insert(0, listing.district)
+                    prefs.preferred_districts = districts
+            
             prefs.save()
-
+            
         except Exception as e:
             logger.error(f"Error in update_preferences_from_view: {e}")
-            
-    # Add this method to your RecommendationEngine class
 
 
     @staticmethod

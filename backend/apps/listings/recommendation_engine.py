@@ -119,13 +119,11 @@ class RecommendationEngine:
             similar = list(Listing.objects.filter(query)[:limit])
 
             if len(similar) < limit:
-                # FIXED: Changed 'views' to 'views_count'
+                # No Count() needed - just order by views_count directly
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE,
                     listing_type=listing.listing_type
-                ).exclude(id=listing.id).annotate(
-                    view_count=Count('views_count')  # ← THIS IS THE FIX
-                ).order_by('-view_count')[:limit - len(similar)]
+                ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]  # ← REMOVE Count()
 
                 similar.extend([p for p in popular if p not in similar])
 
@@ -191,39 +189,57 @@ class RecommendationEngine:
             
     # Add this method to your RecommendationEngine class
 
+
     @staticmethod
     def get_trending_listings(limit=10):
-        """Get trending listings based on view count in the last 7 days"""
+        """Get trending listings based on view count"""
         try:
-            from django.db.models import Count
-            from django.utils import timezone
-            from datetime import timedelta
-            
-            last_week = timezone.now() - timedelta(days=7)
-            
-            # Check if you have a ViewLog model with a listing foreign key
-            # If you have a ViewLog model, use this:
+            # No Count() needed - just use the views_count field directly
             trending = Listing.objects.filter(
                 visibility_status=Listing.VisibilityStatus.ACTIVE,
-                view_events__created_at__gte=last_week  # Use 'view_events' instead of 'views'
-            ).annotate(
-                view_count=Count('view_events')  # Use 'view_events' instead of 'views'
-            ).filter(
-                view_count__gt=0
-            ).order_by('-view_count')[:limit]
+                views_count__gt=0  # Only listings with views
+            ).order_by('-views_count')[:limit]  # Sort by views_count
             
-            # If not enough trending listings, fill with popular ones
-            if len(trending) < limit:
-                popular = Listing.objects.filter(
-                    visibility_status=Listing.VisibilityStatus.ACTIVE
-                ).annotate(
-                    view_count=Count('view_events')  # Use 'view_events' instead of 'views'
-                ).order_by('-view_count')[:limit - len(trending)]
-                
-                trending = list(trending) + [p for p in popular if p not in trending]
-            
-            return trending[:limit]
+            return trending
             
         except Exception as e:
             logger.error(f"Error in get_trending_listings: {e}")
             return []
+
+
+
+
+    # @staticmethod
+    # def get_trending_listings(limit=10):
+    #     """Get trending listings based on view count in the last 7 days"""
+    #     try:
+    #         from django.db.models import Count
+    #         from django.utils import timezone
+    #         from datetime import timedelta
+            
+    #         last_week = timezone.now() - timedelta(days=7)
+            
+    #         trending = Listing.objects.filter(
+    #             visibility_status=Listing.VisibilityStatus.ACTIVE,
+    #             view_events__created_at__gte=last_week  # Use 'view_events' instead of 'views'
+    #         ).annotate(
+    #             view_count=Count('view_events')  # Use 'view_events' instead of 'views'
+    #         ).filter(
+    #             view_count__gt=0
+    #         ).order_by('-view_count')[:limit]
+            
+    #         # If not enough trending listings, fill with popular ones
+    #         if len(trending) < limit:
+    #             popular = Listing.objects.filter(
+    #                 visibility_status=Listing.VisibilityStatus.ACTIVE
+    #             ).annotate(
+    #                 view_count=Count('view_events')  # Use 'view_events' instead of 'views'
+    #             ).order_by('-view_count')[:limit - len(trending)]
+                
+    #             trending = list(trending) + [p for p in popular if p not in trending]
+            
+    #         return trending[:limit]
+            
+    #     except Exception as e:
+    #         logger.error(f"Error in get_trending_listings: {e}")
+    #         return []

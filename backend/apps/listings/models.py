@@ -641,19 +641,7 @@ class ListingView(models.Model):
         user_str = self.user.email if self.user else f"Anonymous({self.session_id})"
         return f"{user_str} viewed {self.listing.title}"
 
-# class UserPreference(models.Model):
-#     """Store user preferences for personalized recommendations"""
-#     user = models.OneToOneField(
-#         settings.AUTH_USER_MODEL,
-#         on_delete=models.CASCADE,
-#         related_name='preferences'
-#     )
-#     preferred_categories = models.JSONField(default=list)
-#     preferred_listing_types = models.JSONField(default=list)
-#     updated_at = models.DateTimeField(auto_now=True)
-    
-#     def __str__(self):
-#         return f"Preferences for {self.user.email}"
+
 class UserPreference(models.Model):
     """Store user preferences for personalized recommendations"""
     user = models.OneToOneField(

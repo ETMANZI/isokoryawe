@@ -195,13 +195,19 @@ class RecommendationEngine:
     def get_trending_listings(limit=10):
         """Get trending listings based on view count in the last 7 days"""
         try:
+            from django.db.models import Count
+            from django.utils import timezone
+            from datetime import timedelta
+            
             last_week = timezone.now() - timedelta(days=7)
             
+            # Check if you have a ViewLog model with a listing foreign key
+            # If you have a ViewLog model, use this:
             trending = Listing.objects.filter(
                 visibility_status=Listing.VisibilityStatus.ACTIVE,
-                views__viewed_at__gte=last_week
+                view_events__created_at__gte=last_week  # Use 'view_events' instead of 'views'
             ).annotate(
-                view_count=Count('views')
+                view_count=Count('view_events')  # Use 'view_events' instead of 'views'
             ).filter(
                 view_count__gt=0
             ).order_by('-view_count')[:limit]
@@ -211,7 +217,7 @@ class RecommendationEngine:
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE
                 ).annotate(
-                    view_count=Count('views')
+                    view_count=Count('view_events')  # Use 'view_events' instead of 'views'
                 ).order_by('-view_count')[:limit - len(trending)]
                 
                 trending = list(trending) + [p for p in popular if p not in trending]

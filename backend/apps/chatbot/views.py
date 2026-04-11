@@ -9,7 +9,7 @@ import uuid
 class ChatbotView(APIView):
     permission_classes = [AllowAny]
     
-    def get_or_create_session(self, request, language='en'):  # ← ADD language parameter
+    def get_or_create_session(self, request, language='en'):
         session_id = request.headers.get('X-Session-ID')
         
         if not session_id:
@@ -19,11 +19,10 @@ class ChatbotView(APIView):
             session_id=session_id,
             defaults={
                 'user': request.user if request.user.is_authenticated else None,
-                'language': language  # ← ADD THIS
+                'language': language
             }
         )
         
-        # Update language if session exists and language changed
         if not created and session.language != language:
             session.language = language
             session.save()
@@ -41,7 +40,6 @@ class ChatbotView(APIView):
         if not message:
             return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Pass language to get_or_create_session
         session = self.get_or_create_session(request, language=language)
         
         ChatMessage.objects.create(

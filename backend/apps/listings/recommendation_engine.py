@@ -111,7 +111,7 @@ class RecommendationEngine:
             if listing.price:
                 price_range = float(listing.price) * 0.2
                 query &= Q(price__gte=Decimal(float(listing.price) - price_range),
-                           price__lte=Decimal(float(listing.price) + price_range))
+                        price__lte=Decimal(float(listing.price) + price_range))
 
             if listing.district:
                 query &= Q(district=listing.district)
@@ -119,10 +119,13 @@ class RecommendationEngine:
             similar = list(Listing.objects.filter(query)[:limit])
 
             if len(similar) < limit:
+                # FIX HERE: Change 'views' to 'views_count'
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE,
                     listing_type=listing.listing_type
-                ).exclude(id=listing.id).annotate(view_count=Count('views')).order_by('-view_count')[:limit - len(similar)]
+                ).exclude(id=listing.id).annotate(
+                    view_count=Count('views_count')  # ← Changed from 'views' to 'views_count'
+                ).order_by('-view_count')[:limit - len(similar)]
 
                 similar.extend([p for p in popular if p not in similar])
 

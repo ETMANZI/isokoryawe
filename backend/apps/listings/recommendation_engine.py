@@ -89,43 +89,7 @@ class RecommendationEngine:
             logger.error(f"Error in get_personalized_recommendations: {e}")
             return []
 
-    # @staticmethod
-    # def get_similar_listings(listing, limit=6):
-    #     try:
-    #         if not listing:
-    #             return []
 
-    #         query = Q(visibility_status=Listing.VisibilityStatus.ACTIVE) & ~Q(id=listing.id)
-
-    #         if listing.category:
-    #             query &= Q(category=listing.category)
-    #         query &= Q(listing_type=listing.listing_type)
-
-    #         if listing.price:
-    #             price_range = float(listing.price) * 0.2
-    #             query &= Q(price__gte=Decimal(float(listing.price) - price_range),
-    #                     price__lte=Decimal(float(listing.price) + price_range))
-
-    #         if listing.district:
-    #             query &= Q(district=listing.district)
-
-    #         similar = list(Listing.objects.filter(query)[:limit])
-
-    #         if len(similar) < limit:
-    #             # FIXED: Use views_count directly
-    #             popular = Listing.objects.filter(
-    #                 visibility_status=Listing.VisibilityStatus.ACTIVE,
-    #                 listing_type=listing.listing_type
-    #             ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]
-
-    #             similar.extend([p for p in popular if p not in similar])
-
-    #         return similar[:limit]
-
-    #     except Exception as e:
-    #         logger.error(f"Error in get_similar_listings: {e}")
-    #         return []
-    
     
     
     @staticmethod

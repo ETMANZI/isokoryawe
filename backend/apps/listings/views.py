@@ -717,33 +717,21 @@ class ListingViewSet(viewsets.ModelViewSet):
     def _apply_featured_ordering(self, queryset):
         """
         Apply featured ordering: Business first, then Premium, then Normal
-        This ensures Premium and Business listings appear first
         """
         from django.db.models import Case, When, Value, IntegerField, Q
         
-        return queryset.annotate(
-            featured_order=Case(
-                # Business subscription gets priority 3 (highest)
-                When(
-                    Q(owner__subscription__plan='business', 
-                       owner__subscription__is_active=True,
-                       owner__subscription__status='approved'),
-                    then=Value(3)
-                ),
-                # Premium subscription gets priority 2
-                When(
-                    Q(owner__subscription__plan='premium', 
-                       owner__subscription__is_active=True,
-                       owner__subscription__status='approved'),
-                    then=Value(2)
-                ),
-                # Manually featured listings get priority 1
-                When(is_featured=True, then=Value(1)),
-                # Normal listings get priority 0
-                default=Value(0),
-                output_field=IntegerField()
-            )
-        ).order_by('-featured_order', '-interested_count', '-created_at')
+        try:
+            return queryset.annotate(
+                featured_order=Case(
+                    # Check if listing is manually featured
+                    When(is_featured=True, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            ).order_by('-featured_order', '-interested_count', '-created_at')
+        except Exception as e:
+            # Fallback if annotation fails
+            return queryset.order_by('-is_featured', '-interested_count', '-created_at')
 
     def get_queryset(self):
         user = self.request.user
@@ -1120,31 +1108,18 @@ class ListingViewSet(viewsets.ModelViewSet):
             "views_count": listing.views_count
         })
     
-    # NEW: Featured Listings Endpoint (shows only featured listings)
     @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
     def featured(self, request):
-        """Get only featured listings (Premium & Business first)"""
+        """Get only featured listings"""
         queryset = self._base_queryset().filter(
             status=Listing.Status.APPROVED,
             visibility_status=Listing.VisibilityStatus.ACTIVE,
+            is_featured=True  # Simplified filter
         )
         
-        # Apply custom filters if provided
         queryset = self._apply_custom_filters(queryset)
+        queryset = queryset.order_by('-created_at')
         
-        # Apply featured ordering
-        queryset = self._apply_featured_ordering(queryset)
-        
-        # Filter only featured (priority 1 or higher)
-        from django.db.models import Q
-        queryset = queryset.filter(
-            Q(is_featured=True) |
-            Q(owner__subscription__plan__in=['premium', 'business'],
-              owner__subscription__is_active=True,
-              owner__subscription__status='approved')
-        )
-        
-        # Paginate
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -1154,22 +1129,7 @@ class ListingViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
-    # Add to your ListingViewSet
-    @action(detail=False, methods=["post"], permission_classes=[permissions.IsAdminUser])
-    def refresh_featured(self, request):
-        """Admin endpoint to refresh all featured listings"""
-        from django.core.management import call_command
-        
-        try:
-            call_command('sync_featured_listings')
-            return Response({"message": "Featured listings refreshed successfully"})
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
-
-
-
-
+ 
 
 
 

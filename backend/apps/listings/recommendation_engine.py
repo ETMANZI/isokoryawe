@@ -6,7 +6,6 @@ from django.utils import timezone
 from .models import Listing, UserPreference, RecommendationCache
 
 logger = logging.getLogger(__name__)
-
 class RecommendationEngine:
 
     @staticmethod
@@ -36,7 +35,6 @@ class RecommendationEngine:
                     if listing.price:
                         viewed_prices.append(float(listing.price))
 
-            # User preferences
             try:
                 prefs = user.preferences
                 preferred_categories = prefs.preferred_categories or []

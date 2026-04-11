@@ -61,7 +61,7 @@ const SUGGESTED_TEXTS = {
 };
 
 export default function Chatbot() {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);

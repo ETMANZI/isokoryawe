@@ -89,42 +89,358 @@ class RecommendationEngine:
             logger.error(f"Error in get_personalized_recommendations: {e}")
             return []
 
+    # @staticmethod
+    # def get_similar_listings(listing, limit=6):
+    #     try:
+    #         if not listing:
+    #             return []
+
+    #         query = Q(visibility_status=Listing.VisibilityStatus.ACTIVE) & ~Q(id=listing.id)
+
+    #         if listing.category:
+    #             query &= Q(category=listing.category)
+    #         query &= Q(listing_type=listing.listing_type)
+
+    #         if listing.price:
+    #             price_range = float(listing.price) * 0.2
+    #             query &= Q(price__gte=Decimal(float(listing.price) - price_range),
+    #                     price__lte=Decimal(float(listing.price) + price_range))
+
+    #         if listing.district:
+    #             query &= Q(district=listing.district)
+
+    #         similar = list(Listing.objects.filter(query)[:limit])
+
+    #         if len(similar) < limit:
+    #             # FIXED: Use views_count directly
+    #             popular = Listing.objects.filter(
+    #                 visibility_status=Listing.VisibilityStatus.ACTIVE,
+    #                 listing_type=listing.listing_type
+    #             ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]
+
+    #             similar.extend([p for p in popular if p not in similar])
+
+    #         return similar[:limit]
+
+    #     except Exception as e:
+    #         logger.error(f"Error in get_similar_listings: {e}")
+    #         return []
+    
+    
+    
     @staticmethod
     def get_similar_listings(listing, limit=6):
+        """
+        AI-Powered Similar Listings Algorithm
+        
+        Scoring Factors:
+        1. Category Match (30-35%) - Same category is best
+        2. Price Similarity (20-25%) - Within 20% price range
+        3. Listing Type Match (15-20%) - Same type (house, car, etc.)
+        4. Location Match (10-15%) - Same district/sector
+        5. Attribute Match (15-25%) - Based on listing type (bedrooms, car make, etc.)
+        6. Popularity Boost (5%) - High view count bonus
+        """
         try:
+            from django.db.models import Case, When, Value, DecimalField, F
+            from django.db.models.functions import Coalesce
+            
             if not listing:
                 return []
 
-            query = Q(visibility_status=Listing.VisibilityStatus.ACTIVE) & ~Q(id=listing.id)
-
-            if listing.category:
-                query &= Q(category=listing.category)
-            query &= Q(listing_type=listing.listing_type)
-
-            if listing.price:
-                price_range = float(listing.price) * 0.2
-                query &= Q(price__gte=Decimal(float(listing.price) - price_range),
-                        price__lte=Decimal(float(listing.price) + price_range))
-
-            if listing.district:
-                query &= Q(district=listing.district)
-
-            similar = list(Listing.objects.filter(query)[:limit])
-
-            if len(similar) < limit:
-                # FIXED: Use views_count directly
+            # Base annotation for all listing types
+            similar = Listing.objects.filter(
+                visibility_status=Listing.VisibilityStatus.ACTIVE
+            ).exclude(id=listing.id).annotate(
+                
+                # 1. CATEGORY MATCH - 100 points if same category
+                category_score=Case(
+                    When(category=listing.category, then=Value(100)),
+                    default=Value(0),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # 2. PRICE SIMILARITY - Within 20% range
+                price_score=Case(
+                    When(
+                        price__gte=listing.price * Decimal('0.8'),
+                        price__lte=listing.price * Decimal('1.2'),
+                        then=Value(100)
+                    ),
+                    When(
+                        price__gte=listing.price * Decimal('0.5'),
+                        price__lte=listing.price * Decimal('1.5'),
+                        then=Value(50)
+                    ),
+                    default=Value(0),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # 3. LISTING TYPE MATCH - Same listing type
+                type_score=Case(
+                    When(listing_type=listing.listing_type, then=Value(100)),
+                    default=Value(0),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # 4. LOCATION MATCH - District or sector match
+                location_score=Case(
+                    When(district=listing.district, then=Value(100)),
+                    When(sector=listing.sector, then=Value(60)),
+                    When(village=listing.village, then=Value(40)),
+                    default=Value(0),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # 5. POPULARITY BOOST - Bonus for high view counts
+                popularity_score=Case(
+                    When(views_count__gte=100, then=Value(20)),
+                    When(views_count__gte=50, then=Value(10)),
+                    When(views_count__gte=10, then=Value(5)),
+                    default=Value(0),
+                    output_field=DecimalField(max_digits=5, decimal_places=2)
+                ),
+                
+                # Default attribute_score (will be overridden for specific types)
+                attribute_score=Value(0, output_field=DecimalField(max_digits=5, decimal_places=2)),
+            )
+            
+            # Add attribute matching based on listing type
+            if listing.listing_type == Listing.ListingType.HOUSE:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(bedrooms=listing.bedrooms, then=Value(30)) +
+                        When(bathrooms=listing.bathrooms, then=Value(30)) +
+                        When(has_electricity=listing.has_electricity, then=Value(20)) +
+                        When(has_water=listing.has_water, then=Value(20)),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for houses
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.30')) +
+                        (F('price_score') * Decimal('0.20')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.15')) +
+                        (F('attribute_score') * Decimal('0.15')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            elif listing.listing_type == Listing.ListingType.CAR:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(car_make=listing.car_make, then=Value(40)) +
+                        When(car_model=listing.car_model, then=Value(30)) +
+                        When(
+                            car_year__gte=(listing.car_year - 3) if listing.car_year else 0,
+                            car_year__lte=(listing.car_year + 3) if listing.car_year else 9999,
+                            then=Value(30)
+                        ),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for cars
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.25')) +
+                        (F('price_score') * Decimal('0.20')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.10')) +
+                        (F('attribute_score') * Decimal('0.25')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            elif listing.listing_type == Listing.ListingType.CLOTHES_PRODUCT:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(clothes_gender=listing.clothes_gender, then=Value(40)) +
+                        When(clothes_size=listing.clothes_size, then=Value(30)) +
+                        When(clothes_category=listing.clothes_category, then=Value(30)),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for clothes
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.25')) +
+                        (F('price_score') * Decimal('0.20')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.10')) +
+                        (F('attribute_score') * Decimal('0.25')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            elif listing.listing_type == Listing.ListingType.FOOD_PRODUCT:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(food_category=listing.food_category, then=Value(50)) +
+                        When(is_perishable=listing.is_perishable, then=Value(25)) +
+                        When(is_prepared_food=listing.is_prepared_food, then=Value(25)),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for food
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.30')) +
+                        (F('price_score') * Decimal('0.20')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.10')) +
+                        (F('attribute_score') * Decimal('0.20')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            elif listing.listing_type == Listing.ListingType.HOME_KITCHEN_PRODUCT:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(home_product_category=listing.home_product_category, then=Value(40)) +
+                        When(material=listing.material, then=Value(30)) +
+                        When(color=listing.color, then=Value(30)),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for home products
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.30')) +
+                        (F('price_score') * Decimal('0.20')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.10')) +
+                        (F('attribute_score') * Decimal('0.20')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            elif listing.listing_type == Listing.ListingType.PARCEL:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(land_size__range=(
+                            listing.land_size * Decimal('0.8') if listing.land_size else 0,
+                            listing.land_size * Decimal('1.2') if listing.land_size else 999999
+                        ), then=Value(100)),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for parcels
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.30')) +
+                        (F('price_score') * Decimal('0.20')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.20')) +
+                        (F('attribute_score') * Decimal('0.10')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            elif listing.listing_type == Listing.ListingType.BUSINESS_AD:
+                similar = similar.annotate(
+                    attribute_score=Case(
+                        When(category=listing.category, then=Value(50)) +
+                        When(district=listing.district, then=Value(50)),
+                        default=Value(0),
+                        output_field=DecimalField(max_digits=5, decimal_places=2)
+                    )
+                )
+                # Adjust weights for business ads
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.25')) +
+                        (F('price_score') * Decimal('0.15')) +
+                        (F('type_score') * Decimal('0.15')) +
+                        (F('location_score') * Decimal('0.30')) +
+                        (F('attribute_score') * Decimal('0.10')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+                
+            else:
+                # Default weights for any other listing type
+                similar = similar.annotate(
+                    similarity_score=(
+                        (F('category_score') * Decimal('0.35')) +
+                        (F('price_score') * Decimal('0.25')) +
+                        (F('type_score') * Decimal('0.20')) +
+                        (F('location_score') * Decimal('0.15')) +
+                        (F('popularity_score') * Decimal('0.05'))
+                    )
+                )
+            
+            # Filter and order by similarity score
+            similar = similar.filter(
+                similarity_score__gt=0
+            ).order_by('-similarity_score')[:limit]
+            
+            # Convert to list and add metadata
+            similar_list = list(similar)
+            
+            # If not enough similar listings, fallback to popular
+            if len(similar_list) < limit:
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE,
                     listing_type=listing.listing_type
-                ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]
-
-                similar.extend([p for p in popular if p not in similar])
-
-            return similar[:limit]
+                ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar_list)]
+                
+                for p in popular:
+                    if p not in similar_list:
+                        p.similarity_score = 0
+                        p.match_quality = "📌 Popular"
+                        similar_list.append(p)
+            
+            # Add match quality labels
+            for item in similar_list:
+                if hasattr(item, 'similarity_score') and item.similarity_score > 0:
+                    if item.similarity_score >= 70:
+                        item.match_quality = "🔥 Very Similar"
+                    elif item.similarity_score >= 50:
+                        item.match_quality = "👍 Similar"
+                    elif item.similarity_score >= 30:
+                        item.match_quality = "👀 You might also like"
+                    else:
+                        item.match_quality = "📌 Related"
+                else:
+                    item.match_quality = "📌 Popular"
+            
+            return similar_list[:limit]
 
         except Exception as e:
             logger.error(f"Error in get_similar_listings: {e}")
-            return []
+            # Fallback to simple version if AI fails
+            try:
+                query = Q(visibility_status=Listing.VisibilityStatus.ACTIVE) & ~Q(id=listing.id)
+                if listing.category:
+                    query &= Q(category=listing.category)
+                query &= Q(listing_type=listing.listing_type)
+                if listing.price:
+                    price_range = float(listing.price) * 0.2
+                    query &= Q(price__gte=Decimal(float(listing.price) - price_range),
+                            price__lte=Decimal(float(listing.price) + price_range))
+                if listing.district:
+                    query &= Q(district=listing.district)
+                
+                similar = list(Listing.objects.filter(query)[:limit])
+                
+                if len(similar) < limit:
+                    popular = Listing.objects.filter(
+                        visibility_status=Listing.VisibilityStatus.ACTIVE,
+                        listing_type=listing.listing_type
+                    ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]
+                    similar.extend([p for p in popular if p not in similar])
+                
+                return similar[:limit]
+            except:
+                return []
 
     @staticmethod
     def record_listing_view(user, listing, request):

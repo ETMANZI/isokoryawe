@@ -181,10 +181,10 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
       >
         {/* MOST POWERFUL TILE LAYER - Shows buildings and houses clearly */}
         {/* Humanitarian Style - Best for seeing building footprints */}
-        <TileLayer
+        {/* <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors | Humanitarian Style'
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-        />
+        /> */}
         
         {/* ALTERNATIVE: If you want satellite view with buildings, uncomment this instead:
         <TileLayer
@@ -193,12 +193,12 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
         />
         */}
 
-        {/* ALTERNATIVE 2: Clean style with building outlines:
+        ALTERNATIVE 2: Clean style with building outlines:
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
-        */}
+       
 
         <FlyToLocation latitude={selectedLat} longitude={selectedLng} />
 

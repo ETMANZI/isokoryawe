@@ -57,7 +57,7 @@ function FlyToLocation({
 
   useEffect(() => {
     if (isValidCoord(latitude) && isValidCoord(longitude)) {
-      map.flyTo([latitude, longitude], 19);
+      map.flyTo([latitude, longitude], 19); // INCREASED to 19 - shows houses clearly
     }
   }, [latitude, longitude, map]);
 
@@ -90,7 +90,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
     if (isValidCoord(selectedLat) && isValidCoord(selectedLng)) {
       return [selectedLat, selectedLng];
     }
-    return [-1.9441, 30.0619];
+    return [-1.9441, 30.0619]; // Kigali, Rwanda
   }, [selectedLat, selectedLng]);
 
   const handleSearch = async () => {
@@ -176,27 +176,20 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
 
       <MapContainer 
         center={center} 
-        zoom={18}
+        zoom={18} // INCREASED from 13 to 18 - starts zoomed in
         style={{ height: "350px", width: "100%", borderRadius: "12px", zIndex: 1 }}
         zoomControl={true}
       >
-        {/* OPTION 1: Humanitarian Style - Best for seeing buildings in Rwanda (NO API KEY NEEDED) */}
+        {/* Satellite view - best for seeing actual houses */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors | Humanitarian Style'
-          url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+          url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
         />
         
-        {/* OPTION 2: Standard OSM (uncomment to use instead) 
+        {/* You can also try this hybrid view (satellite + labels):
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        */}
-        
-        {/* OPTION 3: Carto Light (clean look)
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+          url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
         />
         */}
 
@@ -218,7 +211,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
         <ul className="list-disc pl-4 mt-1 space-y-1">
           <li>🔍 Use the + button to zoom in closer</li>
           <li>🏠 At zoom level 18-19, you'll see individual houses</li>
-          <li>🗺️ Humanitarian style shows building footprints clearly</li>
+          <li>🗺️ Satellite view shows actual buildings from above</li>
           <li>📍 Click anywhere on the map to select a location</li>
         </ul>
       </div>

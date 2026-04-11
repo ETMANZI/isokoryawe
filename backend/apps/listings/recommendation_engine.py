@@ -3,7 +3,7 @@ from datetime import timedelta
 import logging
 from django.db.models import Q, Count
 from django.utils import timezone
-from .models import Listing, ListingView, UserPreference, RecommendationCache
+from .models import Listing, UserPreference, RecommendationCache
 
 logger = logging.getLogger(__name__)
 
@@ -18,32 +18,31 @@ class RecommendationEngine:
                 listing_ids = cached.recommendations[:limit]
                 return list(Listing.objects.filter(id__in=listing_ids, visibility_status=Listing.VisibilityStatus.ACTIVE))
 
-            # Gather user views
-            viewed_listings = ListingView.objects.filter(user=user).select_related('listing').order_by('-viewed_at')[:20]
+            # Gather user views - Using views_count instead of ListingView
+            viewed_listings = Listing.objects.filter(
+                owner=user,
+                visibility_status=Listing.VisibilityStatus.ACTIVE
+            ).order_by('-views_count')[:20]
+            
             viewed_categories, viewed_types, viewed_districts, viewed_prices = set(), set(), set(), []
 
-            for view in viewed_listings:
-                l = view.listing
-                if l:
-                    if l.category:
-                        viewed_categories.add(l.category_id)
-                    viewed_types.add(l.listing_type)
-                    if l.district:
-                        viewed_districts.add(l.district)
-                    if l.price:
-                        viewed_prices.append(float(l.price))
+            for listing in viewed_listings:
+                if listing:
+                    if listing.category:
+                        viewed_categories.add(listing.category_id)
+                    viewed_types.add(listing.listing_type)
+                    if listing.district:
+                        viewed_districts.add(listing.district)
+                    if listing.price:
+                        viewed_prices.append(float(listing.price))
 
             # User preferences
             try:
                 prefs = user.preferences
                 preferred_categories = prefs.preferred_categories or []
                 preferred_types = prefs.preferred_listing_types or []
-                preferred_districts = prefs.preferred_districts or []
-                price_min = prefs.price_min
-                price_max = prefs.price_max
             except UserPreference.DoesNotExist:
-                preferred_categories, preferred_types, preferred_districts = [], [], []
-                price_min = price_max = None
+                preferred_categories, preferred_types = [], []
 
             avg_price = float(sum(viewed_prices)/len(viewed_prices)) if viewed_prices else None
 
@@ -57,27 +56,21 @@ class RecommendationEngine:
             if types_to_use:
                 query &= Q(listing_type__in=types_to_use)
 
-            districts_to_use = list(viewed_districts) + preferred_districts
-            if districts_to_use:
-                query &= Q(district__in=districts_to_use)
-
-            if price_min is not None and price_max is not None:
-                query &= Q(price__gte=Decimal(price_min), price__lte=Decimal(price_max))
-            elif avg_price:
+            if avg_price:
                 price_range = avg_price * 0.3
                 query &= Q(price__gte=Decimal(avg_price - price_range), price__lte=Decimal(avg_price + price_range))
 
-            viewed_ids = [v.listing_id for v in viewed_listings if v.listing_id]
+            viewed_ids = [v.id for v in viewed_listings]
             if viewed_ids:
                 query &= ~Q(id__in=viewed_ids)
 
             recommendations = list(Listing.objects.filter(query)[:limit])
 
-            # Fill with popular listings
+            # Fill with popular listings - FIXED: use views_count
             if len(recommendations) < limit:
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE
-                ).annotate(view_count=Count('views')).order_by('-view_count')[:limit - len(recommendations)]
+                ).order_by('-views_count')[:limit - len(recommendations)]  # ← FIXED
 
                 recommendations.extend([p for p in popular if p not in recommendations])
 
@@ -119,11 +112,11 @@ class RecommendationEngine:
             similar = list(Listing.objects.filter(query)[:limit])
 
             if len(similar) < limit:
-                # No Count() needed - just order by views_count directly
+                # FIXED: Use views_count directly
                 popular = Listing.objects.filter(
                     visibility_status=Listing.VisibilityStatus.ACTIVE,
                     listing_type=listing.listing_type
-                ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]  # ← REMOVE Count()
+                ).exclude(id=listing.id).order_by('-views_count')[:limit - len(similar)]
 
                 similar.extend([p for p in popular if p not in similar])
 
@@ -136,16 +129,9 @@ class RecommendationEngine:
     @staticmethod
     def record_listing_view(user, listing, request):
         try:
-            session_id = request.session.session_key
-            if not session_id and (not user or not user.is_authenticated):
-                from django.contrib.sessions.backends.db import SessionStore
-                session_id = SessionStore().session_key
-
-            ListingView.objects.create(
-                user=user if user and user.is_authenticated else None,
-                listing=listing,
-                session_id=session_id
-            )
+            # Just increment the views_count field
+            listing.views_count += 1
+            listing.save(update_fields=['views_count'])
 
             if user and user.is_authenticated:
                 RecommendationEngine.update_preferences_from_view(user, listing)
@@ -153,40 +139,6 @@ class RecommendationEngine:
         except Exception as e:
             logger.error(f"Error in record_listing_view: {e}")
 
-    # @staticmethod
-    # def update_preferences_from_view(user, listing):
-    #     try:
-    #         prefs, _ = UserPreference.objects.get_or_create(user=user)
-
-    #         # Categories
-    #         if listing.category and listing.category.id not in prefs.preferred_categories:
-    #             categories = prefs.preferred_categories[:5]
-    #             categories.insert(0, listing.category.id)
-    #             prefs.preferred_categories = categories
-
-    #         # Listing types
-    #         if listing.listing_type and listing.listing_type not in prefs.preferred_listing_types:
-    #             types = prefs.preferred_listing_types[:3]
-    #             types.insert(0, listing.listing_type)
-    #             prefs.preferred_listing_types = types
-
-    #         # Price
-    #         if listing.price:
-    #             price = float(listing.price)
-    #             prefs.price_min = min(prefs.price_min or price, price)
-    #             prefs.price_max = max(prefs.price_max or price, price)
-
-    #         # Districts
-    #         if listing.district and listing.district not in prefs.preferred_districts:
-    #             districts = prefs.preferred_districts[:3]
-    #             districts.insert(0, listing.district)
-    #             prefs.preferred_districts = districts
-
-    #         prefs.save()
-
-    #     except Exception as e:
-    #         logger.error(f"Error in update_preferences_from_view: {e}")
-            
     @staticmethod
     def update_preferences_from_view(user, listing):
         try:
@@ -200,96 +152,33 @@ class RecommendationEngine:
             
             # Categories
             if listing.category and listing.category.id not in prefs.preferred_categories:
-                categories = prefs.preferred_categories[:4]  # Keep last 4, insert at front
+                categories = prefs.preferred_categories[:4]
                 categories.insert(0, listing.category.id)
                 prefs.preferred_categories = categories
             
             # Listing types
             if listing.listing_type and listing.listing_type not in prefs.preferred_listing_types:
-                types = prefs.preferred_listing_types[:2]  # Keep last 2, insert at front
+                types = prefs.preferred_listing_types[:2]
                 types.insert(0, listing.listing_type)
                 prefs.preferred_listing_types = types
-            
-            # Price - Only if price_min and price_max fields exist in your model
-            # If these fields don't exist, comment out this block
-            if hasattr(prefs, 'price_min') and hasattr(prefs, 'price_max'):
-                if listing.price:
-                    price = float(listing.price)
-                    current_min = prefs.price_min
-                    current_max = prefs.price_max
-                    
-                    if current_min is None or price < current_min:
-                        prefs.price_min = price
-                    if current_max is None or price > current_max:
-                        prefs.price_max = price
-            
-            # Districts - Only if preferred_districts field exists in your model
-            # If this field doesn't exist, comment out this block
-            if hasattr(prefs, 'preferred_districts'):
-                if not isinstance(prefs.preferred_districts, list):
-                    prefs.preferred_districts = []
-                
-                if listing.district and listing.district not in prefs.preferred_districts:
-                    districts = prefs.preferred_districts[:2]
-                    districts.insert(0, listing.district)
-                    prefs.preferred_districts = districts
             
             prefs.save()
             
         except Exception as e:
             logger.error(f"Error in update_preferences_from_view: {e}")
 
-
     @staticmethod
     def get_trending_listings(limit=10):
         """Get trending listings based on view count"""
         try:
-            # No Count() needed - just use the views_count field directly
+            # FIXED: Use views_count directly
             trending = Listing.objects.filter(
                 visibility_status=Listing.VisibilityStatus.ACTIVE,
-                views_count__gt=0  # Only listings with views
-            ).order_by('-views_count')[:limit]  # Sort by views_count
+                views_count__gt=0
+            ).order_by('-views_count')[:limit]
             
             return trending
             
         except Exception as e:
             logger.error(f"Error in get_trending_listings: {e}")
             return []
-
-
-
-
-    # @staticmethod
-    # def get_trending_listings(limit=10):
-    #     """Get trending listings based on view count in the last 7 days"""
-    #     try:
-    #         from django.db.models import Count
-    #         from django.utils import timezone
-    #         from datetime import timedelta
-            
-    #         last_week = timezone.now() - timedelta(days=7)
-            
-    #         trending = Listing.objects.filter(
-    #             visibility_status=Listing.VisibilityStatus.ACTIVE,
-    #             view_events__created_at__gte=last_week  # Use 'view_events' instead of 'views'
-    #         ).annotate(
-    #             view_count=Count('view_events')  # Use 'view_events' instead of 'views'
-    #         ).filter(
-    #             view_count__gt=0
-    #         ).order_by('-view_count')[:limit]
-            
-    #         # If not enough trending listings, fill with popular ones
-    #         if len(trending) < limit:
-    #             popular = Listing.objects.filter(
-    #                 visibility_status=Listing.VisibilityStatus.ACTIVE
-    #             ).annotate(
-    #                 view_count=Count('view_events')  # Use 'view_events' instead of 'views'
-    #             ).order_by('-view_count')[:limit - len(trending)]
-                
-    #             trending = list(trending) + [p for p in popular if p not in trending]
-            
-    #         return trending[:limit]
-            
-    #     except Exception as e:
-    #         logger.error(f"Error in get_trending_listings: {e}")
-    #         return []

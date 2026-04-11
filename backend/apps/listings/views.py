@@ -503,10 +503,6 @@ class ListingViewSet(viewsets.ModelViewSet):
                 )
 
         count = listing.interests.count()
-        # if interested:
-        #     listing.interests_count = (listing.interests_count or 0) + 1
-        # else:
-        #     listing.interests_count = max((listing.interests_count or 1) - 1, 0)
 
         return Response({
             "interested": interested,

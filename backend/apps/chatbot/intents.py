@@ -11,7 +11,7 @@ INTENTS = {
     "pricing": {
         "patterns": ["how much", "price", "cost", "pricing", "fee", "charges"],
         "responses": [
-            "Market Hub offers flexible subscription plans:\n\n• Basic: 5,000 RWF/month - 2 listings, 1 image per listing\n• Classic: 10,000 RWF/month - 3 listings, 2 images per listing\n• Premium: 20,000 RWF/month - 4 listings, 3 images per listing\n• Business: 30,000 RWF/month - 5 listings, 4 images per listing\n\nWhich plan interests you?"
+            "Market Hub offers flexible subscription plans:\n\n• Basic: 1,500 RWF/month - 3 listings, 1 image per listing\n• Classic: 2,000 RWF/month - 3 listings, 2 images per listing\n• Premium: 3,000 RWF/month - 4 listings, 3 images per listing\n• Business: 4,000 RWF/month - 5 listings, 4 images per listing\n\nWhich plan interests you?"
         ]
     },
     "how_to_post": {

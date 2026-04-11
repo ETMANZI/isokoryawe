@@ -483,22 +483,6 @@ class RecommendationEngine:
         except Exception as e:
             logger.error(f"Error in update_preferences_from_view: {e}")
 
-    # @staticmethod
-    # def get_trending_listings(limit=10):
-    #     """Get trending listings based on view count"""
-    #     try:
-    #         # FIXED: Use views_count directly
-    #         trending = Listing.objects.filter(
-    #             visibility_status=Listing.VisibilityStatus.ACTIVE,
-    #             views_count__gt=0
-    #         ).order_by('-views_count')[:limit]
-            
-    #         return trending
-            
-    #     except Exception as e:
-    #         logger.error(f"Error in get_trending_listings: {e}")
-    #         return []
-    
     @staticmethod
     def get_trending_listings(limit=10, days=7):
         """
@@ -509,6 +493,11 @@ class RecommendationEngine:
         - Price attractiveness (10%)
         """
         try:
+            from django.db.models import Case, When, Value, DecimalField, F, Q
+            from django.db.models.functions import Coalesce, ExtractDay
+            from datetime import timedelta
+            from django.utils import timezone
+            
             now = timezone.now()
             time_threshold = now - timedelta(days=days)
             
@@ -517,9 +506,18 @@ class RecommendationEngine:
                 created_at__gte=time_threshold
             ).annotate(
                 # Factor 1: Views per day (40%)
-                days_old = ExtractDay(now - F('created_at')) + 1,
-                views_per_day = F('views_count') / F('days_old'),
-                normalized_views = Case(
+                days_old=Case(
+                    When(created_at__isnull=False, 
+                        then=ExtractDay(now - F('created_at')) + 1),
+                    default=Value(1),
+                    output_field=DecimalField(max_digits=10, decimal_places=2)
+                ),
+                views_per_day=Case(
+                    When(days_old__gt=0, then=F('views_count') / F('days_old')),
+                    default=Value(0),
+                    output_field=DecimalField(max_digits=10, decimal_places=2)
+                ),
+                normalized_views=Case(
                     When(views_per_day__gt=0, 
                         then=F('views_per_day') * 100 / (F('views_per_day') + 100)),
                     default=Value(0),
@@ -527,7 +525,7 @@ class RecommendationEngine:
                 ),
                 
                 # Factor 2: Engagement rate (30%)
-                engagement_rate = Case(
+                engagement_rate=Case(
                     When(views_count__gt=0,
                         then=(F('call_clicks') + F('whatsapp_clicks')) * 100.0 / F('views_count')),
                     default=Value(0),
@@ -535,8 +533,8 @@ class RecommendationEngine:
                 ),
                 
                 # Factor 3: Recency boost (20%)
-                hours_old = ExtractDay(now - F('created_at')) * 24,
-                recency_score = Case(
+                hours_old=ExtractDay(now - F('created_at')) * 24,
+                recency_score=Case(
                     When(hours_old__lt=24, then=Value(100)),
                     When(hours_old__lt=72, then=Value(70)),
                     When(hours_old__lt=168, then=Value(40)),
@@ -545,11 +543,12 @@ class RecommendationEngine:
                 ),
                 
                 # Factor 4: Price attractiveness (10%)
-                avg_price_in_category = Coalesce(
+                avg_price_in_category=Coalesce(
                     Avg('price', filter=Q(category=F('category'))),
-                    Value(1)
+                    Value(1),
+                    output_field=DecimalField(max_digits=10, decimal_places=2)
                 ),
-                price_score = Case(
+                price_score=Case(
                     When(price__lt=F('avg_price_in_category') * 0.7, then=Value(100)),
                     When(price__lt=F('avg_price_in_category'), then=Value(70)),
                     When(price__gt=F('avg_price_in_category') * 1.5, then=Value(20)),
@@ -558,15 +557,109 @@ class RecommendationEngine:
                 ),
             ).annotate(
                 trending_score=(
-                    F('normalized_views') * Decimal('0.40') +
-                    F('engagement_rate') * Decimal('0.30') +
-                    F('recency_score') * Decimal('0.20') +
-                    F('price_score') * Decimal('0.10')
+                    Coalesce(F('normalized_views'), Value(0)) * Decimal('0.40') +
+                    Coalesce(F('engagement_rate'), Value(0)) * Decimal('0.30') +
+                    Coalesce(F('recency_score'), Value(0)) * Decimal('0.20') +
+                    Coalesce(F('price_score'), Value(0)) * Decimal('0.10')
                 )
             ).filter(trending_score__gt=0).order_by('-trending_score')[:limit]
+            
+            # Add trending metadata
+            for idx, item in enumerate(trending):
+                item.trending_rank = idx + 1
+                if item.trending_score >= 80:
+                    item.trending_badge = "🔥 HOT"
+                elif item.trending_score >= 60:
+                    item.trending_badge = "📈 TRENDING"
+                elif item.trending_score >= 40:
+                    item.trending_badge = "⭐ POPULAR"
+                else:
+                    item.trending_badge = "🆕 NEW"
             
             return trending
             
         except Exception as e:
-            logger.error(f"Error in trending: {e}")
-            return []
+            logger.error(f"Error in get_trending_listings: {e}")
+            # Fallback to simple trending by views
+            try:
+                return Listing.objects.filter(
+                    visibility_status=Listing.VisibilityStatus.ACTIVE,
+                    views_count__gt=0
+                ).order_by('-views_count')[:limit]
+            except:
+                return []
+        
+        
+        
+        
+    # @staticmethod
+    # def get_trending_listings(limit=10, days=7):
+    #     """
+    #     Powerful trending algorithm with 4 key factors:
+    #     - Views velocity (40%)
+    #     - Engagement rate (30%)  
+    #     - Recency (20%)
+    #     - Price attractiveness (10%)
+    #     """
+    #     try:
+    #         now = timezone.now()
+    #         time_threshold = now - timedelta(days=days)
+            
+    #         trending = Listing.objects.filter(
+    #             visibility_status=Listing.VisibilityStatus.ACTIVE,
+    #             created_at__gte=time_threshold
+    #         ).annotate(
+    #             # Factor 1: Views per day (40%)
+    #             days_old = ExtractDay(now - F('created_at')) + 1,
+    #             views_per_day = F('views_count') / F('days_old'),
+    #             normalized_views = Case(
+    #                 When(views_per_day__gt=0, 
+    #                     then=F('views_per_day') * 100 / (F('views_per_day') + 100)),
+    #                 default=Value(0),
+    #                 output_field=DecimalField(max_digits=10, decimal_places=2)
+    #             ),
+                
+    #             # Factor 2: Engagement rate (30%)
+    #             engagement_rate = Case(
+    #                 When(views_count__gt=0,
+    #                     then=(F('call_clicks') + F('whatsapp_clicks')) * 100.0 / F('views_count')),
+    #                 default=Value(0),
+    #                 output_field=DecimalField(max_digits=10, decimal_places=2)
+    #             ),
+                
+    #             # Factor 3: Recency boost (20%)
+    #             hours_old = ExtractDay(now - F('created_at')) * 24,
+    #             recency_score = Case(
+    #                 When(hours_old__lt=24, then=Value(100)),
+    #                 When(hours_old__lt=72, then=Value(70)),
+    #                 When(hours_old__lt=168, then=Value(40)),
+    #                 default=Value(20),
+    #                 output_field=DecimalField(max_digits=10, decimal_places=2)
+    #             ),
+                
+    #             # Factor 4: Price attractiveness (10%)
+    #             avg_price_in_category = Coalesce(
+    #                 Avg('price', filter=Q(category=F('category'))),
+    #                 Value(1)
+    #             ),
+    #             price_score = Case(
+    #                 When(price__lt=F('avg_price_in_category') * 0.7, then=Value(100)),
+    #                 When(price__lt=F('avg_price_in_category'), then=Value(70)),
+    #                 When(price__gt=F('avg_price_in_category') * 1.5, then=Value(20)),
+    #                 default=Value(50),
+    #                 output_field=DecimalField(max_digits=10, decimal_places=2)
+    #             ),
+    #         ).annotate(
+    #             trending_score=(
+    #                 F('normalized_views') * Decimal('0.40') +
+    #                 F('engagement_rate') * Decimal('0.30') +
+    #                 F('recency_score') * Decimal('0.20') +
+    #                 F('price_score') * Decimal('0.10')
+    #             )
+    #         ).filter(trending_score__gt=0).order_by('-trending_score')[:limit]
+            
+    #         return trending
+            
+    #     except Exception as e:
+    #         logger.error(f"Error in trending: {e}")
+    #         return []

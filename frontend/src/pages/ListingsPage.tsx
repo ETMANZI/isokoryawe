@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { TrendingListings } from "../components/Recommendations";
+// import { TrendingListings } from "../components/Recommendations";
 
 import { useTranslation } from "react-i18next";
 import {
@@ -716,9 +716,7 @@ export default function ListingsPage() {
               );
             })}
           </div>
-              <div className="mt-8">
-                <TrendingListings />
-              </div>
+             
           {totalPages > 1 && (
             <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
               <button

@@ -623,6 +623,8 @@ class RecommendationEngine:
             trending = Listing.objects.filter(
                 visibility_status=Listing.VisibilityStatus.ACTIVE,
                 created_at__gte=time_threshold
+            ).exclude(  # ← EXCLUDE BUSINESS ADS
+                listing_type=Listing.ListingType.BUSINESS_AD
             ).annotate(
                 # Factor 1: Views per day (40%)
                 days_old=Case(

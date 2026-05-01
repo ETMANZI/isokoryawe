@@ -12,15 +12,18 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 # ALLOWED_HOSTS - Updated for Railway
+# ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
+#     "ALLOWED_HOSTS",
+#     ".railway.app,localhost,127.0.0.1"
+# ).split(",") if h.strip()]
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
     "ALLOWED_HOSTS",
-    ".railway.app,localhost,127.0.0.1"
+    ".railway.app,localhost,127.0.0.1,isokoryawe.rw,www.isokoryawe.rw"
 ).split(",") if h.strip()]
-
 # CSRF_TRUSTED_ORIGINS - Updated for Railway
 CSRF_TRUSTED_ORIGINS = [h.strip() for h in os.environ.get(
     "CSRF_TRUSTED_ORIGINS",
-    "https://*.railway.app,http://localhost:5173"
+    "https://*.railway.app,http://localhost:5173,http://www.isokoryawe.rw,http://isokoryawe.rw"
 ).split(",") if h.strip()]
 
 INSTALLED_APPS = [
@@ -164,6 +167,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
     "https://*.railway.app",
+    "http://www.isokoryawe.rw",
+    "http://isokoryawe.rw",
 ]
 
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "")
@@ -226,11 +231,15 @@ if not DEBUG:
 DATA_UPLOAD_MAX_MEMORY_SIZE = 110 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 110 * 1024 * 1024
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# cloudinary.config(
+#     cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],   # ← note: 'CLOUD_NAME', not 'CLOUDINARY_CLOUD_NAME'
+#     api_key=CLOUDINARY_STORAGE['API_KEY'],
+#     api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+#     secure=True
+# )

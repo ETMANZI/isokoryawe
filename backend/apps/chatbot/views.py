@@ -30,7 +30,7 @@ class ChatbotView(APIView):
         )
         
         if created:
-            print(f"🔍 [SESSION] Created new session with language: {language}")
+            print(f"🔍 [SESSION] Created the new session with language: {language}")
         else:
             print(f"🔍 [SESSION] Existing session found. Current language: {session.language}")
         
